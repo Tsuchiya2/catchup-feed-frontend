@@ -32,7 +32,44 @@ This project follows a microservices architecture pattern:
 
 ## Getting Started
 
-*Coming soon after initial setup*
+### Prerequisites
+
+- Node.js 18+
+- npm or pnpm
+
+### Installation
+
+```bash
+npm install
+```
+
+### Development
+
+```bash
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+### Testing
+
+```bash
+# Run tests
+npm test
+
+# Run tests with UI
+npm run test:ui
+
+# Run tests with coverage
+npm run test:coverage
+```
+
+### Building
+
+```bash
+npm run build
+npm start
+```
 
 ## License
 

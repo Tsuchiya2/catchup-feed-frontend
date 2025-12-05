@@ -1,0 +1,63 @@
+# =============================================================================
+# catchup-feed-web Docker Compose (Development Only)
+# =============================================================================
+# This configuration is for local development only.
+# Production deployment is handled by Vercel.
+#
+# Prerequisites:
+#   - catchup-feed backend must be running first
+#   - Backend network "catchup-feed_backend" must exist
+#
+# Usage:
+#   cp .env.example .env
+#   docker compose up -d
+#   docker compose logs -f
+# =============================================================================
+
+services:
+  web:
+    build:
+      context: .
+      target: dev
+    container_name: catchup-web-dev
+    ports:
+      - "3001:3000"  # Use 3001 to avoid conflict with Grafana (3000)
+    volumes:
+      # Source code (bind mounts for hot reload)
+      - ./src:/app/src
+      - ./public:/app/public
+      # Configuration files
+      - ./next.config.ts:/app/next.config.ts
+      - ./tailwind.config.ts:/app/tailwind.config.ts
+      - ./tsconfig.json:/app/tsconfig.json
+      - ./package.json:/app/package.json
+      - ./package-lock.json:/app/package-lock.json
+      - ./postcss.config.mjs:/app/postcss.config.mjs
+      - ./components.json:/app/components.json
+      # Named volumes for performance (avoid slow bind mounts)
+      - node_modules:/app/node_modules
+      - nextjs_cache:/app/.next
+    env_file:
+      - .env
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+
+# External network created by catchup-feed backend
+networks:
+  backend:
+    external: true
+    name: catchup-feed_backend
+
+# Named volumes for dependency and build cache
+volumes:
+  node_modules:
+    name: catchup-web-node-modules
+  nextjs_cache:
+    name: catchup-web-nextjs-cache

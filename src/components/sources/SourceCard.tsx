@@ -1,0 +1,85 @@
+/**
+ * SourceCard Component
+ *
+ * Displays a source (RSS feed) in a card format with:
+ * - Source name and RSS icon
+ * - Feed URL (truncated with tooltip)
+ * - Active/Inactive status badge
+ * - Last crawled timestamp
+ */
+import * as React from 'react';
+import { Rss } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
+import { formatRelativeTime } from '@/lib/utils/formatDate';
+import type { Source } from '@/types/api';
+import { StatusBadge } from './StatusBadge';
+
+/**
+ * Props for the SourceCard component
+ */
+interface SourceCardProps {
+  /** The source data to display */
+  source: Source;
+  /** Additional CSS classes */
+  className?: string;
+}
+
+/**
+ * SourceCard displays a source in a card format.
+ *
+ * Memoized to prevent unnecessary re-renders in lists.
+ *
+ * @example
+ * ```tsx
+ * <SourceCard source={source} />
+ * ```
+ */
+export const SourceCard = React.memo(function SourceCard({ source, className }: SourceCardProps) {
+  const lastCrawled = source.last_crawled_at
+    ? formatRelativeTime(source.last_crawled_at)
+    : 'Never crawled';
+
+  return (
+    <Card
+      className={cn('flex flex-col', className)}
+      role="listitem"
+      aria-label={`Source: ${source.name}`}
+    >
+      <CardContent className="flex flex-col gap-4 p-6">
+        {/* Icon and Name */}
+        <div className="flex items-start gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+            <Rss className="h-5 w-5 text-primary" aria-hidden="true" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <h3 className="truncate text-lg font-semibold text-foreground">{source.name}</h3>
+          </div>
+        </div>
+
+        {/* Feed URL */}
+        <div className="min-w-0">
+          <p
+            className="truncate text-xs text-muted-foreground"
+            title={source.feed_url}
+            aria-label={`Feed URL: ${source.feed_url}`}
+          >
+            {source.feed_url}
+          </p>
+        </div>
+
+        {/* Status and Last Crawled */}
+        <div className="flex items-center justify-between gap-2 pt-2">
+          <StatusBadge active={source.active} />
+          <time
+            className="text-xs text-muted-foreground"
+            dateTime={source.last_crawled_at || undefined}
+            aria-label={`Last crawled: ${lastCrawled}`}
+          >
+            {lastCrawled}
+          </time>
+        </div>
+      </CardContent>
+    </Card>
+  );
+});

@@ -6,6 +6,7 @@ import SourcesPage from '../page';
 import * as roleUtils from '@/lib/auth/role';
 import * as sourcesApi from '@/lib/api/endpoints/sources';
 import * as useSources from '@/hooks/useSources';
+import * as useSourceSearch from '@/hooks/useSourceSearch';
 import { ApiError } from '@/lib/api/errors';
 import type { Source } from '@/types/api';
 
@@ -13,6 +14,17 @@ import type { Source } from '@/types/api';
 vi.mock('@/lib/auth/role');
 vi.mock('@/lib/api/endpoints/sources');
 vi.mock('@/hooks/useSources');
+vi.mock('@/hooks/useSourceSearch');
+
+// Mock next/navigation
+vi.mock('next/navigation', () => ({
+  useSearchParams: () => new URLSearchParams(),
+  useRouter: () => ({
+    push: vi.fn(),
+    replace: vi.fn(),
+  }),
+  usePathname: () => '/sources',
+}));
 
 describe('SourcesPage', () => {
   let queryClient: QueryClient;
@@ -60,6 +72,13 @@ describe('SourcesPage', () => {
     // Setup default mock implementations
     vi.mocked(useSources.useSources).mockReturnValue({
       sources: mockSources,
+      isLoading: false,
+      error: null,
+      refetch: vi.fn(),
+    });
+
+    vi.mocked(useSourceSearch.useSourceSearch).mockReturnValue({
+      sources: [],
       isLoading: false,
       error: null,
       refetch: vi.fn(),

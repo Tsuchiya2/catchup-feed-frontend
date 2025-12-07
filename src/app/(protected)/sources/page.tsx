@@ -1,7 +1,9 @@
 'use client';
 
 import * as React from 'react';
-import { Rss } from 'lucide-react';
+import { Suspense } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { Rss, Search } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { PageHeader } from '@/components/common/PageHeader';
 import { SourceCard } from '@/components/sources/SourceCard';
@@ -9,25 +11,71 @@ import { ErrorMessage } from '@/components/common/ErrorMessage';
 import { EmptyState } from '@/components/common/EmptyState';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSources } from '@/hooks/useSources';
+import { useSourceSearch } from '@/hooks/useSourceSearch';
 import { getUserRole } from '@/lib/auth/role';
 import { updateSourceActive } from '@/lib/api/endpoints/sources';
+import {
+  SourceSearch,
+  type SourceSearchState,
+  toSearchParams,
+  hasActiveFilters,
+} from '@/components/sources/SourceSearch';
 import type { UserRole } from '@/lib/auth/role';
 import type { Source } from '@/types/api';
 
 /**
- * Sources List Page
+ * Sources List Page Content
  *
- * Protected page that displays a grid of RSS/Atom feed sources.
- * Admin users can toggle source active status.
- * Non-admin users see read-only status badges.
- * Requires authentication - unauthenticated users will be redirected by middleware.
+ * Wrapped in Suspense boundary for useSearchParams compatibility.
  */
-export default function SourcesPage() {
+function SourcesPageContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
   // User role state
   const [userRole, setUserRole] = React.useState<UserRole>(null);
 
-  // Fetch sources
-  const { sources, isLoading, error, refetch } = useSources();
+  // Get search parameters from URL
+  const keyword = searchParams.get('keyword') || '';
+  const sourceType = searchParams.get('source_type') || null;
+  const activeParam = searchParams.get('active');
+  const active = activeParam === null ? null : activeParam === 'true';
+
+  // Search state
+  const [searchState, setSearchState] = React.useState<SourceSearchState>({
+    keyword,
+    sourceType,
+    active,
+  });
+
+  // Determine if we're in search mode
+  const isSearchMode = hasActiveFilters(searchState);
+
+  // Fetch sources - conditionally enable based on mode to prevent duplicate API calls
+  const listResult = useSources({ enabled: !isSearchMode });
+
+  const searchResult = useSourceSearch(toSearchParams(searchState), { enabled: isSearchMode });
+
+  // Use appropriate result based on mode
+  const { sources, isLoading, error, refetch } = isSearchMode ? searchResult : listResult;
+
+  // Update URL when search state changes
+  React.useEffect(() => {
+    const params = new URLSearchParams();
+
+    if (searchState.keyword) {
+      params.set('keyword', searchState.keyword);
+    }
+    if (searchState.sourceType) {
+      params.set('source_type', searchState.sourceType);
+    }
+    if (searchState.active !== null) {
+      params.set('active', searchState.active.toString());
+    }
+
+    const queryString = params.toString();
+    router.push(queryString ? `/sources?${queryString}` : '/sources');
+  }, [searchState, router]);
 
   // Query client for cache manipulation
   const queryClient = useQueryClient();
@@ -86,6 +134,13 @@ export default function SourcesPage() {
       {/* Page Header */}
       <PageHeader title="Sources" description="RSS/Atom feeds being tracked" />
 
+      {/* Search and Filter Panel */}
+      <SourceSearch
+        searchState={searchState}
+        onSearchChange={setSearchState}
+        isLoading={isLoading}
+      />
+
       {/* Error State */}
       {error && (
         <div className="mb-6">
@@ -117,9 +172,13 @@ export default function SourcesPage() {
       {/* Empty State */}
       {!isLoading && !error && sources.length === 0 && (
         <EmptyState
-          title="No sources configured"
-          description="Feed sources will appear here once they are added by the administrator."
-          icon={<Rss className="h-12 w-12" />}
+          title={isSearchMode ? 'No sources found' : 'No sources configured'}
+          description={
+            isSearchMode
+              ? 'Try adjusting your search keywords or filters.'
+              : 'Feed sources will appear here once they are added by the administrator.'
+          }
+          icon={isSearchMode ? <Search className="h-12 w-12" /> : <Rss className="h-12 w-12" />}
         />
       )}
 
@@ -144,5 +203,46 @@ export default function SourcesPage() {
         </>
       )}
     </div>
+  );
+}
+
+/**
+ * Sources List Page
+ *
+ * Protected page that displays a grid of RSS/Atom feed sources.
+ * Admin users can toggle source active status.
+ * Non-admin users see read-only status badges.
+ * Requires authentication - unauthenticated users will be redirected by middleware.
+ *
+ * Wrapped in Suspense boundary for useSearchParams compatibility with Next.js 15.
+ */
+export default function SourcesPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="container py-8">
+          <PageHeader title="Sources" description="RSS/Atom feeds being tracked" />
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="rounded-lg border bg-card p-6">
+                <div className="mb-4 flex items-start gap-3">
+                  <Skeleton className="h-10 w-10 rounded" />
+                  <div className="flex-1">
+                    <Skeleton className="mb-2 h-5 w-3/4" />
+                    <Skeleton className="h-3 w-full" />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-20" />
+                  <Skeleton className="h-3 w-32" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      }
+    >
+      <SourcesPageContent />
+    </Suspense>
   );
 }

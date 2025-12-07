@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { FileText } from 'lucide-react';
+import { FileText, Search } from 'lucide-react';
 import { PageHeader } from '@/components/common/PageHeader';
 import { Pagination } from '@/components/common/Pagination';
 import { ArticleCard } from '@/components/articles/ArticleCard';
@@ -11,6 +11,13 @@ import { ErrorMessage } from '@/components/common/ErrorMessage';
 import { EmptyState } from '@/components/common/EmptyState';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useArticles } from '@/hooks/useArticles';
+import { useArticleSearch } from '@/hooks/useArticleSearch';
+import {
+  ArticleSearch,
+  type ArticleSearchState,
+  toSearchParams,
+  hasActiveFilters,
+} from '@/components/articles/ArticleSearch';
 
 /**
  * Articles List Page Content
@@ -25,11 +32,69 @@ function ArticlesPageContent() {
   const page = Number(searchParams.get('page')) || 1;
   const limit = Number(searchParams.get('limit')) || 10;
 
-  // Fetch articles with current pagination
-  const { articles, pagination, isLoading, error, refetch } = useArticles({
-    page,
-    limit,
+  // Get search parameters from URL
+  const keyword = searchParams.get('keyword') || '';
+  const sourceId = searchParams.get('source_id')
+    ? parseInt(searchParams.get('source_id')!, 10)
+    : null;
+  const fromDate = searchParams.get('from') || null;
+  const toDate = searchParams.get('to') || null;
+
+  // Search state
+  const [searchState, setSearchState] = React.useState<ArticleSearchState>({
+    keyword,
+    sourceId,
+    fromDate,
+    toDate,
   });
+
+  // Determine if we're in search mode
+  const isSearchMode = hasActiveFilters(searchState);
+
+  // Fetch articles - conditionally enable based on mode to prevent duplicate API calls
+  const listResult = useArticles(
+    {
+      page,
+      limit,
+    },
+    { enabled: !isSearchMode }
+  );
+
+  const searchResult = useArticleSearch(
+    {
+      ...toSearchParams(searchState),
+      page,
+      limit,
+    },
+    { enabled: isSearchMode }
+  );
+
+  // Use appropriate result based on mode
+  const { articles, pagination, isLoading, error, refetch } = isSearchMode
+    ? searchResult
+    : listResult;
+
+  // Update URL when search state changes
+  React.useEffect(() => {
+    const params = new URLSearchParams();
+
+    if (searchState.keyword) {
+      params.set('keyword', searchState.keyword);
+    }
+    if (searchState.sourceId) {
+      params.set('source_id', searchState.sourceId.toString());
+    }
+    if (searchState.fromDate) {
+      params.set('from', searchState.fromDate);
+    }
+    if (searchState.toDate) {
+      params.set('to', searchState.toDate);
+    }
+    params.set('page', '1'); // Reset to page 1 when filters change
+    params.set('limit', limit.toString());
+
+    router.push(`/articles?${params.toString()}`);
+  }, [searchState, limit, router]);
 
   // Handle page change
   const handlePageChange = (newPage: number) => {
@@ -42,6 +107,13 @@ function ArticlesPageContent() {
     <div className="container py-8">
       {/* Page Header */}
       <PageHeader title="Articles" description="Browse all articles from your sources" />
+
+      {/* Search and Filter Panel */}
+      <ArticleSearch
+        searchState={searchState}
+        onSearchChange={setSearchState}
+        isLoading={isLoading}
+      />
 
       {/* Error State */}
       {error && (
@@ -66,9 +138,15 @@ function ArticlesPageContent() {
       {/* Empty State */}
       {!isLoading && !error && articles.length === 0 && (
         <EmptyState
-          title="No articles yet"
-          description="Articles will appear here once they are added by the feed crawler."
-          icon={<FileText className="h-12 w-12" />}
+          title={isSearchMode ? 'No articles found' : 'No articles yet'}
+          description={
+            isSearchMode
+              ? 'Try adjusting your search keywords or filters.'
+              : 'Articles will appear here once they are added by the feed crawler.'
+          }
+          icon={
+            isSearchMode ? <Search className="h-12 w-12" /> : <FileText className="h-12 w-12" />
+          }
         />
       )}
 

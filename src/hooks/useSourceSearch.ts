@@ -1,20 +1,21 @@
 /**
- * useSources Hook
+ * useSourceSearch Hook
  *
- * Custom React hook for fetching sources list.
+ * Custom React hook for searching sources with multi-keyword and filters.
  * Uses React Query for cache management with 60s stale time.
  */
 
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { getSources } from '@/lib/api/endpoints/sources';
+import { searchSources } from '@/lib/api/endpoints/sources';
 import type { Source } from '@/types/api';
+import type { SourceSearchParams } from '@/lib/api/endpoints/sources';
 
 /**
- * Sources hook return type
+ * Source search hook return type
  */
-interface UseSourcesReturn {
+interface UseSourceSearchReturn {
   /** Array of sources */
   sources: Source[];
   /** Whether the sources are being fetched */
@@ -28,38 +29,45 @@ interface UseSourcesReturn {
 /**
  * Hook options
  */
-interface UseSourcesOptions {
+interface UseSourceSearchOptions {
   /** Whether the query should be enabled (default: true) */
   enabled?: boolean;
 }
 
 /**
- * Custom hook for fetching sources
+ * Custom hook for searching sources
  *
+ * @param params - Search parameters (keyword, source_type, active)
  * @param options - Hook options (enabled)
  * @returns Sources data, loading state, and refetch function
  *
  * @example
  * ```typescript
- * function SourcesList() {
- *   const { sources, isLoading, error, refetch } = useSources({ enabled: true });
+ * function SourceSearch() {
+ *   const [params, setParams] = useState<SourceSearchParams>({
+ *     keyword: 'Tech',
+ *     source_type: 'RSS',
+ *     active: true,
+ *   });
  *
- *   if (isLoading) return <div>Loading...</div>;
- *   if (error) return <div>Error: {error.message}</div>;
+ *   const { sources, isLoading, error } = useSourceSearch(params, { enabled: true });
  *
  *   return (
  *     <div>
  *       {sources.map((source) => (
- *         <div key={source.id}>{source.name}</div>
+ *         <SourceCard key={source.id} source={source} />
  *       ))}
- *       <button onClick={() => refetch()}>Refresh</button>
  *     </div>
  *   );
  * }
  * ```
  */
-export function useSources(options?: UseSourcesOptions): UseSourcesReturn {
-  const queryKey = ['sources'];
+export function useSourceSearch(
+  params?: SourceSearchParams,
+  options?: UseSourceSearchOptions
+): UseSourceSearchReturn {
+  // Query key includes all search params for cache isolation
+  const queryKey = ['sources', 'search', params ?? {}];
 
   const {
     data,
@@ -69,7 +77,7 @@ export function useSources(options?: UseSourcesOptions): UseSourcesReturn {
   } = useQuery({
     queryKey,
     queryFn: async () => {
-      const response = await getSources();
+      const response = await searchSources(params);
       return response;
     },
     staleTime: 60000, // 60 seconds
@@ -82,7 +90,7 @@ export function useSources(options?: UseSourcesOptions): UseSourcesReturn {
     refetchQuery();
   };
 
-  // Backend returns array directly, not wrapped in object
+  // Backend returns array directly
   const sources = Array.isArray(data) ? data : [];
 
   return {
@@ -92,3 +100,6 @@ export function useSources(options?: UseSourcesOptions): UseSourcesReturn {
     refetch,
   };
 }
+
+// Re-export types for convenience
+export type { SourceSearchParams };

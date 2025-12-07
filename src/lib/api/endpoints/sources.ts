@@ -8,6 +8,44 @@ import { apiClient } from '@/lib/api/client';
 import type { Source, SourcesResponse, SourceResponse } from '@/types/api';
 
 /**
+ * Search parameters for source search
+ */
+export interface SourceSearchParams {
+  keyword?: string;
+  source_type?: string;
+  active?: boolean;
+}
+
+/**
+ * Build query string for source search
+ *
+ * @param params - Search parameters object
+ * @returns Query string (e.g., '?keyword=test&source_type=RSS')
+ */
+function buildSourceSearchQueryString(params?: SourceSearchParams): string {
+  if (!params) {
+    return '';
+  }
+
+  const queryParams = new URLSearchParams();
+
+  if (params.keyword !== undefined) {
+    queryParams.append('keyword', params.keyword);
+  }
+
+  if (params.source_type !== undefined) {
+    queryParams.append('source_type', params.source_type);
+  }
+
+  if (params.active !== undefined) {
+    queryParams.append('active', params.active.toString());
+  }
+
+  const queryString = queryParams.toString();
+  return queryString ? `?${queryString}` : '';
+}
+
+/**
  * Fetch all sources
  *
  * @returns Promise resolving to sources response
@@ -25,6 +63,34 @@ import type { Source, SourcesResponse, SourceResponse } from '@/types/api';
  */
 export async function getSources(): Promise<SourcesResponse> {
   const endpoint = '/sources';
+
+  const response = await apiClient.get<SourcesResponse>(endpoint);
+  return response;
+}
+
+/**
+ * Search sources with various filters
+ *
+ * @param params - Search parameters (keyword, source_type, active)
+ * @returns Promise resolving to sources response
+ * @throws {ApiError} When the request fails
+ *
+ * @example
+ * ```typescript
+ * // Search by keyword
+ * const response = await searchSources({ keyword: 'tech' });
+ *
+ * // Search with filters
+ * const response = await searchSources({
+ *   keyword: 'blog',
+ *   source_type: 'RSS',
+ *   active: true
+ * });
+ * ```
+ */
+export async function searchSources(params?: SourceSearchParams): Promise<SourcesResponse> {
+  const queryString = buildSourceSearchQueryString(params);
+  const endpoint = `/sources/search${queryString}`;
 
   const response = await apiClient.get<SourcesResponse>(endpoint);
   return response;

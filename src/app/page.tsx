@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { FileText, Rss, Zap } from 'lucide-react';
 
@@ -15,9 +16,13 @@ export default function Home() {
         <div className="mx-auto max-w-3xl space-y-8">
           {/* Logo/Icon */}
           <div className="flex justify-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-lg">
-              <span className="text-3xl font-bold">C</span>
-            </div>
+            <Image
+              src="/catch-feed-icon.webp"
+              alt="Catchup Feed"
+              width={64}
+              height={64}
+              className="rounded-2xl shadow-lg"
+            />
           </div>
 
           {/* Title & Description */}
@@ -73,7 +78,7 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="border-t py-6">
-        <div className="container text-center text-sm text-muted-foreground">
+        <div className="container mx-auto text-center text-sm text-muted-foreground">
           <p>&copy; {new Date().getFullYear()} Catchup Feed. All rights reserved.</p>
         </div>
       </footer>

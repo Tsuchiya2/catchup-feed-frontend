@@ -1,15 +1,16 @@
 /**
- * useArticles Hook
+ * useArticleSearch Hook
  *
- * Custom React hook for fetching articles with pagination and filtering.
+ * Custom React hook for searching articles with multi-keyword and filters.
  * Uses React Query for cache management with 60s stale time.
  */
 
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { getArticles } from '@/lib/api/endpoints/articles';
-import type { Article, ArticlesQuery } from '@/types/api';
+import { searchArticles } from '@/lib/api/endpoints/articles';
+import type { Article } from '@/types/api';
+import type { ArticleSearchParams } from '@/lib/api/endpoints/articles';
 
 /**
  * Pagination information
@@ -22,9 +23,9 @@ interface PaginationInfo {
 }
 
 /**
- * Articles hook return type
+ * Article search hook return type
  */
-interface UseArticlesReturn {
+interface UseArticleSearchReturn {
   /** Array of articles */
   articles: Article[];
   /** Pagination information */
@@ -40,47 +41,46 @@ interface UseArticlesReturn {
 /**
  * Hook options
  */
-interface UseArticlesOptions {
+interface UseArticleSearchOptions {
   /** Whether the query should be enabled (default: true) */
   enabled?: boolean;
 }
 
 /**
- * Custom hook for fetching articles
+ * Custom hook for searching articles
  *
- * @param query - Query parameters (page, limit, sourceId)
+ * @param params - Search parameters (keyword, source_id, from, to, page, limit)
  * @param options - Hook options (enabled)
  * @returns Articles data, pagination, loading state, and refetch function
  *
  * @example
  * ```typescript
- * function ArticlesList() {
- *   const { articles, pagination, isLoading, error, refetch } = useArticles({
+ * function ArticleSearch() {
+ *   const [params, setParams] = useState<ArticleSearchParams>({
+ *     keyword: 'React',
+ *     source_id: 1,
  *     page: 1,
  *     limit: 10,
- *   }, { enabled: true });
+ *   });
  *
- *   if (isLoading) return <div>Loading...</div>;
- *   if (error) return <div>Error: {error.message}</div>;
+ *   const { articles, isLoading, error } = useArticleSearch(params, { enabled: true });
  *
  *   return (
  *     <div>
  *       {articles.map((article) => (
- *         <div key={article.id}>{article.title}</div>
+ *         <ArticleCard key={article.id} article={article} />
  *       ))}
- *       <p>Total: {pagination.total}</p>
- *       <button onClick={() => refetch()}>Refresh</button>
  *     </div>
  *   );
  * }
  * ```
  */
-export function useArticles(
-  query?: ArticlesQuery,
-  options?: UseArticlesOptions
-): UseArticlesReturn {
-  // Query key includes filter params for cache isolation
-  const queryKey = ['articles', query ?? {}];
+export function useArticleSearch(
+  params?: ArticleSearchParams,
+  options?: UseArticleSearchOptions
+): UseArticleSearchReturn {
+  // Query key includes all search params for cache isolation
+  const queryKey = ['articles', 'search', params ?? {}];
 
   const {
     data,
@@ -90,7 +90,7 @@ export function useArticles(
   } = useQuery({
     queryKey,
     queryFn: async () => {
-      const response = await getArticles(query);
+      const response = await searchArticles(params);
       return response;
     },
     staleTime: 60000, // 60 seconds
@@ -99,33 +99,27 @@ export function useArticles(
     enabled: options?.enabled ?? true,
   });
 
-  // Default pagination values
-  // Note: Backend returns array directly, so we calculate pagination from array length
-  const defaultPagination: PaginationInfo = {
-    page: query?.page ?? 1,
-    limit: query?.limit ?? 10,
-    total: 0,
-    totalPages: 0,
-  };
-
   const refetch = () => {
     refetchQuery();
   };
 
-  // Backend returns array directly, not wrapped in object
+  // Backend returns array directly
   const articles = Array.isArray(data) ? data : [];
   const total = articles.length;
 
   return {
     articles,
     pagination: {
-      page: query?.page ?? 1,
-      limit: query?.limit ?? 10,
+      page: params?.page ?? 1,
+      limit: params?.limit ?? 10,
       total,
-      totalPages: Math.ceil(total / (query?.limit ?? 10)),
+      totalPages: Math.ceil(total / (params?.limit ?? 10)),
     },
     isLoading,
     error: error as Error | null,
     refetch,
   };
 }
+
+// Re-export types for convenience
+export type { ArticleSearchParams };

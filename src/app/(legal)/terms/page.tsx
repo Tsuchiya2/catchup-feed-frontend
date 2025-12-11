@@ -198,7 +198,6 @@ export default function TermsPage() {
             unenforceable by a court, the remaining provisions of these Terms will remain in effect.
           </p>
         </section>
-
       </div>
     </article>
   );

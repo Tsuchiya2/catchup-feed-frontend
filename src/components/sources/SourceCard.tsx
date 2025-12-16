@@ -90,13 +90,16 @@ export const SourceCard = React.memo(function SourceCard({
 
         {/* Feed URL */}
         <div className="min-w-0">
-          <p
-            className="truncate text-xs text-muted-foreground"
+          <a
+            href={source.feed_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block truncate text-xs text-muted-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             title={source.feed_url}
-            aria-label={`Feed URL: ${source.feed_url}`}
+            aria-label={`Visit feed: ${source.feed_url}`}
           >
             {source.feed_url}
-          </p>
+          </a>
         </div>
 
         {/* Status and Last Crawled */}

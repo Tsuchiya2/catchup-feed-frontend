@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Catchup Feed - Stay Updated',
     description: 'Your personalized news aggregator with AI-powered insights',
-    url: 'https://catchup-feed.com',
+    url: 'https://pulse.catchup-feed.com',
     siteName: 'Catchup Feed',
     images: [
       {

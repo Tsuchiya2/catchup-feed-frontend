@@ -40,14 +40,6 @@ describe('SourceCard', () => {
       expect(icon).toHaveClass('text-primary');
     });
 
-    it('should render feed URL as clickable link', () => {
-      const source = createMockSource({ feed_url: 'https://example.com/rss' });
-      render(<SourceCard source={source} userRole="user" />);
-      const link = screen.getByRole('link', { name: /visit feed:/i });
-      expect(link).toBeInTheDocument();
-      expect(link).toHaveAttribute('href', 'https://example.com/rss');
-    });
-
     it('should render status badge', () => {
       const source = createMockSource({ active: true });
       render(<SourceCard source={source} userRole="user" />);

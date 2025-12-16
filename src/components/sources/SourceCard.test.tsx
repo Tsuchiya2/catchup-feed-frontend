@@ -40,12 +40,6 @@ describe('SourceCard', () => {
       expect(icon).toHaveClass('text-primary');
     });
 
-    it('should render feed URL', () => {
-      const source = createMockSource({ feed_url: 'https://example.com/rss' });
-      render(<SourceCard source={source} userRole="user" />);
-      expect(screen.getByText('https://example.com/rss')).toBeInTheDocument();
-    });
-
     it('should render status badge', () => {
       const source = createMockSource({ active: true });
       render(<SourceCard source={source} userRole="user" />);
@@ -107,8 +101,8 @@ describe('SourceCard', () => {
     it('should truncate long feed URL', () => {
       const source = createMockSource({ feed_url: 'https://example.com/' + 'a'.repeat(100) });
       render(<SourceCard source={source} userRole="user" />);
-      const urlElement = screen.getByText(source.feed_url);
-      expect(urlElement).toHaveClass('truncate');
+      const link = screen.getByRole('link', { name: /visit feed:/i });
+      expect(link).toHaveClass('truncate');
     });
   });
 
@@ -135,7 +129,7 @@ describe('SourceCard', () => {
     it('should have accessible feed URL with aria-label', () => {
       const source = createMockSource({ feed_url: 'https://example.com/feed' });
       render(<SourceCard source={source} userRole="user" />);
-      expect(screen.getByLabelText('Feed URL: https://example.com/feed')).toBeInTheDocument();
+      expect(screen.getByLabelText('Visit feed: https://example.com/feed')).toBeInTheDocument();
     });
 
     it('should have time element for last crawled', () => {
@@ -150,8 +144,92 @@ describe('SourceCard', () => {
       const longUrl = 'https://example.com/' + 'a'.repeat(100);
       const source = createMockSource({ feed_url: longUrl });
       render(<SourceCard source={source} userRole="user" />);
-      const urlElement = screen.getByText(longUrl);
-      expect(urlElement).toHaveAttribute('title', longUrl);
+      const link = screen.getByRole('link', { name: /visit feed:/i });
+      expect(link).toHaveAttribute('title', longUrl);
+    });
+  });
+
+  describe('Feed URL Link', () => {
+    it('should render feed URL as clickable link', () => {
+      const source = createMockSource({ feed_url: 'https://example.com/feed.xml' });
+      render(<SourceCard source={source} userRole="user" />);
+
+      const link = screen.getByRole('link', { name: /visit feed:/i });
+      expect(link).toBeInTheDocument();
+      expect(link).toHaveAttribute('href', 'https://example.com/feed.xml');
+    });
+
+    it('should open link in new tab', () => {
+      const source = createMockSource({ feed_url: 'https://example.com/feed.xml' });
+      render(<SourceCard source={source} userRole="user" />);
+
+      const link = screen.getByRole('link', { name: /visit feed:/i });
+      expect(link).toHaveAttribute('target', '_blank');
+    });
+
+    it('should include security attributes', () => {
+      const source = createMockSource({ feed_url: 'https://example.com/feed.xml' });
+      render(<SourceCard source={source} userRole="user" />);
+
+      const link = screen.getByRole('link', { name: /visit feed:/i });
+      expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+    });
+
+    it('should have correct accessibility label', () => {
+      const source = createMockSource({ feed_url: 'https://example.com/feed.xml' });
+      render(<SourceCard source={source} userRole="user" />);
+
+      const link = screen.getByRole('link', { name: /visit feed:/i });
+      expect(link).toHaveAttribute('aria-label', 'Visit feed: https://example.com/feed.xml');
+    });
+
+    it('should show tooltip with full URL', () => {
+      const source = createMockSource({ feed_url: 'https://example.com/feed.xml' });
+      render(<SourceCard source={source} userRole="user" />);
+
+      const link = screen.getByRole('link', { name: /visit feed:/i });
+      expect(link).toHaveAttribute('title', 'https://example.com/feed.xml');
+    });
+
+    it('should truncate long URLs visually', () => {
+      const source = createMockSource({ feed_url: 'https://example.com/' + 'a'.repeat(100) });
+      render(<SourceCard source={source} userRole="user" />);
+
+      const link = screen.getByRole('link', { name: /visit feed:/i });
+      expect(link).toHaveClass('truncate');
+    });
+
+    it('should be keyboard accessible', () => {
+      const source = createMockSource({ feed_url: 'https://example.com/feed.xml' });
+      render(<SourceCard source={source} userRole="user" />);
+
+      const link = screen.getByRole('link', { name: /visit feed:/i });
+
+      // Link should be focusable (not have tabIndex -1)
+      expect(link).not.toHaveAttribute('tabIndex', '-1');
+
+      // Link should be able to receive focus
+      link.focus();
+      expect(link).toHaveFocus();
+    });
+
+    it('should have hover and focus styles', () => {
+      const source = createMockSource({ feed_url: 'https://example.com/feed.xml' });
+      render(<SourceCard source={source} userRole="user" />);
+
+      const link = screen.getByRole('link', { name: /visit feed:/i });
+      expect(link).toHaveClass('hover:text-primary');
+      expect(link).toHaveClass('transition-colors');
+      expect(link).toHaveClass('focus-visible:ring-2');
+    });
+
+    it('should maintain block-level layout', () => {
+      const source = createMockSource({ feed_url: 'https://example.com/feed.xml' });
+      render(<SourceCard source={source} userRole="user" />);
+
+      const link = screen.getByRole('link', { name: /visit feed:/i });
+      expect(link).toHaveClass('block');
+      expect(link).toHaveClass('text-xs');
     });
   });
 
@@ -198,7 +276,8 @@ describe('SourceCard', () => {
       });
       render(<SourceCard source={source} userRole="user" />);
       expect(screen.getByText('Minimal')).toBeInTheDocument();
-      expect(screen.getByText('https://min.com')).toBeInTheDocument();
+      const link = screen.getByRole('link', { name: /visit feed:/i });
+      expect(link).toHaveTextContent('https://min.com');
       expect(screen.getByText('Never crawled')).toBeInTheDocument();
     });
 

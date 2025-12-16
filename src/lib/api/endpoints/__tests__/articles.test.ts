@@ -366,15 +366,16 @@ describe('Articles API Endpoints', () => {
       const result = await searchArticles({ keyword: 'test' });
 
       // Assert
-      const article = result.data[0]!;
-      expect(article.id).toBeDefined();
-      expect(article.source_id).toBeDefined();
-      expect(article.source_name).toBeDefined();
-      expect(article.title).toBeDefined();
-      expect(article.url).toBeDefined();
-      expect(article.summary).toBeDefined();
-      expect(article.published_at).toBeDefined();
-      expect(article.created_at).toBeDefined();
+      const article = result.data[0];
+      expect(article).toBeDefined();
+      expect(article!.id).toBeDefined();
+      expect(article!.source_id).toBeDefined();
+      expect(article!.source_name).toBeDefined();
+      expect(article!.title).toBeDefined();
+      expect(article!.url).toBeDefined();
+      expect(article!.summary).toBeDefined();
+      expect(article!.published_at).toBeDefined();
+      expect(article!.created_at).toBeDefined();
     });
 
     it('should handle multiple search requests sequentially', async () => {
@@ -411,6 +412,8 @@ describe('Articles API Endpoints', () => {
       expect(apiClient.get).toHaveBeenCalledTimes(2);
       expect(apiClient.get).toHaveBeenNthCalledWith(1, '/articles?keyword=typescript');
       expect(apiClient.get).toHaveBeenNthCalledWith(2, '/articles?keyword=react');
+      expect(result1.data[0]).toBeDefined();
+      expect(result2.data[0]).toBeDefined();
       expect(result1.data[0]!.id).toBe(1);
       expect(result2.data[0]!.id).toBe(2);
     });
@@ -449,6 +452,8 @@ describe('Articles API Endpoints', () => {
       expect(apiClient.get).toHaveBeenCalledTimes(2);
       expect(apiClient.get).toHaveBeenNthCalledWith(1, '/articles?source_id=1');
       expect(apiClient.get).toHaveBeenNthCalledWith(2, '/articles?source_id=2');
+      expect(result1.data[0]).toBeDefined();
+      expect(result2.data[0]).toBeDefined();
       expect(result1.data[0]!.id).toBe(1);
       expect(result2.data[0]!.id).toBe(2);
     });

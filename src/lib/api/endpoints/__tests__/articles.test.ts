@@ -85,7 +85,7 @@ describe('Articles API Endpoints', () => {
 
       // Assert
       expect(apiClient.get).toHaveBeenCalledTimes(1);
-      expect(apiClient.get).toHaveBeenCalledWith('/articles');
+      expect(apiClient.get).toHaveBeenCalledWith('/articles/search');
       expect(result).toEqual(mockResponse);
       expect(result.data).toHaveLength(2);
     });
@@ -109,7 +109,7 @@ describe('Articles API Endpoints', () => {
 
       // Assert
       expect(apiClient.get).toHaveBeenCalledTimes(1);
-      expect(apiClient.get).toHaveBeenCalledWith('/articles');
+      expect(apiClient.get).toHaveBeenCalledWith('/articles/search');
       expect(result).toEqual(mockResponse);
     });
 
@@ -132,7 +132,7 @@ describe('Articles API Endpoints', () => {
 
       // Assert
       expect(apiClient.get).toHaveBeenCalledTimes(1);
-      expect(apiClient.get).toHaveBeenCalledWith('/articles?keyword=typescript');
+      expect(apiClient.get).toHaveBeenCalledWith('/articles/search?keyword=typescript');
     });
 
     it('should build correct query string with source_id parameter', async () => {
@@ -154,7 +154,7 @@ describe('Articles API Endpoints', () => {
 
       // Assert
       expect(apiClient.get).toHaveBeenCalledTimes(1);
-      expect(apiClient.get).toHaveBeenCalledWith('/articles?source_id=42');
+      expect(apiClient.get).toHaveBeenCalledWith('/articles/search?source_id=42');
     });
 
     it('should build correct query string with date range parameters', async () => {
@@ -179,7 +179,7 @@ describe('Articles API Endpoints', () => {
 
       // Assert
       expect(apiClient.get).toHaveBeenCalledTimes(1);
-      expect(apiClient.get).toHaveBeenCalledWith('/articles?from=2025-01-01&to=2025-12-31');
+      expect(apiClient.get).toHaveBeenCalledWith('/articles/search?from=2025-01-01&to=2025-12-31');
     });
 
     it('should build correct query string with page parameter', async () => {
@@ -201,7 +201,7 @@ describe('Articles API Endpoints', () => {
 
       // Assert
       expect(apiClient.get).toHaveBeenCalledTimes(1);
-      expect(apiClient.get).toHaveBeenCalledWith('/articles?page=2');
+      expect(apiClient.get).toHaveBeenCalledWith('/articles/search?page=2');
     });
 
     it('should build correct query string with limit parameter', async () => {
@@ -223,7 +223,7 @@ describe('Articles API Endpoints', () => {
 
       // Assert
       expect(apiClient.get).toHaveBeenCalledTimes(1);
-      expect(apiClient.get).toHaveBeenCalledWith('/articles?limit=20');
+      expect(apiClient.get).toHaveBeenCalledWith('/articles/search?limit=20');
     });
 
     it('should build correct query string with all parameters', async () => {
@@ -253,7 +253,7 @@ describe('Articles API Endpoints', () => {
       // Assert
       expect(apiClient.get).toHaveBeenCalledTimes(1);
       expect(apiClient.get).toHaveBeenCalledWith(
-        '/articles?keyword=react&source_id=1&from=2025-01-01&to=2025-12-31&page=2&limit=20'
+        '/articles/search?keyword=react&source_id=1&from=2025-01-01&to=2025-12-31&page=2&limit=20'
       );
     });
 
@@ -410,8 +410,8 @@ describe('Articles API Endpoints', () => {
 
       // Assert
       expect(apiClient.get).toHaveBeenCalledTimes(2);
-      expect(apiClient.get).toHaveBeenNthCalledWith(1, '/articles?keyword=typescript');
-      expect(apiClient.get).toHaveBeenNthCalledWith(2, '/articles?keyword=react');
+      expect(apiClient.get).toHaveBeenNthCalledWith(1, '/articles/search?keyword=typescript');
+      expect(apiClient.get).toHaveBeenNthCalledWith(2, '/articles/search?keyword=react');
       expect(result1.data[0]).toBeDefined();
       expect(result2.data[0]).toBeDefined();
       expect(result1.data[0]!.id).toBe(1);
@@ -450,8 +450,8 @@ describe('Articles API Endpoints', () => {
 
       // Assert
       expect(apiClient.get).toHaveBeenCalledTimes(2);
-      expect(apiClient.get).toHaveBeenNthCalledWith(1, '/articles?source_id=1');
-      expect(apiClient.get).toHaveBeenNthCalledWith(2, '/articles?source_id=2');
+      expect(apiClient.get).toHaveBeenNthCalledWith(1, '/articles/search?source_id=1');
+      expect(apiClient.get).toHaveBeenNthCalledWith(2, '/articles/search?source_id=2');
       expect(result1.data[0]).toBeDefined();
       expect(result2.data[0]).toBeDefined();
       expect(result1.data[0]!.id).toBe(1);
@@ -478,7 +478,7 @@ describe('Articles API Endpoints', () => {
       // Assert
       expect(apiClient.get).toHaveBeenCalledTimes(1);
       // URLSearchParams automatically encodes special characters
-      expect(apiClient.get).toHaveBeenCalledWith('/articles?keyword=test+%26+special');
+      expect(apiClient.get).toHaveBeenCalledWith('/articles/search?keyword=test+%26+special');
     });
 
     it('should handle empty string keyword parameter', async () => {
@@ -500,7 +500,7 @@ describe('Articles API Endpoints', () => {
 
       // Assert
       expect(apiClient.get).toHaveBeenCalledTimes(1);
-      expect(apiClient.get).toHaveBeenCalledWith('/articles?keyword=');
+      expect(apiClient.get).toHaveBeenCalledWith('/articles/search?keyword=');
     });
 
     it('should preserve error details in ApiError', async () => {

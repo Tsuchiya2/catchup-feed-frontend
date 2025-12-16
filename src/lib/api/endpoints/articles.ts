@@ -235,7 +235,7 @@ export async function searchArticles(
   params?: ArticleSearchParams
 ): Promise<PaginatedArticlesResponse> {
   const queryString = buildSearchQueryString(params);
-  const endpoint = `/articles${queryString}`;
+  const endpoint = `/articles/search${queryString}`;
 
   // Performance measurement start
   const perfMarkStart = `api-search-articles-${Date.now()}`;

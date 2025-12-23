@@ -239,8 +239,15 @@ export function timingSafeEqual(a: string, b: string): boolean {
  * base64UrlEncode(buffer); // Returns: "AQIDBAU"
  */
 export function base64UrlEncode(buffer: Uint8Array): string {
-  // Convert Uint8Array to base64 string
-  const base64 = btoa(String.fromCharCode(...buffer));
+  // Convert Uint8Array to base64 string (handles any buffer size)
+  let binary = '';
+  for (let i = 0; i < buffer.length; i++) {
+    const byte = buffer[i];
+    if (byte !== undefined) {
+      binary += String.fromCharCode(byte);
+    }
+  }
+  const base64 = btoa(binary);
 
   // Make URL-safe and remove padding
   return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');

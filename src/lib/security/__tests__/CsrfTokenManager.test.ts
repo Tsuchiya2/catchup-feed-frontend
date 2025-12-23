@@ -690,14 +690,14 @@ describe('CsrfTokenManager', () => {
     });
   });
 
-  describe('Concurrency', () => {
-    it('should handle concurrent token operations', () => {
+  describe('Sequential Operations', () => {
+    it('should handle rapid successive token operations', () => {
       const manager = getCsrfTokenManager();
 
       const response1 = new Response(null, { headers: { 'X-CSRF-Token': 'concurrent-1' } });
       const response2 = new Response(null, { headers: { 'X-CSRF-Token': 'concurrent-2' } });
 
-      // Simulate concurrent operations
+      // Simulate rapid successive operations
       manager.extractToken(response1);
       const token1 = manager.getToken();
       manager.extractToken(response2);
@@ -708,7 +708,7 @@ describe('CsrfTokenManager', () => {
       expect(token1).toBe('concurrent-1');
     });
 
-    it('should handle concurrent clear operations', () => {
+    it('should handle multiple clear operations', () => {
       mockSessionStorage.getItem.mockReturnValue('token');
       const manager = getCsrfTokenManager();
 

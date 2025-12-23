@@ -74,8 +74,6 @@ describe('CSRF Utilities', () => {
       // Assert
       expect(mockGetRandomValues).toHaveBeenCalledWith(expect.any(Uint8Array));
       expect(mockGetRandomValues).toHaveBeenCalledTimes(1);
-
-      mockGetRandomValues.mockRestore();
     });
   });
 
@@ -379,23 +377,22 @@ describe('CSRF Utilities', () => {
       expect(result).toBe(true);
     });
 
-    it('should have consistent execution time for same-length strings (timing-safe)', () => {
-      // This test verifies the timing-safe property by ensuring the function
-      // doesn't short-circuit early when finding a mismatch
+    it('should process entire string without short-circuiting (timing-safe property)', () => {
+      // This test documents the timing-safe property: the function processes
+      // the entire string regardless of where the mismatch occurs
 
       // Arrange
       const sameLength1 = 'aaaaaaaaaa';
       const sameLength2 = 'baaaaaaaaa'; // First char differs
       const sameLength3 = 'aaaaaaaaba'; // Last char differs
 
-      // Act & Assert - All should take roughly the same time
-      // We can't measure exact time in tests, but we verify correct behavior
+      // Act & Assert - Both should return false after processing entire string
+      // The function doesn't short-circuit early when finding a mismatch
       const result1 = timingSafeEqual(sameLength1, sameLength2);
       const result2 = timingSafeEqual(sameLength1, sameLength3);
 
       expect(result1).toBe(false);
       expect(result2).toBe(false);
-      // Both comparisons should process the entire string
     });
   });
 

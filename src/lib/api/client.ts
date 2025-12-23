@@ -185,7 +185,7 @@ class ApiClient {
 
   /**
    * Check if an error is a CSRF validation failure
-   * CSRF errors are 403 responses with a specific error message
+   * CSRF errors are 403 responses with a specific error message or code
    */
   private isCsrfError(error: unknown): boolean {
     if (!(error instanceof ApiError)) {
@@ -195,6 +195,11 @@ class ApiClient {
     // Check for 403 status
     if (error.status !== 403) {
       return false;
+    }
+
+    // Check for specific error code (if present in details)
+    if (error.details?.code === 'CSRF_VALIDATION_FAILED') {
+      return true;
     }
 
     // Check error message for CSRF-specific keywords

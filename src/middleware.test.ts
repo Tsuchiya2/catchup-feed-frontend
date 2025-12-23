@@ -116,8 +116,7 @@ describe('Middleware - CSRF Protection Integration Tests', () => {
       const jsonResponse = await response.json();
       expect(jsonResponse).toEqual({
         error: 'CSRF token validation failed',
-        message:
-          'Your request could not be verified. Please refresh the page and try again.',
+        message: 'Your request could not be verified. Please refresh the page and try again.',
       });
     });
 
@@ -482,8 +481,7 @@ describe('Middleware - CSRF Protection Integration Tests', () => {
       const body = await response.json();
       expect(body).toEqual({
         error: 'CSRF token validation failed',
-        message:
-          'Your request could not be verified. Please refresh the page and try again.',
+        message: 'Your request could not be verified. Please refresh the page and try again.',
       });
     });
 

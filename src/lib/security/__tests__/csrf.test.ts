@@ -567,8 +567,7 @@ describe('CSRF Utilities', () => {
 
     it('should set secure cookie in production environment', () => {
       // Arrange
-      const originalEnv = process.env.NODE_ENV;
-      process.env.NODE_ENV = 'production';
+      vi.stubEnv('NODE_ENV', 'production');
       const response = NextResponse.next();
 
       // Act
@@ -579,13 +578,12 @@ describe('CSRF Utilities', () => {
       expect(cookie?.secure).toBe(true);
 
       // Cleanup
-      process.env.NODE_ENV = originalEnv;
+      vi.unstubAllEnvs();
     });
 
     it('should not set secure cookie in development environment', () => {
       // Arrange
-      const originalEnv = process.env.NODE_ENV;
-      process.env.NODE_ENV = 'development';
+      vi.stubEnv('NODE_ENV', 'development');
       const response = NextResponse.next();
 
       // Act
@@ -596,7 +594,7 @@ describe('CSRF Utilities', () => {
       expect(cookie?.secure).toBe(false);
 
       // Cleanup
-      process.env.NODE_ENV = originalEnv;
+      vi.unstubAllEnvs();
     });
 
     it('should set cookie with 24-hour maxAge', () => {

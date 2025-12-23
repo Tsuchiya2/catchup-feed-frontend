@@ -196,10 +196,8 @@ describe('CsrfTokenManager', () => {
     });
 
     it('should not store token if window is undefined (SSR)', () => {
-      // @ts-expect-error - Temporarily set window to undefined for SSR test
       const originalWindow = global.window;
-      // @ts-expect-error - Testing SSR scenario
-      delete global.window;
+      delete (global as unknown as { window?: typeof window }).window;
 
       const manager = CsrfTokenManager.getInstance();
       const mockResponse = new Response(null, {
@@ -297,10 +295,8 @@ describe('CsrfTokenManager', () => {
     });
 
     it('should not call sessionStorage in SSR environment', () => {
-      // @ts-expect-error - Temporarily set window to undefined for SSR test
       const originalWindow = global.window;
-      // @ts-expect-error - Testing SSR scenario
-      delete global.window;
+      delete (global as unknown as { window?: typeof window }).window;
 
       const manager = CsrfTokenManager.getInstance();
       manager.clearToken();
@@ -390,10 +386,8 @@ describe('CsrfTokenManager', () => {
 
   describe('SSR Safety', () => {
     it('should not throw error when window is undefined', () => {
-      // @ts-expect-error - Temporarily set window to undefined for SSR test
       const originalWindow = global.window;
-      // @ts-expect-error - Testing SSR scenario
-      delete global.window;
+      delete (global as unknown as { window?: typeof window }).window;
 
       expect(() => {
         const manager = CsrfTokenManager.getInstance();
@@ -406,10 +400,8 @@ describe('CsrfTokenManager', () => {
     });
 
     it('should work in SSR environment without sessionStorage', () => {
-      // @ts-expect-error - Temporarily set window to undefined for SSR test
       const originalWindow = global.window;
-      // @ts-expect-error - Testing SSR scenario
-      delete global.window;
+      delete (global as unknown as { window?: typeof window }).window;
 
       const manager = CsrfTokenManager.getInstance();
 
@@ -426,10 +418,8 @@ describe('CsrfTokenManager', () => {
     });
 
     it('should maintain singleton pattern in SSR environment', () => {
-      // @ts-expect-error - Temporarily set window to undefined for SSR test
       const originalWindow = global.window;
-      // @ts-expect-error - Testing SSR scenario
-      delete global.window;
+      delete (global as unknown as { window?: typeof window }).window;
 
       const instance1 = CsrfTokenManager.getInstance();
       const instance2 = CsrfTokenManager.getInstance();

@@ -111,8 +111,7 @@ export function middleware(request: NextRequest) {
       return NextResponse.json(
         {
           error: 'CSRF token validation failed',
-          message:
-            'Your request could not be verified. Please refresh the page and try again.',
+          message: 'Your request could not be verified. Please refresh the page and try again.',
         },
         { status: 403 }
       );

@@ -472,9 +472,9 @@ describe('ApiClient', () => {
 
   describe('CSRF token handling', () => {
     let mockSessionStorage: Record<string, string>;
-    let mockGetCsrfToken: ReturnType<typeof vi.fn>;
-    let mockAddCsrfTokenToHeaders: ReturnType<typeof vi.fn>;
-    let mockSetCsrfTokenFromResponse: ReturnType<typeof vi.fn>;
+    let mockGetCsrfToken: () => string | null;
+    let mockAddCsrfTokenToHeaders: (headers: Record<string, string>) => Record<string, string>;
+    let mockSetCsrfTokenFromResponse: (response: Response) => void;
 
     beforeEach(() => {
       // Mock sessionStorage

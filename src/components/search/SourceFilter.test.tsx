@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { SourceFilter } from './SourceFilter';
 import * as useSourcesModule from '@/hooks/useSources';
+import { sourceFilters } from '@/utils/sourceFilters';
 import type { Source } from '@/types/api';
 
 // Mock useSources hook
@@ -207,6 +208,123 @@ describe('SourceFilter', () => {
 
       const select = screen.getByLabelText('Source');
       expect(select).toHaveAttribute('id', 'source-filter');
+    });
+  });
+
+  describe('Active Source Filtering', () => {
+    it('should only display active sources in dropdown', () => {
+      const mixedSources = [
+        createMockSource({ id: 1, name: 'Active Source 1', active: true }),
+        createMockSource({ id: 2, name: 'Inactive Source', active: false }),
+        createMockSource({ id: 3, name: 'Active Source 2', active: true }),
+      ];
+
+      vi.mocked(useSourcesModule.useSources).mockReturnValue({
+        sources: mixedSources,
+        isLoading: false,
+        error: null,
+        refetch: vi.fn(),
+      });
+
+      render(<SourceFilter value={null} onChange={vi.fn()} />);
+
+      // Should show "All Sources" option
+      expect(screen.getByRole('option', { name: 'All Sources' })).toBeInTheDocument();
+
+      // Should show only active sources
+      expect(screen.getByRole('option', { name: 'Active Source 1' })).toBeInTheDocument();
+      expect(screen.getByRole('option', { name: 'Active Source 2' })).toBeInTheDocument();
+
+      // Should NOT show inactive source
+      expect(screen.queryByRole('option', { name: 'Inactive Source' })).not.toBeInTheDocument();
+
+      // Total: 1 (All Sources) + 2 (active sources) = 3 options
+      const options = screen.getAllByRole('option');
+      expect(options).toHaveLength(3);
+    });
+
+    it('should show only All Sources when all sources are inactive', () => {
+      const inactiveSources = [
+        createMockSource({ id: 1, name: 'Inactive Source 1', active: false }),
+        createMockSource({ id: 2, name: 'Inactive Source 2', active: false }),
+      ];
+
+      vi.mocked(useSourcesModule.useSources).mockReturnValue({
+        sources: inactiveSources,
+        isLoading: false,
+        error: null,
+        refetch: vi.fn(),
+      });
+
+      render(<SourceFilter value={null} onChange={vi.fn()} />);
+
+      // Should show only "All Sources" option
+      const options = screen.getAllByRole('option');
+      expect(options).toHaveLength(1);
+      expect(options[0]).toHaveTextContent('All Sources');
+
+      // Should NOT show any inactive sources
+      expect(screen.queryByRole('option', { name: 'Inactive Source 1' })).not.toBeInTheDocument();
+      expect(screen.queryByRole('option', { name: 'Inactive Source 2' })).not.toBeInTheDocument();
+    });
+
+    it('should handle sources with undefined active field as inactive', () => {
+      const sourcesWithUndefined = [
+        createMockSource({ id: 1, name: 'Active Source', active: true }),
+        // Create a source without active field (simulating undefined)
+        {
+          id: 2,
+          name: 'Source Without Active Field',
+          feed_url: 'https://example.com/feed2.xml',
+          last_crawled_at: new Date().toISOString(),
+        } as Source,
+      ];
+
+      vi.mocked(useSourcesModule.useSources).mockReturnValue({
+        sources: sourcesWithUndefined,
+        isLoading: false,
+        error: null,
+        refetch: vi.fn(),
+      });
+
+      render(<SourceFilter value={null} onChange={vi.fn()} />);
+
+      // Should show only the source with active: true
+      expect(screen.getByRole('option', { name: 'Active Source' })).toBeInTheDocument();
+
+      // Should NOT show source with undefined active field
+      expect(
+        screen.queryByRole('option', { name: 'Source Without Active Field' })
+      ).not.toBeInTheDocument();
+
+      // Total: 1 (All Sources) + 1 (active source) = 2 options
+      const options = screen.getAllByRole('option');
+      expect(options).toHaveLength(2);
+    });
+
+    it('should use custom filterPredicate when provided', () => {
+      const mixedSources = [
+        createMockSource({ id: 1, name: 'Active Source', active: true }),
+        createMockSource({ id: 2, name: 'Inactive Source', active: false }),
+      ];
+
+      vi.mocked(useSourcesModule.useSources).mockReturnValue({
+        sources: mixedSources,
+        isLoading: false,
+        error: null,
+        refetch: vi.fn(),
+      });
+
+      // Using sourceFilters.all predicate should show all sources
+      render(<SourceFilter value={null} onChange={vi.fn()} filterPredicate={sourceFilters.all} />);
+
+      // Should show all sources when using sourceFilters.all
+      expect(screen.getByRole('option', { name: 'Active Source' })).toBeInTheDocument();
+      expect(screen.getByRole('option', { name: 'Inactive Source' })).toBeInTheDocument();
+
+      // Total: 1 (All Sources) + 2 (all sources) = 3 options
+      const options = screen.getAllByRole('option');
+      expect(options).toHaveLength(3);
     });
   });
 });

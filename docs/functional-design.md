@@ -51,6 +51,7 @@ Catchup Feed Web is a modern RSS/Atom feed reader frontend built with Next.js 15
 | Article List | ✅ Implemented | Paginated article browsing | `/articles` |
 | Article Detail | ✅ Implemented | Full article view with AI summary | `/articles/[id]` |
 | Article Search | ✅ Implemented | Keyword and filter-based search | `/articles?keyword=...` |
+| Source Filter Active-Only | ✅ Implemented | Filter dropdown shows only active sources | `/articles` (SourceFilter) |
 | Source List | ✅ Implemented | RSS/Atom feed source catalog | `/sources` |
 | Source Search | ✅ Implemented | Search and filter sources | `/sources?keyword=...` |
 | Source Creation | ✅ Implemented | Add new RSS/Atom feeds (Admin only) | `/sources` (form) |
@@ -978,13 +979,43 @@ interface SearchInputProps {
 interface SourceFilterProps {
   value: number | null;
   onChange: (sourceId: number | null) => void;
+  className?: string;
+  disabled?: boolean;
+  filterPredicate?: SourceFilterPredicate;  // Optional custom filter
 }
 ```
 
 **Features**:
-- Dropdown with all available sources
-- "All Sources" option (null value)
+- Dropdown with active sources by default (filters inactive sources)
+- "All Sources" option (null value) always available
 - Fetches sources via `useSources()` hook
+- Uses `filterSources()` utility with `sourceFilters.active` predicate
+- Extensible filtering via optional `filterPredicate` prop
+- Observability logging for filtered source counts
+
+**Default Behavior**:
+By default, the SourceFilter displays only active sources (`active: true`) on the Articles page. This prevents users from filtering by inactive or defunct sources that are no longer being crawled.
+
+**Active Source Filtering**:
+```typescript
+// Default filtering behavior
+const filteredSources = filterSources(sources, sourceFilters.active);
+// Users only see active sources in dropdown
+```
+
+**Customization**:
+```typescript
+// Show all sources (including inactive)
+<SourceFilter filterPredicate={sourceFilters.all} />
+
+// Custom filter predicate
+<SourceFilter filterPredicate={(s) => s.active && s.name.includes('Tech')} />
+```
+
+**Edge Cases**:
+- If all sources are inactive: Displays only "All Sources" option
+- If no sources exist: Displays only "All Sources" option
+- Undefined `active` field: Treated as inactive (defensive filtering)
 
 ### Feature: Source Search
 
@@ -1591,6 +1622,47 @@ validateArticle(article: unknown): article is Article
 
 // Normalize source name (trim, lowercase)
 normalizeSourceName(sourceName: string): string
+```
+
+**Source Filtering** (`/src/utils/sourceFilters.ts`):
+```typescript
+// Filter predicate function type
+export type SourceFilterPredicate = (source: Source) => boolean;
+
+// Pre-defined filter predicates
+export const sourceFilters = {
+  active: (source: Source) => source.active === true,  // Only active sources
+  all: (_source: Source) => true,                      // All sources
+};
+
+// Helper function to filter sources with default active filter
+export const filterSources = (
+  sources: Source[],
+  predicate: SourceFilterPredicate = sourceFilters.active
+): Source[];
+
+// Compose multiple predicates with AND/OR logic
+export const composeFilters = (
+  predicates: SourceFilterPredicate[],
+  mode: 'AND' | 'OR' = 'AND'
+): SourceFilterPredicate;
+```
+
+**Usage Examples**:
+```typescript
+// Filter to active sources only (default)
+const activeSources = filterSources(sources);
+
+// Show all sources
+const allSources = filterSources(sources, sourceFilters.all);
+
+// Compose filters (active AND contains keyword)
+const filtered = filterSources(sources,
+  composeFilters([
+    sourceFilters.active,
+    (s) => s.name.toLowerCase().includes('tech')
+  ])
+);
 ```
 
 ---

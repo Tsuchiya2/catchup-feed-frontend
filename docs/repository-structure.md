@@ -221,6 +221,7 @@ src/
 │   ├── article.ts              # Article utilities (validation, normalization)
 │   ├── errorMessages.ts        # Error message utilities
 │   ├── logger.ts               # Migration logger
+│   ├── sourceFilters.ts        # Source filtering utilities (predicates)
 │   ├── sourceTransformers.ts   # Source data transformers
 │   └── validation/             # Validation utilities
 │       └── sourceValidation.ts # Source form validation

@@ -66,6 +66,46 @@ interface Source {
 - `SourceFormData`: Form state for source creation and editing UI
 - `SourceFormErrors`: Validation errors for source form
 - `SourceSearchParams`: Query parameters for source search (keyword, source_type, active)
+- `SourceFilterPredicate`: Function type for filtering sources based on custom logic
+
+**Active vs Inactive Sources:**
+- **Active Source**: Source with `active: true`, actively being crawled for new articles
+- **Inactive Source**: Source with `active: false`, no longer being crawled (archived or defunct)
+
+---
+
+### Source Filter Predicate
+
+A function that determines whether a source should be included in a filtered list.
+
+**TypeScript Definition:**
+```typescript
+export type SourceFilterPredicate = (source: Source) => boolean;
+```
+
+**Common Predicates:**
+- `sourceFilters.active`: Filters to only active sources (`source.active === true`)
+- `sourceFilters.all`: Includes all sources (no filtering)
+
+**Usage:**
+Filter predicates are used by the `SourceFilter` component on the Articles page to control which sources appear in the dropdown menu. By default, only active sources are shown to prevent users from filtering by defunct sources.
+
+**Custom Predicates:**
+```typescript
+// Custom predicate: Only sources with recent crawls
+const recentFilter: SourceFilterPredicate = (source) => {
+  if (!source.last_crawled_at) return false;
+  const lastCrawl = new Date(source.last_crawled_at);
+  const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+  return lastCrawl > dayAgo;
+};
+
+// Compose multiple predicates
+const activeAndRecent = composeFilters([
+  sourceFilters.active,
+  recentFilter
+], 'AND');
+```
 
 ---
 

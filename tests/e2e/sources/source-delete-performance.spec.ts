@@ -28,11 +28,7 @@ test.describe('Source Delete Performance @performance', () => {
             id: i + 1,
             name: `Test Source ${i + 1}`,
             feed_url: `https://example.com/feed${i + 1}.xml`,
-            site_url: `https://example.com/${i + 1}`,
             active: true,
-            fetch_interval_minutes: 60,
-            created_at: '2024-01-01T00:00:00Z',
-            updated_at: '2024-01-01T00:00:00Z',
           }))
         ),
       });

@@ -20,7 +20,7 @@ import { logger } from '@/lib/logger';
 import { metrics } from '@/lib/observability/metrics';
 import { startSpan, addBreadcrumb, addContext } from '@/lib/observability/tracing';
 import type { SourcesResponse } from '@/types/api';
-import { ApiError } from '@/lib/api/client';
+import { ApiError } from '@/lib/api/errors';
 
 /**
  * Delete source hook return type

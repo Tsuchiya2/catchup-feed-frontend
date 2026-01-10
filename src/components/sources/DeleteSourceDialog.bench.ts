@@ -18,11 +18,7 @@ const mockSource: Source = {
   id: 1,
   name: 'Test Source',
   feed_url: 'https://example.com/feed.xml',
-  site_url: 'https://example.com',
   active: true,
-  fetch_interval_minutes: 60,
-  created_at: '2024-01-01T00:00:00Z',
-  updated_at: '2024-01-01T00:00:00Z',
 };
 
 // Wrapper component with QueryClient

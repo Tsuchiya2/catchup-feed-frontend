@@ -7,11 +7,6 @@ export default defineConfig({
   test: {
     // Use forks pool to ensure clean process exit after benchmarks
     pool: 'forks',
-    poolOptions: {
-      forks: {
-        singleFork: true,
-      },
-    },
     environment: 'jsdom',
     globals: true,
     setupFiles: ['./tests/setup.ts'],

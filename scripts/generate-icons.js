@@ -11,24 +11,29 @@ const fs = require('fs');
 const path = require('path');
 
 const sizes = [72, 96, 128, 144, 152, 192, 384, 512];
-const svgPath = path.join(__dirname, '../public/icons/icon.svg');
+const sourcePath = path.join(__dirname, '../public/catch-feed-icon.webp');
 const outputDir = path.join(__dirname, '../public/icons');
 
 async function generateIcons() {
   console.log('PWA Icon Generation Script');
   console.log('=========================\n');
 
+  // Check if source file exists
+  if (!fs.existsSync(sourcePath)) {
+    console.error('✗ Source file not found:', sourcePath);
+    process.exit(1);
+  }
+
   // Check if sharp is available
   let sharp;
   try {
     sharp = require('sharp');
     console.log('✓ Sharp library detected. Generating PNG icons...\n');
-
-    const svgBuffer = fs.readFileSync(svgPath);
+    console.log(`  Source: catch-feed-icon.webp\n`);
 
     for (const size of sizes) {
       const outputPath = path.join(outputDir, `icon-${size}x${size}.png`);
-      await sharp(svgBuffer).resize(size, size).png().toFile(outputPath);
+      await sharp(sourcePath).resize(size, size, { fit: 'cover' }).png().toFile(outputPath);
       console.log(`✓ Generated: icon-${size}x${size}.png`);
     }
 
@@ -39,11 +44,10 @@ async function generateIcons() {
       console.log('\nTo generate icons automatically, install sharp:');
       console.log('  npm install --save-dev sharp\n');
       console.log('Or generate icons manually using an online tool:');
-      console.log('  1. Open public/icons/icon.svg in a browser');
-      console.log('  2. Use an SVG to PNG converter (e.g., CloudConvert, SVG2PNG)');
-      console.log('  3. Generate the following sizes:');
+      console.log('  1. Open public/catch-feed-icon.webp');
+      console.log('  2. Use an image converter to generate the following sizes:');
       sizes.forEach((size) => console.log(`     - ${size}x${size} → icon-${size}x${size}.png`));
-      console.log('  4. Save all files to public/icons/\n');
+      console.log('  3. Save all files to public/icons/\n');
     } else {
       console.error('Error generating icons:', error);
       process.exit(1);

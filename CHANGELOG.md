@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.2](https://github.com/Tsuchiya2/catchup-feed-frontend/compare/catchup-feed-frontend-v1.7.1...catchup-feed-frontend-v1.7.2) (2026-01-18)
+
+
+### Documentation
+
+* **readme:** remove planned features section ([77f63f2](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/77f63f2bedd25bb0ffd801b58c0468e7ebd59648))
+
 ## [1.7.1](https://github.com/Tsuchiya2/catchup-feed-frontend/compare/catchup-feed-frontend-v1.7.0...catchup-feed-frontend-v1.7.1) (2026-01-18)
 
 

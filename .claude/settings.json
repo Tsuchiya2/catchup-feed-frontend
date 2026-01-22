@@ -2,7 +2,10 @@
   "permissions": {
     "allow": [
       "Bash(docker compose exec:*)",
-      "Bash(docker-compose exec:*)"
+      "Bash(docker-compose exec:*)",                                   "Bash(docker compose:*)",
+      "Bash(docker build:*)",                                          "Bash(docker run:*)",
+      "Bash(docker ps:*)",                                             "Bash(docker logs:*)",
+      "Bash(docker images:*)"
     ],
     "deny": [
       "Bash(git add:*)",
@@ -16,7 +19,7 @@
   "sandbox": {
     "enabled": true,
     "autoAllowBashIfSandboxed": true,
-    "excludedCommands": ["git push", "rm -rf", "docker rm"]
+    "excludedCommands": ["git push", "rm -rf"]
   },
   "hooks": {
     "PermissionRequest": [

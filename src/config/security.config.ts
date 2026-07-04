@@ -99,9 +99,6 @@ const cspDirectives: CSPDirectives = {
   'connect-src': [
     "'self'",
     appConfig.api.baseUrl, // Allow API calls to backend
-    ...(appConfig.observability.sentryDsn
-      ? ['https://*.ingest.sentry.io'] // Allow Sentry if configured
-      : []),
   ],
   'frame-src': ["'self'"],
   'object-src': ["'none'"],

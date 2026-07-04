@@ -12,15 +12,6 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { PWAUpdateNotification } from '../PWAUpdateNotification';
 
-// Mock metrics
-vi.mock('@/lib/observability/metrics', () => ({
-  metrics: {
-    pwa: {
-      update: vi.fn(),
-    },
-  },
-}));
-
 // Mock workbox-window
 const mockWorkbox = {
   addEventListener: vi.fn(),

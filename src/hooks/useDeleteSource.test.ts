@@ -22,7 +22,7 @@ vi.mock('@/lib/api/endpoints/sources', () => ({
   deleteSource: vi.fn(),
 }));
 
-// Mock observability dependencies
+// Mock logging dependencies
 vi.mock('@/lib/logger', () => ({
   logger: {
     info: vi.fn(),
@@ -30,30 +30,6 @@ vi.mock('@/lib/logger', () => ({
     warn: vi.fn(),
     error: vi.fn(),
   },
-}));
-
-vi.mock('@/lib/observability/metrics', () => ({
-  metrics: {
-    source: {
-      delete: {
-        attempt: vi.fn(),
-        success: vi.fn(),
-        failure: vi.fn(),
-        cacheRollback: vi.fn(),
-        dialog: vi.fn(),
-      },
-    },
-  },
-}));
-
-vi.mock('@/lib/observability/tracing', () => ({
-  startSpan: vi.fn((_name, _op, callback) => callback()),
-  addBreadcrumb: vi.fn(),
-  addContext: vi.fn(),
-}));
-
-vi.mock('@sentry/nextjs', () => ({
-  captureException: vi.fn(),
 }));
 
 vi.mock('@/lib/api/client', () => ({

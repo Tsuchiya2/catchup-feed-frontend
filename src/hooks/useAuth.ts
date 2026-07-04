@@ -18,7 +18,6 @@ import {
   clearAllTokens,
   isTokenExpired,
 } from '@/lib/auth/TokenManager';
-import { metrics, setUserContext, clearUserContext } from '@/lib/observability';
 
 /**
  * Authentication hook return type
@@ -115,34 +114,10 @@ export function useAuth(): UseAuthReturn {
         document.cookie = `catchup_feed_auth_token=${response.token}; path=/; max-age=86400; SameSite=Strict`;
       }
 
-      // Set user context for error tracking
-      // Note: We could decode the JWT token to get user info,
-      // but for now we'll set a basic context with the token presence
-      // User details can be enriched later when fetching user profile
-      try {
-        // Decode JWT token to extract user info (basic implementation)
-        const tokenParts = response.token.split('.');
-        if (tokenParts.length === 3 && tokenParts[1]) {
-          const payload = JSON.parse(atob(tokenParts[1]));
-          if (payload.sub || payload.user_id || payload.id) {
-            setUserContext({
-              id: String(payload.sub || payload.user_id || payload.id),
-              email: payload.email || undefined,
-            });
-          }
-        }
-      } catch (error) {
-        // If token decoding fails, skip setting user context
-        // This is not critical, so we don't throw an error
-      }
-
-      // Track successful login metric
-      metrics.login.success();
-
       // Redirect to dashboard
       router.push('/dashboard');
     },
-    onError: (error) => {
+    onError: () => {
       // Clear all tokens on login failure
       clearAllTokens();
       setToken(null);
@@ -152,10 +127,6 @@ export function useAuth(): UseAuthReturn {
       if (typeof document !== 'undefined') {
         document.cookie = 'catchup_feed_auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
       }
-
-      // Track failed login metric
-      const reason = error instanceof Error ? error.message : 'unknown';
-      metrics.login.failure(reason);
     },
   });
 
@@ -183,12 +154,6 @@ export function useAuth(): UseAuthReturn {
     if (typeof document !== 'undefined') {
       document.cookie = 'catchup_feed_auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
     }
-
-    // Clear user context from error tracking
-    clearUserContext();
-
-    // Track logout metric
-    metrics.login.logout();
 
     // Redirect to login page
     router.push('/login');

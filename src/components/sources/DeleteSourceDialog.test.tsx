@@ -13,27 +13,6 @@ vi.mock('@/hooks/useDeleteSource', () => ({
   useDeleteSource: vi.fn(),
 }));
 
-// Mock observability dependencies
-vi.mock('@/lib/observability/metrics', () => ({
-  metrics: {
-    source: {
-      delete: {
-        attempt: vi.fn(),
-        success: vi.fn(),
-        failure: vi.fn(),
-        cacheRollback: vi.fn(),
-        dialog: vi.fn(),
-      },
-    },
-  },
-}));
-
-vi.mock('@/lib/observability/tracing', () => ({
-  startSpan: vi.fn((_name, _op, callback) => callback()),
-  addBreadcrumb: vi.fn(),
-  addContext: vi.fn(),
-}));
-
 describe('DeleteSourceDialog', () => {
   const mockSource: Source = {
     id: 1,

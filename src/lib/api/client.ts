@@ -13,8 +13,6 @@ import {
   getRefreshToken,
 } from '@/lib/auth/TokenManager';
 import { ApiError, NetworkError, TimeoutError } from '@/lib/api/errors';
-import { addTracingHeaders, startSpan } from '@/lib/observability';
-import { metrics } from '@/lib/observability';
 import { appConfig } from '@/config/app.config';
 import { logger } from '@/lib/logger';
 import {
@@ -363,9 +361,6 @@ class ApiClient {
       ...headers,
     };
 
-    // Add tracing headers for distributed tracing
-    requestHeaders = addTracingHeaders(requestHeaders);
-
     // Add Authorization header if authentication is required
     if (requiresAuth) {
       const token = getAuthToken();
@@ -394,27 +389,11 @@ class ApiClient {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
-    // Track request start time for latency metrics
-    const startTime = Date.now();
-
     try {
-      // Wrap fetch in a span for distributed tracing
-      const response = await startSpan(
-        `API Request: ${method} ${endpoint}`,
-        'http.client',
-        async () => {
-          return await fetch(url, {
-            ...init,
-            signal: controller.signal,
-          });
-        }
-      );
-
-      // Calculate request latency
-      const latency = Date.now() - startTime;
-
-      // Track API latency metric
-      metrics.performance.apiLatency(endpoint, latency, response.status);
+      const response = await fetch(url, {
+        ...init,
+        signal: controller.signal,
+      });
 
       // Clear timeout
       clearTimeout(timeoutId);
@@ -476,13 +455,6 @@ class ApiClient {
     } catch (error) {
       // Clear timeout
       clearTimeout(timeoutId);
-
-      // Track error metrics
-      if (error instanceof ApiError) {
-        metrics.error.api(endpoint, error.status);
-      } else if (error instanceof NetworkError || error instanceof TypeError) {
-        metrics.error.network();
-      }
 
       // Handle abort (timeout)
       if (error instanceof Error && error.name === 'AbortError') {

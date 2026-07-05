@@ -83,9 +83,7 @@ describe('TokenSection', () => {
     await user.click(screen.getByRole('button', { name: /I saved the URL/i }));
 
     await waitFor(() => {
-      expect(
-        screen.queryByTestId(SUBSCRIBER_TEST_IDS.ISSUED_TOKEN_DIALOG)
-      ).not.toBeInTheDocument();
+      expect(screen.queryByTestId(SUBSCRIBER_TEST_IDS.ISSUED_TOKEN_DIALOG)).not.toBeInTheDocument();
     });
 
     // Regression (B-1): closing the dialog must reset the issue mutation so

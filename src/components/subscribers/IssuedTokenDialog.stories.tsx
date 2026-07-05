@@ -25,7 +25,8 @@ const issuedToken: IssuedFeedToken = {
   id: 10,
   subscriber_id: 1,
   token: 'q3XanY0T3ZkQ4x8x0G1v2b3n4m5l6k7j8h9g0f1d2s3a',
-  feed_url: 'https://radio.catchup-feed.com/feeds/q3XanY0T3ZkQ4x8x0G1v2b3n4m5l6k7j8h9g0f1d2s3a/feed.xml',
+  feed_url:
+    'https://radio.catchup-feed.com/feeds/q3XanY0T3ZkQ4x8x0G1v2b3n4m5l6k7j8h9g0f1d2s3a/feed.xml',
   active: true,
   created_at: '2026-07-04T09:00:00Z',
   revoked_at: null,

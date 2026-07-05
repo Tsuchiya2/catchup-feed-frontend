@@ -229,7 +229,10 @@ export type SubscriberInput = Nullable<
  * Feed token as listed by GET /subscribers/:id/tokens.
  * Plaintext token is NEVER included (D-5: hash-only storage).
  */
-export type FeedToken = Nullable<Schemas['internal_handler_http_subscriber.TokenDTO'], 'revoked_at'>;
+export type FeedToken = Nullable<
+  Schemas['internal_handler_http_subscriber.TokenDTO'],
+  'revoked_at'
+>;
 
 /**
  * Response of POST /subscribers/:id/tokens.

@@ -93,9 +93,7 @@ describe('SourceCard', () => {
   describe('Styling', () => {
     it('should apply custom className', () => {
       const source = createMockSource();
-      const { container } = render(
-        <SourceCard source={source} className="custom-class" />
-      );
+      const { container } = render(<SourceCard source={source} className="custom-class" />);
       expect(container.firstChild).toHaveClass('custom-class');
     });
 
@@ -470,9 +468,7 @@ describe('SourceCard', () => {
 
       it('should render Pencil icon for visual indication', () => {
         const source = createMockSource();
-        const { container } = render(
-          <SourceCard source={source} onEdit={mockOnEdit} />
-        );
+        const { container } = render(<SourceCard source={source} onEdit={mockOnEdit} />);
 
         const editButton = screen.getByTestId('source-edit-button');
         const icon = editButton.querySelector('svg');
@@ -911,7 +907,9 @@ describe('SourceCard', () => {
     it('should memoize handleToggle callback', () => {
       const source = createMockSource();
 
-      const { rerender } = render(<SourceCard source={source} onUpdateActive={mockOnUpdateActive} />);
+      const { rerender } = render(
+        <SourceCard source={source} onUpdateActive={mockOnUpdateActive} />
+      );
 
       // Re-render with same onUpdateActive
       rerender(<SourceCard source={source} onUpdateActive={mockOnUpdateActive} />);

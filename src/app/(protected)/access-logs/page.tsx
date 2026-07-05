@@ -49,10 +49,7 @@ function AccessLogsPageContent() {
 
   return (
     <div className="container py-8">
-      <PageHeader
-        title="Access Logs"
-        description="Who is still listening — and who went quiet"
-      />
+      <PageHeader title="Access Logs" description="Who is still listening — and who went quiet" />
 
       {/* Summary: neglect detection */}
       <Card className="mb-6 mt-6">
@@ -105,7 +102,9 @@ function AccessLogsPageContent() {
           </div>
         </CardHeader>
         <CardContent>
-          {logsResult.error && <ErrorMessage error={logsResult.error} onRetry={logsResult.refetch} />}
+          {logsResult.error && (
+            <ErrorMessage error={logsResult.error} onRetry={logsResult.refetch} />
+          )}
           {logsResult.isLoading && (
             <div className="space-y-2">
               <Skeleton className="h-12 w-full" />

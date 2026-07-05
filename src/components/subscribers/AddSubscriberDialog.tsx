@@ -53,8 +53,8 @@ export function AddSubscriberDialog({ isOpen, onClose, onSuccess }: AddSubscribe
         <DialogHeader>
           <DialogTitle>Add Friend</DialogTitle>
           <DialogDescription>
-            Register a friend who will subscribe to the radio feed. You can issue their
-            subscription token afterwards from the Manage screen.
+            Register a friend who will subscribe to the radio feed. You can issue their subscription
+            token afterwards from the Manage screen.
           </DialogDescription>
         </DialogHeader>
 

@@ -78,7 +78,10 @@ describe('AccessLogSummaryTable', () => {
     const onSelect = vi.fn();
 
     render(
-      <AccessLogSummaryTable summaries={[summary({ subscriber_id: 7 })]} onSelectSubscriber={onSelect} />
+      <AccessLogSummaryTable
+        summaries={[summary({ subscriber_id: 7 })]}
+        onSelectSubscriber={onSelect}
+      />
     );
 
     await user.click(screen.getByTestId('summary-row-7'));

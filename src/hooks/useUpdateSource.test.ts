@@ -108,7 +108,12 @@ describe('useUpdateSource', () => {
       await act(async () => {
         await result1.current.mutateAsync({
           id: 1,
-          data: { name: 'Blog 1', feedURL: 'https://blog1.com/feed.xml', category: 'tech', active: true },
+          data: {
+            name: 'Blog 1',
+            feedURL: 'https://blog1.com/feed.xml',
+            category: 'tech',
+            active: true,
+          },
         });
       });
 
@@ -119,7 +124,12 @@ describe('useUpdateSource', () => {
       await act(async () => {
         await result2.current.mutateAsync({
           id: 2,
-          data: { name: 'Blog 2', feedURL: 'https://blog2.com/feed.xml', category: 'tech', active: false },
+          data: {
+            name: 'Blog 2',
+            feedURL: 'https://blog2.com/feed.xml',
+            category: 'tech',
+            active: false,
+          },
         });
       });
 
@@ -751,11 +761,21 @@ describe('useUpdateSource', () => {
       await act(async () => {
         const promise1 = result.current.mutateAsync({
           id: 1,
-          data: { name: 'Update 1', feedURL: 'https://test1.com/feed.xml', category: 'tech', active: true },
+          data: {
+            name: 'Update 1',
+            feedURL: 'https://test1.com/feed.xml',
+            category: 'tech',
+            active: true,
+          },
         });
         const promise2 = result.current.mutateAsync({
           id: 2,
-          data: { name: 'Update 2', feedURL: 'https://test2.com/feed.xml', category: 'tech', active: false },
+          data: {
+            name: 'Update 2',
+            feedURL: 'https://test2.com/feed.xml',
+            category: 'tech',
+            active: false,
+          },
         });
 
         await Promise.all([promise1, promise2]);

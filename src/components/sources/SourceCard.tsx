@@ -3,13 +3,16 @@
  *
  * Displays a source (RSS feed) in a card format with:
  * - Source name and RSS icon
- * - Edit button (admin only, when onEdit provided)
- * - Delete button (admin only, when onDelete provided)
+ * - Edit button (when onEdit provided)
+ * - Delete button (when onDelete provided)
  * - Feed URL (truncated with tooltip)
  * - Category and language badges
- * - Active/Inactive status badge (non-admin) or toggle (admin)
+ * - Active/Inactive toggle (when onUpdateActive provided) or status badge
  * - Added (created_at) timestamp
  * - Cyber/glow theme styling
+ *
+ * Single-administrator system (C-7/C-20): pages behind authentication
+ * always render management controls, so there is no role branching here.
  */
 import * as React from 'react';
 import { Rss, Pencil, Trash2 } from 'lucide-react';
@@ -19,7 +22,6 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { formatRelativeTime } from '@/lib/utils/formatDate';
 import type { Source } from '@/types/api';
-import type { UserRole } from '@/lib/auth/role';
 import { StatusBadge } from './StatusBadge';
 import { ActiveToggle } from './ActiveToggle';
 import { SOURCE_TEST_IDS, SOURCE_ARIA_LABELS } from '@/constants/source';
@@ -32,13 +34,11 @@ interface SourceCardProps {
   source: Source;
   /** Additional CSS classes */
   className?: string;
-  /** User role for conditional rendering */
-  userRole: UserRole;
-  /** Callback when active status is updated (admin only) */
+  /** Callback when active status is updated */
   onUpdateActive?: (sourceId: number, active: boolean) => Promise<void>;
-  /** Callback when edit button is clicked (admin only) */
+  /** Callback when edit button is clicked */
   onEdit?: (source: Source) => void;
-  /** Callback when delete button is clicked (admin only) */
+  /** Callback when delete button is clicked */
   onDelete?: (source: Source) => void;
 }
 
@@ -51,7 +51,6 @@ interface SourceCardProps {
  * ```tsx
  * <SourceCard
  *   source={source}
- *   userRole={userRole}
  *   onUpdateActive={handleUpdateActive}
  *   onEdit={handleEdit}
  *   onDelete={handleDelete}
@@ -61,14 +60,11 @@ interface SourceCardProps {
 export const SourceCard = React.memo(function SourceCard({
   source,
   className,
-  userRole,
   onUpdateActive,
   onEdit,
   onDelete,
 }: SourceCardProps) {
   const createdAt = source.created_at ? formatRelativeTime(source.created_at) : 'Unknown';
-
-  const isAdmin = userRole === 'admin';
 
   /**
    * Handle toggle callback
@@ -98,7 +94,7 @@ export const SourceCard = React.memo(function SourceCard({
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
               <h3 className="truncate text-lg font-semibold text-foreground">{source.name}</h3>
-              {isAdmin && onEdit && (
+              {onEdit && (
                 <Button
                   variant="ghost"
                   size="icon"
@@ -110,7 +106,7 @@ export const SourceCard = React.memo(function SourceCard({
                   <Pencil className="h-4 w-4" />
                 </Button>
               )}
-              {isAdmin && onDelete && (
+              {onDelete && (
                 <Button
                   variant="ghost"
                   size="icon"
@@ -154,8 +150,8 @@ export const SourceCard = React.memo(function SourceCard({
 
         {/* Status and Last Crawled */}
         <div className="flex items-center justify-between gap-2 pt-2">
-          {/* Conditional rendering: Toggle for admin, Badge for non-admin */}
-          {isAdmin && onUpdateActive ? (
+          {/* Conditional rendering: Toggle when updatable, Badge otherwise */}
+          {onUpdateActive ? (
             <ActiveToggle
               sourceId={source.id}
               sourceName={source.name}

@@ -150,35 +150,25 @@ export type SourcesResponse = Source[];
 export type SourceResponse = Source;
 
 /**
- * Input data for creating a new source (POST /sources)
- * category is required by the backend; lang is optional.
+ * Input data for creating a new source (POST /sources).
+ * Derived from the generated CreateRequest schema; name/feedURL/category are
+ * required by backend validation, lang stays optional.
  */
-export interface CreateSourceInput {
-  /** Source name (max 255 characters) */
-  name: string;
-  /** RSS/Atom feed URL (max 2048 characters) */
-  feedURL: string;
-  /** Category (required; radio segment grouping unit) */
-  category: string;
-  /** Content language (optional, e.g. "ja", "en") */
-  lang?: string;
-}
+export type CreateSourceInput = Full<
+  Omit<Schemas['internal_handler_http_source.CreateRequest'], 'lang'>
+> &
+  Pick<Schemas['internal_handler_http_source.CreateRequest'], 'lang'>;
 
 /**
- * Input data for updating an existing source (PUT /sources/:id)
+ * Input data for updating an existing source (PUT /sources/:id).
+ * Derived from the generated UpdateRequest schema; the backend accepts
+ * partial input (empty fields are kept as-is), but the edit form always
+ * sends the full set, so only lang stays optional here.
  */
-export interface UpdateSourceInput {
-  /** Source name (Required, 1-255 characters) */
-  name: string;
-  /** RSS/Atom feed URL (Required, valid URL, 1-2048 characters) */
-  feedURL: string;
-  /** Category (Required) */
-  category: string;
-  /** Content language (optional) */
-  lang?: string;
-  /** Active status (Required, current active status) */
-  active: boolean;
-}
+export type UpdateSourceInput = Full<
+  Omit<Schemas['internal_handler_http_source.UpdateRequest'], 'lang'>
+> &
+  Pick<Schemas['internal_handler_http_source.UpdateRequest'], 'lang'>;
 
 /**
  * Form field state for source creation and editing

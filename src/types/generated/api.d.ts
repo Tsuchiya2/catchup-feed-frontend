@@ -211,7 +211,7 @@ export interface paths {
             /** @description 記事情報 */
             requestBody: {
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": components["schemas"]["internal_handler_http_article.CreateRequest"];
                 };
             };
             responses: {
@@ -423,7 +423,7 @@ export interface paths {
             /** @description 更新する記事情報 */
             requestBody: {
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": components["schemas"]["internal_handler_http_article.UpdateRequest"];
                 };
             };
             responses: {
@@ -665,7 +665,7 @@ export interface paths {
             /** @description ソース情報 */
             requestBody: {
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": components["schemas"]["internal_handler_http_source.CreateRequest"];
                 };
             };
             responses: {
@@ -809,7 +809,7 @@ export interface paths {
             /** @description 更新するソース情報 */
             requestBody: {
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": components["schemas"]["internal_handler_http_source.UpdateRequest"];
                 };
             };
             responses: {
@@ -1427,6 +1427,21 @@ export interface components {
             subscriber_id?: number;
             subscriber_name?: string;
         };
+        "internal_handler_http_article.CreateRequest": {
+            /** @example 記事全文... */
+            content?: string;
+            /**
+             * @description PublishedAt is an RFC 3339 timestamp; empty means unknown.
+             * @example 2025-10-26T10:00:00Z
+             */
+            published_at?: string;
+            /** @example 1 */
+            source_id?: number;
+            /** @example Go 1.23 リリース */
+            title?: string;
+            /** @example https://example.com/article/1 */
+            url?: string;
+        };
         "internal_handler_http_article.DTO": {
             /** @example 2025-10-26T12:00:00Z */
             crawled_at?: string;
@@ -1449,6 +1464,21 @@ export interface components {
             data?: components["schemas"]["internal_handler_http_article.DTO"][];
             pagination?: components["schemas"]["catchup-feed_internal_common_pagination.Metadata"];
         };
+        "internal_handler_http_article.UpdateRequest": {
+            /** @example 記事全文... */
+            content?: string;
+            /**
+             * @description PublishedAt is an RFC 3339 timestamp.
+             * @example 2025-10-26T10:00:00Z
+             */
+            published_at?: string;
+            /** @example 1 */
+            source_id?: number;
+            /** @example Go 1.23 リリース */
+            title?: string;
+            /** @example https://example.com/article/1 */
+            url?: string;
+        };
         "internal_handler_http_auth.loginRequest": {
             /** @example admin@example.com */
             email?: string;
@@ -1458,6 +1488,16 @@ export interface components {
         "internal_handler_http_auth.tokenResponse": {
             /** @example eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9... */
             token?: string;
+        };
+        "internal_handler_http_source.CreateRequest": {
+            /** @example go */
+            category?: string;
+            /** @example https://go.dev/blog/feed.atom */
+            feedURL?: string;
+            /** @example en */
+            lang?: string;
+            /** @example Go Blog */
+            name?: string;
         };
         "internal_handler_http_source.DTO": {
             active?: boolean;
@@ -1469,6 +1509,18 @@ export interface components {
             name?: string;
             /** @description Mapped from FeedURL for frontend compatibility */
             url?: string;
+        };
+        "internal_handler_http_source.UpdateRequest": {
+            /** @example true */
+            active?: boolean;
+            /** @example go */
+            category?: string;
+            /** @example https://go.dev/blog/feed.atom */
+            feedURL?: string;
+            /** @example en */
+            lang?: string;
+            /** @example Go Blog */
+            name?: string;
         };
         "internal_handler_http_subscriber.DTO": {
             active?: boolean;

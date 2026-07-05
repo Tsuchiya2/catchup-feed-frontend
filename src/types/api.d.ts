@@ -1,13 +1,39 @@
 /**
  * API Type Definitions
  *
- * This file contains TypeScript types for the Catchup Feed backend API.
+ * Friendly aliases over the generated OpenAPI types.
  *
- * To regenerate types from the OpenAPI spec, run:
- *   npm run generate:api
+ * The contract source of truth is `src/types/generated/api.d.ts`, generated
+ * from the backend Swagger spec via:
  *
- * This requires the backend API server to be running on http://localhost:8080
+ *   npm run generate:api [-- <path-or-url-to-swagger.json>]
+ *
+ * This file only renames/derives from the generated schemas so app code can
+ * use stable, readable names. Do not hand-write API shapes here; if the
+ * backend contract changes, regenerate first, then adjust the aliases.
+ *
+ * Note on optionality: the backend emits Swagger 2.0 without `required`
+ * markers, so every generated field is optional. The helpers below restore
+ * required-ness (backend DTOs serialize all fields) and mark pointer-backed
+ * fields as `| null`.
  */
+
+import type { components } from './generated/api';
+
+type Schemas = components['schemas'];
+
+/**
+ * All fields required (backend DTOs always serialize every field).
+ */
+type Full<T> = Required<T>;
+
+/**
+ * All fields required, but keys K are nullable (backed by Go pointers,
+ * serialized as `null` when unset).
+ */
+type Nullable<T, K extends keyof T> = Omit<Required<T>, K> & {
+  [P in K]-?: NonNullable<T[P]> | null;
+};
 
 // ============================================================================
 // Authentication Types
@@ -16,14 +42,11 @@
 /**
  * Login request payload
  */
-export interface LoginRequest {
-  email: string;
-  password: string;
-}
+export type LoginRequest = Full<Schemas['internal_handler_http_auth.loginRequest']>;
 
 /**
  * Login response with JWT token
- * Note: Backend returns only token, expiresAt is not included in response
+ * Note: Backend returns only token, refresh_token is a frontend extension
  */
 export interface LoginResponse {
   token: string;
@@ -31,14 +54,14 @@ export interface LoginResponse {
 }
 
 /**
- * Token refresh request payload
+ * Token refresh request payload (frontend-internal)
  */
 export interface RefreshTokenRequest {
   refresh_token: string;
 }
 
 /**
- * Token refresh response
+ * Token refresh response (frontend-internal)
  */
 export interface RefreshTokenResponse {
   token: string;
@@ -46,7 +69,7 @@ export interface RefreshTokenResponse {
 }
 
 /**
- * Token validation response
+ * Token validation response (frontend-internal)
  */
 export interface TokenValidationResponse {
   valid: boolean;
@@ -59,19 +82,9 @@ export interface TokenValidationResponse {
 // ============================================================================
 
 /**
- * Article entity
- * Matches backend DTO: internal/handler/http/article/dto.go
+ * Article entity (title + summary only; the API does not return content)
  */
-export interface Article {
-  id: number;
-  source_id: number;
-  source_name: string;
-  title: string;
-  url: string;
-  summary: string;
-  published_at: string;
-  created_at: string;
-}
+export type Article = Full<Schemas['internal_handler_http_article.DTO']>;
 
 /**
  * Query parameters for fetching articles
@@ -89,20 +102,10 @@ export interface ArticlesQuery {
 /**
  * Pagination metadata from backend API
  */
-export interface PaginationMetadata {
-  /** Current page number (1-indexed) */
-  page: number;
-  /** Number of items per page */
-  limit: number;
-  /** Total number of items across all pages */
-  total: number;
-  /** Total number of pages */
-  total_pages: number;
-}
+export type PaginationMetadata = Full<Schemas['catchup-feed_internal_common_pagination.Metadata']>;
 
 /**
  * Generic paginated response wrapper
- * Enables pagination for any entity type
  * @template T - The type of items in the data array
  */
 export interface PaginatedResponse<T> {
@@ -119,7 +122,6 @@ export interface PaginatedArticlesResponse extends PaginatedResponse<Article> {}
 
 /**
  * Articles list response
- * Updated to use paginated format
  */
 export type ArticlesResponse = PaginatedArticlesResponse;
 
@@ -134,19 +136,11 @@ export type ArticleResponse = Article;
 
 /**
  * Source entity
- * Matches backend DTO: internal/handler/http/source/dto.go
  */
-export interface Source {
-  id: number;
-  name: string;
-  feed_url: string;
-  last_crawled_at?: string | null;
-  active: boolean;
-}
+export type Source = Full<Schemas['internal_handler_http_source.DTO']>;
 
 /**
- * Sources list response
- * Backend returns array directly, not wrapped in object
+ * Sources list response (backend returns a bare array)
  */
 export type SourcesResponse = Source[];
 
@@ -154,6 +148,136 @@ export type SourcesResponse = Source[];
  * Single source response
  */
 export type SourceResponse = Source;
+
+/**
+ * Input data for creating a new source (POST /sources)
+ * category is required by the backend; lang is optional.
+ */
+export interface CreateSourceInput {
+  /** Source name (max 255 characters) */
+  name: string;
+  /** RSS/Atom feed URL (max 2048 characters) */
+  feedURL: string;
+  /** Category (required; radio segment grouping unit) */
+  category: string;
+  /** Content language (optional, e.g. "ja", "en") */
+  lang?: string;
+}
+
+/**
+ * Input data for updating an existing source (PUT /sources/:id)
+ */
+export interface UpdateSourceInput {
+  /** Source name (Required, 1-255 characters) */
+  name: string;
+  /** RSS/Atom feed URL (Required, valid URL, 1-2048 characters) */
+  feedURL: string;
+  /** Category (Required) */
+  category: string;
+  /** Content language (optional) */
+  lang?: string;
+  /** Active status (Required, current active status) */
+  active: boolean;
+}
+
+/**
+ * Form field state for source creation and editing
+ * Used internally by SourceForm component
+ */
+export interface SourceFormData {
+  /** Source name */
+  name: string;
+  /** RSS/Atom feed URL */
+  feedURL: string;
+  /** Category (required) */
+  category: string;
+  /** Content language (optional) */
+  lang: string;
+}
+
+/**
+ * Form validation errors for source creation
+ */
+export interface SourceFormErrors {
+  /** Error message for name field */
+  name?: string;
+  /** Error message for feedURL field */
+  feedURL?: string;
+  /** Error message for category field */
+  category?: string;
+  /** Error message for lang field */
+  lang?: string;
+}
+
+// ============================================================================
+// Subscriber (friend) Types
+// ============================================================================
+
+/**
+ * Subscriber (friend) entity.
+ * `deactivated_at` set = soft-deleted (deactivated), never hard-deleted.
+ */
+export type Subscriber = Nullable<
+  Schemas['internal_handler_http_subscriber.DTO'],
+  'email' | 'note' | 'deactivated_at'
+>;
+
+/**
+ * Create/update body for subscribers.
+ * PUT /subscribers/:id is a FULL REPLACEMENT: always send every field.
+ */
+export type SubscriberInput = Nullable<
+  Schemas['internal_handler_http_subscriber.Request'],
+  'email' | 'note'
+>;
+
+// ============================================================================
+// Feed Token Types
+// ============================================================================
+
+/**
+ * Feed token as listed by GET /subscribers/:id/tokens.
+ * Plaintext token is NEVER included (D-5: hash-only storage).
+ */
+export type FeedToken = Nullable<Schemas['internal_handler_http_subscriber.TokenDTO'], 'revoked_at'>;
+
+/**
+ * Response of POST /subscribers/:id/tokens.
+ * `token` and `feed_url` are shown exactly once and can never be
+ * retrieved again (D-5). Losing them requires revoke + re-issue.
+ */
+export type IssuedFeedToken = Nullable<
+  Schemas['internal_handler_http_subscriber.IssuedTokenDTO'],
+  'revoked_at'
+>;
+
+/**
+ * Response of DELETE /tokens/:id (revocation is irreversible).
+ */
+export type RevokedFeedToken = Full<Schemas['internal_handler_http_subscriber.RevokedTokenDTO']>;
+
+// ============================================================================
+// Access Log Types
+// ============================================================================
+
+/**
+ * A single feed access record.
+ * `episode_id` null = feed.xml fetch, otherwise an episode mp3 download.
+ */
+export type AccessLog = Nullable<
+  Schemas['internal_handler_http_accesslog.DTO'],
+  'episode_id' | 'user_agent'
+>;
+
+/**
+ * Per-subscriber access summary (GET /access-logs/summary).
+ * `last_accessed_at` / `days_since_last_access` are null when the
+ * subscriber has never accessed the feed.
+ */
+export type AccessLogSummary = Nullable<
+  Schemas['internal_handler_http_accesslog.SummaryDTO'],
+  'last_accessed_at' | 'days_since_last_access'
+>;
 
 // ============================================================================
 // Error Types
@@ -189,53 +313,4 @@ export interface PaginationInfo {
 export interface ApiResponse<T> {
   data: T;
   error?: ApiErrorResponse;
-}
-
-// ============================================================================
-// Source Creation Types
-// ============================================================================
-
-/**
- * Input data for creating a new source
- * Matches backend API contract for POST /sources
- */
-export interface CreateSourceInput {
-  /** Source name (max 255 characters) */
-  name: string;
-  /** RSS/Atom feed URL (max 2048 characters) */
-  feedURL: string;
-}
-
-/**
- * Input data for updating an existing source
- * Matches backend API contract for PUT /sources/:id
- */
-export interface UpdateSourceInput {
-  /** Source name (Required, 1-255 characters) */
-  name: string;
-  /** RSS/Atom feed URL (Required, valid URL, 1-2048 characters) */
-  feedURL: string;
-  /** Active status (Required, current active status) */
-  active: boolean;
-}
-
-/**
- * Form field state for source creation and editing
- * Used internally by SourceForm component
- */
-export interface SourceFormData {
-  /** Source name */
-  name: string;
-  /** RSS/Atom feed URL */
-  feedURL: string;
-}
-
-/**
- * Form validation errors for source creation
- */
-export interface SourceFormErrors {
-  /** Error message for name field */
-  name?: string;
-  /** Error message for feedURL field */
-  feedURL?: string;
 }

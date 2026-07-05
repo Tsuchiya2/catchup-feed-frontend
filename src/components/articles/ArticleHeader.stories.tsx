@@ -39,7 +39,7 @@ const mockArticle: Article = {
   url: 'https://example.com/article-1',
   summary: 'Learn about React Server Components',
   published_at: '2024-01-15T10:30:00Z',
-  created_at: '2024-01-15T10:35:00Z',
+  crawled_at: '2024-01-15T10:35:00Z',
 };
 
 /**
@@ -123,7 +123,7 @@ export const MinimalData: Story = {
       url: '',
       summary: '',
       published_at: '',
-      created_at: '2024-01-15T10:35:00Z',
+      crawled_at: '2024-01-15T10:35:00Z',
     },
   },
 };

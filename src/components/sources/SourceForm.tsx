@@ -10,6 +10,8 @@ import { SOURCE_TEST_IDS, SOURCE_ARIA_LABELS } from '@/constants/source';
 import {
   validateSourceName,
   validateSourceFeedURL,
+  validateSourceCategory,
+  validateSourceLang,
   type SourceFormData,
   type SourceFormErrors,
 } from '@/utils/validation/sourceValidation';
@@ -39,6 +41,8 @@ export interface SourceFormProps {
 const defaultFormData: SourceFormData = {
   name: '',
   feedURL: '',
+  category: '',
+  lang: '',
 };
 
 /**
@@ -99,6 +103,14 @@ export function SourceForm({
       return validateSourceFeedURL(value);
     }
 
+    if (field === 'category') {
+      return validateSourceCategory(value);
+    }
+
+    if (field === 'lang') {
+      return validateSourceLang(value);
+    }
+
     return undefined;
   };
 
@@ -128,12 +140,14 @@ export function SourceForm({
     const newErrors: SourceFormErrors = {
       name: validateField('name', formData.name),
       feedURL: validateField('feedURL', formData.feedURL),
+      category: validateField('category', formData.category),
+      lang: validateField('lang', formData.lang),
     };
 
     setErrors(newErrors);
 
     // Check if there are any errors
-    if (newErrors.name || newErrors.feedURL) {
+    if (newErrors.name || newErrors.feedURL || newErrors.category || newErrors.lang) {
       return;
     }
 
@@ -141,6 +155,8 @@ export function SourceForm({
     await onSubmit({
       name: formData.name.trim(),
       feedURL: formData.feedURL.trim(),
+      category: formData.category.trim(),
+      lang: formData.lang.trim(),
     });
   };
 
@@ -187,6 +203,41 @@ export function SourceForm({
           aria-describedby={errors.feedURL ? 'source-feedURL-error' : undefined}
           disabled={isLoading}
           maxLength={SOURCE_CONFIG.URL_MAX_LENGTH}
+        />
+      </FormField>
+
+      {/* Category Field */}
+      <FormField label="Category" required htmlFor="source-category" error={errors.category}>
+        <Input
+          id="source-category"
+          data-testid={SOURCE_TEST_IDS.CATEGORY_INPUT}
+          aria-label={SOURCE_ARIA_LABELS.CATEGORY_INPUT}
+          value={formData.category}
+          onChange={(e) => handleChange('category', e.target.value)}
+          onBlur={() => handleBlur('category')}
+          placeholder="e.g., dev"
+          aria-required="true"
+          aria-invalid={!!errors.category}
+          aria-describedby={errors.category ? 'source-category-error' : undefined}
+          disabled={isLoading}
+          maxLength={SOURCE_CONFIG.CATEGORY_MAX_LENGTH}
+        />
+      </FormField>
+
+      {/* Lang Field */}
+      <FormField label="Language" htmlFor="source-lang" error={errors.lang}>
+        <Input
+          id="source-lang"
+          data-testid={SOURCE_TEST_IDS.LANG_INPUT}
+          aria-label={SOURCE_ARIA_LABELS.LANG_INPUT}
+          value={formData.lang}
+          onChange={(e) => handleChange('lang', e.target.value)}
+          onBlur={() => handleBlur('lang')}
+          placeholder="e.g., ja, en (optional)"
+          aria-invalid={!!errors.lang}
+          aria-describedby={errors.lang ? 'source-lang-error' : undefined}
+          disabled={isLoading}
+          maxLength={SOURCE_CONFIG.LANG_MAX_LENGTH}
         />
       </FormField>
 

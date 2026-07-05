@@ -34,22 +34,31 @@ describe('SourcesPage', () => {
       id: 1,
       name: 'Tech Blog',
       feed_url: 'https://example.com/tech.xml',
+      url: 'https://example.com/tech.xml',
+      category: 'dev',
+      lang: 'en',
       active: true,
-      last_crawled_at: '2025-01-15T10:00:00Z',
+      created_at: '2025-01-15T10:00:00Z',
     },
     {
       id: 2,
       name: 'News Site',
       feed_url: 'https://example.com/news.xml',
+      url: 'https://example.com/news.xml',
+      category: 'news',
+      lang: 'ja',
       active: false,
-      last_crawled_at: '2025-01-14T15:30:00Z',
+      created_at: '2025-01-14T15:30:00Z',
     },
     {
       id: 3,
       name: 'Developer Feed',
       feed_url: 'https://example.com/dev.xml',
+      url: 'https://example.com/dev.xml',
+      category: 'dev',
+      lang: '',
       active: true,
-      last_crawled_at: null,
+      created_at: '2025-01-13T09:00:00Z',
     },
   ];
 
@@ -84,13 +93,8 @@ describe('SourcesPage', () => {
       refetch: vi.fn(),
     });
 
-    vi.mocked(sourcesApi.updateSourceActive).mockResolvedValue({
-      id: 1,
-      name: 'Tech Blog',
-      feed_url: 'https://example.com/tech.xml',
-      active: false,
-      last_crawled_at: '2025-01-15T10:00:00Z',
-    });
+    // Backend responds 204 No Content
+    vi.mocked(sourcesApi.updateSourceActive).mockResolvedValue(undefined);
   });
 
   afterEach(() => {
@@ -250,8 +254,8 @@ describe('SourcesPage', () => {
     it('should update cache optimistically', async () => {
       // Arrange
       const user = userEvent.setup();
-      let resolveUpdate: (value: Source) => void;
-      const updatePromise = new Promise<Source>((resolve) => {
+      let resolveUpdate: () => void;
+      const updatePromise = new Promise<void>((resolve) => {
         resolveUpdate = resolve;
       });
       vi.mocked(sourcesApi.updateSourceActive).mockReturnValue(updatePromise);
@@ -273,14 +277,8 @@ describe('SourcesPage', () => {
         expect(toggles[0]!).not.toBeChecked();
       });
 
-      // Resolve the API call
-      resolveUpdate!({
-        id: 1,
-        name: 'Tech Blog',
-        feed_url: 'https://example.com/tech.xml',
-        active: false,
-        last_crawled_at: '2025-01-15T10:00:00Z',
-      });
+      // Resolve the API call (backend responds 204 No Content)
+      resolveUpdate!();
     });
 
     it('should invalidate query cache after successful update', async () => {
@@ -314,20 +312,8 @@ describe('SourcesPage', () => {
       // Arrange
       const user = userEvent.setup();
       vi.mocked(sourcesApi.updateSourceActive)
-        .mockResolvedValueOnce({
-          id: 1,
-          name: 'Tech Blog',
-          feed_url: 'https://example.com/tech.xml',
-          active: false,
-          last_crawled_at: '2025-01-15T10:00:00Z',
-        })
-        .mockResolvedValueOnce({
-          id: 2,
-          name: 'News Site',
-          feed_url: 'https://example.com/news.xml',
-          active: true,
-          last_crawled_at: '2025-01-14T15:30:00Z',
-        });
+        .mockResolvedValueOnce(undefined)
+        .mockResolvedValueOnce(undefined);
 
       renderWithClient(<SourcesPage />);
 
@@ -659,20 +645,8 @@ describe('SourcesPage', () => {
       vi.mocked(roleUtils.getUserRole).mockReturnValue('admin');
 
       vi.mocked(sourcesApi.updateSourceActive)
-        .mockResolvedValueOnce({
-          id: 1,
-          name: 'Tech Blog',
-          feed_url: 'https://example.com/tech.xml',
-          active: false,
-          last_crawled_at: '2025-01-15T10:00:00Z',
-        })
-        .mockResolvedValueOnce({
-          id: 1,
-          name: 'Tech Blog',
-          feed_url: 'https://example.com/tech.xml',
-          active: true,
-          last_crawled_at: '2025-01-15T10:00:00Z',
-        });
+        .mockResolvedValueOnce(undefined)
+        .mockResolvedValueOnce(undefined);
 
       renderWithClient(<SourcesPage />);
 

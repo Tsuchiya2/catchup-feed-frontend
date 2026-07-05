@@ -19,6 +19,10 @@ export interface SourceFormData {
   name: string;
   /** RSS/Atom feed URL */
   feedURL: string;
+  /** Category (required; radio segment grouping unit) */
+  category: string;
+  /** Content language (optional, e.g. "ja", "en") */
+  lang: string;
 }
 
 /**
@@ -30,6 +34,10 @@ export interface SourceFormErrors {
   name?: string;
   /** Error message for feedURL field, undefined if valid */
   feedURL?: string;
+  /** Error message for category field, undefined if valid */
+  category?: string;
+  /** Error message for lang field, undefined if valid */
+  lang?: string;
 }
 
 /**
@@ -114,6 +122,56 @@ export function validateSourceFeedURL(feedURL: string): string | undefined {
 }
 
 /**
+ * Validates source category field
+ *
+ * Validation rules:
+ * - Must not be empty (after trimming whitespace) - required by the backend
+ * - Must not exceed maximum length defined in SOURCE_CONFIG
+ *
+ * @param category - The category to validate
+ * @returns Error message if invalid, undefined if valid
+ *
+ * @example
+ * ```typescript
+ * validateSourceCategory('dev')  // undefined (valid)
+ * validateSourceCategory('')     // "Category is required"
+ * ```
+ */
+export function validateSourceCategory(category: string): string | undefined {
+  if (!category || category.trim().length === 0) {
+    return ERROR_MESSAGES.CATEGORY_REQUIRED;
+  }
+
+  if (category.length > SOURCE_CONFIG.CATEGORY_MAX_LENGTH) {
+    return ERROR_MESSAGES.CATEGORY_MAX_LENGTH;
+  }
+
+  return undefined;
+}
+
+/**
+ * Validates source lang field (optional)
+ *
+ * Validation rules:
+ * - Empty is allowed (backend applies its default)
+ * - Must not exceed maximum length defined in SOURCE_CONFIG
+ *
+ * @param lang - The language code to validate (e.g. "ja", "en")
+ * @returns Error message if invalid, undefined if valid
+ */
+export function validateSourceLang(lang: string): string | undefined {
+  if (!lang || lang.trim().length === 0) {
+    return undefined;
+  }
+
+  if (lang.length > SOURCE_CONFIG.LANG_MAX_LENGTH) {
+    return ERROR_MESSAGES.LANG_MAX_LENGTH;
+  }
+
+  return undefined;
+}
+
+/**
  * Validates entire source form data
  *
  * Runs all field validations and collects errors.
@@ -164,6 +222,18 @@ export function validateSourceForm(data: SourceFormData): SourceFormErrors {
   const feedURLError = validateSourceFeedURL(data.feedURL);
   if (feedURLError) {
     errors.feedURL = feedURLError;
+  }
+
+  // Validate category field
+  const categoryError = validateSourceCategory(data.category);
+  if (categoryError) {
+    errors.category = categoryError;
+  }
+
+  // Validate lang field
+  const langError = validateSourceLang(data.lang);
+  if (langError) {
+    errors.lang = langError;
   }
 
   return errors;

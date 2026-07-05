@@ -1,12 +1,12 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { SourceSearch, SourceSearchState, toSearchParams, hasActiveFilters } from './SourceSearch';
 
 describe('SourceSearch', () => {
   const defaultSearchState: SourceSearchState = {
     keyword: '',
-    sourceType: null,
+    category: null,
     active: null,
   };
 
@@ -23,10 +23,11 @@ describe('SourceSearch', () => {
       expect(screen.getByPlaceholderText('Search by name or URL...')).toBeInTheDocument();
     });
 
-    it('should render type filter', () => {
+    it('should render category filter', () => {
       render(<SourceSearch searchState={defaultSearchState} onSearchChange={vi.fn()} />);
 
-      expect(screen.getByLabelText('Type')).toBeInTheDocument();
+      expect(screen.getByLabelText('Filter by category')).toBeInTheDocument();
+      expect(screen.getByText('Category')).toBeInTheDocument();
     });
 
     it('should render active filter', () => {
@@ -69,11 +70,11 @@ describe('SourceSearch', () => {
       expect(screen.getByPlaceholderText('Search by name or URL...')).toHaveValue('Blog');
     });
 
-    it('should display current type selection', () => {
-      const searchState = { ...defaultSearchState, sourceType: 'RSS' };
+    it('should display current category selection', () => {
+      const searchState = { ...defaultSearchState, category: 'dev' };
       render(<SourceSearch searchState={searchState} onSearchChange={vi.fn()} />);
 
-      expect(screen.getByLabelText('Type')).toHaveValue('RSS');
+      expect(screen.getByLabelText('Filter by category')).toHaveValue('dev');
     });
 
     it('should display current active selection (true)', () => {
@@ -92,16 +93,18 @@ describe('SourceSearch', () => {
   });
 
   describe('State Changes', () => {
-    it('should call onSearchChange when type changes', async () => {
+    it('should call onSearchChange when category changes (debounced)', async () => {
       const user = userEvent.setup();
       const onSearchChange = vi.fn();
       render(<SourceSearch searchState={defaultSearchState} onSearchChange={onSearchChange} />);
 
-      await user.selectOptions(screen.getByLabelText('Type'), 'RSS');
+      await user.type(screen.getByLabelText('Filter by category'), 'dev');
 
-      expect(onSearchChange).toHaveBeenCalledWith({
-        ...defaultSearchState,
-        sourceType: 'RSS',
+      await waitFor(() => {
+        expect(onSearchChange).toHaveBeenCalledWith({
+          ...defaultSearchState,
+          category: 'dev',
+        });
       });
     });
 
@@ -121,14 +124,14 @@ describe('SourceSearch', () => {
     it('should call onSearchChange when Clear All Filters is clicked', async () => {
       const user = userEvent.setup();
       const onSearchChange = vi.fn();
-      const searchState = { keyword: 'test', sourceType: 'RSS', active: true };
+      const searchState = { keyword: 'test', category: 'dev', active: true };
       render(<SourceSearch searchState={searchState} onSearchChange={onSearchChange} />);
 
       await user.click(screen.getByRole('button', { name: 'Clear All Filters' }));
 
       expect(onSearchChange).toHaveBeenCalledWith({
         keyword: '',
-        sourceType: null,
+        category: null,
         active: null,
       });
     });
@@ -154,8 +157,8 @@ describe('SourceSearch', () => {
       expect(screen.getByRole('button', { name: 'Clear All Filters' })).toBeInTheDocument();
     });
 
-    it('should show Clear All when sourceType is set', () => {
-      const searchState = { ...defaultSearchState, sourceType: 'RSS' };
+    it('should show Clear All when category is set', () => {
+      const searchState = { ...defaultSearchState, category: 'dev' };
       render(<SourceSearch searchState={searchState} onSearchChange={vi.fn()} />);
 
       expect(screen.getByRole('button', { name: 'Clear All Filters' })).toBeInTheDocument();
@@ -181,13 +184,13 @@ describe('toSearchParams', () => {
   it('should convert full state to params', () => {
     const state: SourceSearchState = {
       keyword: 'Blog',
-      sourceType: 'RSS',
+      category: 'dev',
       active: true,
     };
 
     expect(toSearchParams(state)).toEqual({
       keyword: 'Blog',
-      source_type: 'RSS',
+      category: 'dev',
       active: true,
     });
   });
@@ -195,13 +198,13 @@ describe('toSearchParams', () => {
   it('should omit empty values', () => {
     const state: SourceSearchState = {
       keyword: '',
-      sourceType: null,
+      category: null,
       active: null,
     };
 
     expect(toSearchParams(state)).toEqual({
       keyword: undefined,
-      source_type: undefined,
+      category: undefined,
       active: undefined,
     });
   });
@@ -209,13 +212,13 @@ describe('toSearchParams', () => {
   it('should handle partial state', () => {
     const state: SourceSearchState = {
       keyword: 'test',
-      sourceType: null,
+      category: null,
       active: true,
     };
 
     expect(toSearchParams(state)).toEqual({
       keyword: 'test',
-      source_type: undefined,
+      category: undefined,
       active: true,
     });
   });
@@ -223,13 +226,13 @@ describe('toSearchParams', () => {
   it('should handle active: false correctly', () => {
     const state: SourceSearchState = {
       keyword: '',
-      sourceType: null,
+      category: null,
       active: false,
     };
 
     expect(toSearchParams(state)).toEqual({
       keyword: undefined,
-      source_type: undefined,
+      category: undefined,
       active: false,
     });
   });
@@ -239,7 +242,7 @@ describe('hasActiveFilters', () => {
   it('should return false for empty state', () => {
     const state: SourceSearchState = {
       keyword: '',
-      sourceType: null,
+      category: null,
       active: null,
     };
 
@@ -249,17 +252,17 @@ describe('hasActiveFilters', () => {
   it('should return true when keyword is set', () => {
     const state: SourceSearchState = {
       keyword: 'test',
-      sourceType: null,
+      category: null,
       active: null,
     };
 
     expect(hasActiveFilters(state)).toBe(true);
   });
 
-  it('should return true when sourceType is set', () => {
+  it('should return true when category is set', () => {
     const state: SourceSearchState = {
       keyword: '',
-      sourceType: 'RSS',
+      category: 'dev',
       active: null,
     };
 
@@ -269,7 +272,7 @@ describe('hasActiveFilters', () => {
   it('should return true when active is true', () => {
     const state: SourceSearchState = {
       keyword: '',
-      sourceType: null,
+      category: null,
       active: true,
     };
 
@@ -279,7 +282,7 @@ describe('hasActiveFilters', () => {
   it('should return true when active is false', () => {
     const state: SourceSearchState = {
       keyword: '',
-      sourceType: null,
+      category: null,
       active: false,
     };
 
@@ -289,7 +292,7 @@ describe('hasActiveFilters', () => {
   it('should return true when multiple filters are set', () => {
     const state: SourceSearchState = {
       keyword: 'test',
-      sourceType: 'RSS',
+      category: 'dev',
       active: true,
     };
 

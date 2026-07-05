@@ -1,5 +1,7 @@
 {
-  "extends": ["next/core-web-vitals"],
+  "extends": [
+    "next/core-web-vitals"
+  ],
   "rules": {},
   "ignorePatterns": [
     "node_modules/",
@@ -8,6 +10,7 @@
     "build/",
     "dist/",
     "coverage/",
-    "storybook-static/"
+    "storybook-static/",
+    "src/types/generated/"
   ]
 }

@@ -25,8 +25,11 @@ describe('useSourceSearch', () => {
     id: 1,
     name: 'Test Source',
     feed_url: 'https://example.com/feed.xml',
+    url: 'https://example.com/feed.xml',
+    category: 'dev',
+    lang: 'en',
     active: true,
-    last_crawled_at: new Date().toISOString(),
+    created_at: '2025-01-01T00:00:00Z',
     ...overrides,
   });
 
@@ -105,10 +108,10 @@ describe('useSourceSearch', () => {
       expect(sourceApi.searchSources).toHaveBeenCalledWith({ keyword: 'Blog' });
     });
 
-    it('should handle source_type filter', async () => {
+    it('should handle category filter', async () => {
       vi.mocked(sourceApi.searchSources).mockResolvedValue(mockSources);
 
-      const { result } = renderHook(() => useSourceSearch({ source_type: 'RSS' }), {
+      const { result } = renderHook(() => useSourceSearch({ category: 'dev' }), {
         wrapper: createWrapper(),
       });
 
@@ -116,7 +119,7 @@ describe('useSourceSearch', () => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      expect(sourceApi.searchSources).toHaveBeenCalledWith({ source_type: 'RSS' });
+      expect(sourceApi.searchSources).toHaveBeenCalledWith({ category: 'dev' });
     });
 
     it('should handle active status filter', async () => {
@@ -152,7 +155,7 @@ describe('useSourceSearch', () => {
 
       const params = {
         keyword: 'Tech',
-        source_type: 'RSS',
+        category: 'dev',
         active: true,
       };
       const { result } = renderHook(() => useSourceSearch(params), {

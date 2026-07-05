@@ -39,7 +39,11 @@ const mockSource: Source = {
   id: 1,
   name: 'Original Tech Blog',
   feed_url: 'https://original.com/feed.xml',
+  url: 'https://original.com/feed.xml',
+  category: 'tech',
+  lang: 'en',
   active: true,
+  created_at: '2024-01-01T00:00:00Z',
 };
 
 const mockSourcesResponse: SourcesResponse = [mockSource];
@@ -67,7 +71,7 @@ describe('useUpdateSource', () => {
   describe('API Call Tests', () => {
     it('calls updateSource API with correct id and data parameters', async () => {
       const mockUpdateSource = vi.mocked(sourcesApi.updateSource);
-      mockUpdateSource.mockResolvedValueOnce(mockSource);
+      mockUpdateSource.mockResolvedValueOnce(undefined);
 
       const { result } = renderHook(() => useUpdateSource(), {
         wrapper: createWrapper(),
@@ -76,6 +80,7 @@ describe('useUpdateSource', () => {
       const updateData = {
         name: 'Updated Tech Blog',
         feedURL: 'https://updated.com/feed.xml',
+        category: 'tech',
         active: false,
       };
 
@@ -92,7 +97,7 @@ describe('useUpdateSource', () => {
 
     it('calls updateSource API with multiple different IDs', async () => {
       const mockUpdateSource = vi.mocked(sourcesApi.updateSource);
-      mockUpdateSource.mockResolvedValue(mockSource);
+      mockUpdateSource.mockResolvedValue(undefined);
 
       const wrapper = createWrapper();
 
@@ -103,7 +108,7 @@ describe('useUpdateSource', () => {
       await act(async () => {
         await result1.current.mutateAsync({
           id: 1,
-          data: { name: 'Blog 1', feedURL: 'https://blog1.com/feed.xml', active: true },
+          data: { name: 'Blog 1', feedURL: 'https://blog1.com/feed.xml', category: 'tech', active: true },
         });
       });
 
@@ -114,18 +119,20 @@ describe('useUpdateSource', () => {
       await act(async () => {
         await result2.current.mutateAsync({
           id: 2,
-          data: { name: 'Blog 2', feedURL: 'https://blog2.com/feed.xml', active: false },
+          data: { name: 'Blog 2', feedURL: 'https://blog2.com/feed.xml', category: 'tech', active: false },
         });
       });
 
       expect(mockUpdateSource).toHaveBeenCalledWith(1, {
         name: 'Blog 1',
         feedURL: 'https://blog1.com/feed.xml',
+        category: 'tech',
         active: true,
       });
       expect(mockUpdateSource).toHaveBeenCalledWith(2, {
         name: 'Blog 2',
         feedURL: 'https://blog2.com/feed.xml',
+        category: 'tech',
         active: false,
       });
       expect(mockUpdateSource).toHaveBeenCalledTimes(2);
@@ -136,8 +143,8 @@ describe('useUpdateSource', () => {
     it('updates cache immediately on mutate (optimistic update)', async () => {
       const mockUpdateSource = vi.mocked(sourcesApi.updateSource);
       let resolvePromise: () => void;
-      const pendingPromise = new Promise<Source>((resolve) => {
-        resolvePromise = () => resolve(mockSource);
+      const pendingPromise = new Promise<void>((resolve) => {
+        resolvePromise = () => resolve();
       });
       mockUpdateSource.mockReturnValueOnce(pendingPromise);
 
@@ -166,6 +173,7 @@ describe('useUpdateSource', () => {
           data: {
             name: 'Optimistically Updated',
             feedURL: 'https://optimistic.com/feed.xml',
+            category: 'tech',
             active: false,
           },
         });
@@ -191,7 +199,7 @@ describe('useUpdateSource', () => {
 
     it('snapshots previous state before optimistic update', async () => {
       const mockUpdateSource = vi.mocked(sourcesApi.updateSource);
-      mockUpdateSource.mockResolvedValueOnce(mockSource);
+      mockUpdateSource.mockResolvedValueOnce(undefined);
 
       const queryClient = new QueryClient({
         defaultOptions: {
@@ -223,6 +231,7 @@ describe('useUpdateSource', () => {
           data: {
             name: 'New Name',
             feedURL: 'https://new.com/feed.xml',
+            category: 'tech',
             active: true,
           },
         });
@@ -234,7 +243,7 @@ describe('useUpdateSource', () => {
 
     it('preserves other sources in cache during optimistic update', async () => {
       const mockUpdateSource = vi.mocked(sourcesApi.updateSource);
-      mockUpdateSource.mockResolvedValueOnce(mockSource);
+      mockUpdateSource.mockResolvedValueOnce(undefined);
 
       const queryClient = new QueryClient({
         defaultOptions: {
@@ -253,7 +262,11 @@ describe('useUpdateSource', () => {
           id: 2,
           name: 'Other Blog',
           feed_url: 'https://other.com/feed.xml',
+          url: 'https://other.com/feed.xml',
+          category: 'tech',
+          lang: 'en',
           active: true,
+          created_at: '2024-01-02T00:00:00Z',
         },
       ];
       queryClient.setQueryData<SourcesResponse>(['sources'], multipleSourcesData);
@@ -268,6 +281,7 @@ describe('useUpdateSource', () => {
           data: {
             name: 'Updated First Blog',
             feedURL: 'https://updated.com/feed.xml',
+            category: 'tech',
             active: false,
           },
         });
@@ -320,6 +334,7 @@ describe('useUpdateSource', () => {
             data: {
               name: 'Failed Update',
               feedURL: 'https://failed.com/feed.xml',
+              category: 'tech',
               active: false,
             },
           });
@@ -354,6 +369,7 @@ describe('useUpdateSource', () => {
             data: {
               name: 'Test',
               feedURL: 'https://test.com/feed.xml',
+              category: 'tech',
               active: true,
             },
           });
@@ -384,6 +400,7 @@ describe('useUpdateSource', () => {
             data: {
               name: 'Non-existent',
               feedURL: 'https://test.com/feed.xml',
+              category: 'tech',
               active: true,
             },
           });
@@ -414,6 +431,7 @@ describe('useUpdateSource', () => {
             data: {
               name: 'Unauthorized Update',
               feedURL: 'https://test.com/feed.xml',
+              category: 'tech',
               active: true,
             },
           });
@@ -432,7 +450,7 @@ describe('useUpdateSource', () => {
   describe('Success Handling Tests', () => {
     it('invalidates sources query on success', async () => {
       const mockUpdateSource = vi.mocked(sourcesApi.updateSource);
-      mockUpdateSource.mockResolvedValueOnce(mockSource);
+      mockUpdateSource.mockResolvedValueOnce(undefined);
 
       const queryClient = new QueryClient({
         defaultOptions: {
@@ -460,6 +478,7 @@ describe('useUpdateSource', () => {
           data: {
             name: 'Updated',
             feedURL: 'https://updated.com/feed.xml',
+            category: 'tech',
             active: true,
           },
         });
@@ -472,7 +491,7 @@ describe('useUpdateSource', () => {
 
     it('triggers cache refetch after successful update', async () => {
       const mockUpdateSource = vi.mocked(sourcesApi.updateSource);
-      mockUpdateSource.mockResolvedValueOnce(mockSource);
+      mockUpdateSource.mockResolvedValueOnce(undefined);
 
       const queryClient = new QueryClient({
         defaultOptions: {
@@ -497,6 +516,7 @@ describe('useUpdateSource', () => {
           data: {
             name: 'Updated',
             feedURL: 'https://updated.com/feed.xml',
+            category: 'tech',
             active: true,
           },
         });
@@ -513,8 +533,8 @@ describe('useUpdateSource', () => {
     it('isPending is true during mutation', async () => {
       const mockUpdateSource = vi.mocked(sourcesApi.updateSource);
       let resolvePromise: () => void;
-      const pendingPromise = new Promise<Source>((resolve) => {
-        resolvePromise = () => resolve(mockSource);
+      const pendingPromise = new Promise<void>((resolve) => {
+        resolvePromise = () => resolve();
       });
       mockUpdateSource.mockReturnValueOnce(pendingPromise);
 
@@ -528,6 +548,7 @@ describe('useUpdateSource', () => {
           data: {
             name: 'Test',
             feedURL: 'https://test.com/feed.xml',
+            category: 'tech',
             active: true,
           },
         });
@@ -548,7 +569,7 @@ describe('useUpdateSource', () => {
 
     it('isSuccess is true after successful mutation', async () => {
       const mockUpdateSource = vi.mocked(sourcesApi.updateSource);
-      mockUpdateSource.mockResolvedValueOnce(mockSource);
+      mockUpdateSource.mockResolvedValueOnce(undefined);
 
       const { result } = renderHook(() => useUpdateSource(), {
         wrapper: createWrapper(),
@@ -560,6 +581,7 @@ describe('useUpdateSource', () => {
           data: {
             name: 'Success Test',
             feedURL: 'https://success.com/feed.xml',
+            category: 'tech',
             active: true,
           },
         });
@@ -586,6 +608,7 @@ describe('useUpdateSource', () => {
             data: {
               name: 'Fail Test',
               feedURL: 'https://fail.com/feed.xml',
+              category: 'tech',
               active: true,
             },
           });
@@ -616,6 +639,7 @@ describe('useUpdateSource', () => {
             data: {
               name: 'Test',
               feedURL: 'https://test.com/feed.xml',
+              category: 'tech',
               active: true,
             },
           });
@@ -641,7 +665,7 @@ describe('useUpdateSource', () => {
 
     it('reset() clears success state', async () => {
       const mockUpdateSource = vi.mocked(sourcesApi.updateSource);
-      mockUpdateSource.mockResolvedValueOnce(mockSource);
+      mockUpdateSource.mockResolvedValueOnce(undefined);
 
       const { result } = renderHook(() => useUpdateSource(), {
         wrapper: createWrapper(),
@@ -653,6 +677,7 @@ describe('useUpdateSource', () => {
           data: {
             name: 'Test',
             feedURL: 'https://test.com/feed.xml',
+            category: 'tech',
             active: true,
           },
         });
@@ -676,7 +701,7 @@ describe('useUpdateSource', () => {
   describe('Edge Cases', () => {
     it('handles empty cache gracefully during optimistic update', async () => {
       const mockUpdateSource = vi.mocked(sourcesApi.updateSource);
-      mockUpdateSource.mockResolvedValueOnce(mockSource);
+      mockUpdateSource.mockResolvedValueOnce(undefined);
 
       const queryClient = new QueryClient({
         defaultOptions: {
@@ -700,6 +725,7 @@ describe('useUpdateSource', () => {
           data: {
             name: 'Empty Cache Test',
             feedURL: 'https://test.com/feed.xml',
+            category: 'tech',
             active: true,
           },
         });
@@ -713,7 +739,7 @@ describe('useUpdateSource', () => {
 
     it('handles concurrent mutations correctly', async () => {
       const mockUpdateSource = vi.mocked(sourcesApi.updateSource);
-      mockUpdateSource.mockResolvedValue(mockSource);
+      mockUpdateSource.mockResolvedValue(undefined);
 
       const wrapper = createWrapper();
 
@@ -725,11 +751,11 @@ describe('useUpdateSource', () => {
       await act(async () => {
         const promise1 = result.current.mutateAsync({
           id: 1,
-          data: { name: 'Update 1', feedURL: 'https://test1.com/feed.xml', active: true },
+          data: { name: 'Update 1', feedURL: 'https://test1.com/feed.xml', category: 'tech', active: true },
         });
         const promise2 = result.current.mutateAsync({
           id: 2,
-          data: { name: 'Update 2', feedURL: 'https://test2.com/feed.xml', active: false },
+          data: { name: 'Update 2', feedURL: 'https://test2.com/feed.xml', category: 'tech', active: false },
         });
 
         await Promise.all([promise1, promise2]);
@@ -742,7 +768,7 @@ describe('useUpdateSource', () => {
       const mockUpdateSource = vi.mocked(sourcesApi.updateSource);
       const error = new Error('First attempt failed');
       mockUpdateSource.mockRejectedValueOnce(error);
-      mockUpdateSource.mockResolvedValueOnce(mockSource);
+      mockUpdateSource.mockResolvedValueOnce(undefined);
 
       const { result } = renderHook(() => useUpdateSource(), {
         wrapper: createWrapper(),
@@ -756,6 +782,7 @@ describe('useUpdateSource', () => {
             data: {
               name: 'Retry Test',
               feedURL: 'https://retry.com/feed.xml',
+              category: 'tech',
               active: true,
             },
           });
@@ -780,6 +807,7 @@ describe('useUpdateSource', () => {
           data: {
             name: 'Retry Test',
             feedURL: 'https://retry.com/feed.xml',
+            category: 'tech',
             active: true,
           },
         });
@@ -795,7 +823,7 @@ describe('useUpdateSource', () => {
   describe('Integration with mutateAsync', () => {
     it('mutateAsync returns promise that resolves on success', async () => {
       const mockUpdateSource = vi.mocked(sourcesApi.updateSource);
-      mockUpdateSource.mockResolvedValueOnce(mockSource);
+      mockUpdateSource.mockResolvedValueOnce(undefined);
 
       const { result } = renderHook(() => useUpdateSource(), {
         wrapper: createWrapper(),
@@ -810,6 +838,7 @@ describe('useUpdateSource', () => {
             data: {
               name: 'Promise Test',
               feedURL: 'https://promise.com/feed.xml',
+              category: 'tech',
               active: true,
             },
           })
@@ -843,6 +872,7 @@ describe('useUpdateSource', () => {
             data: {
               name: 'Error Test',
               feedURL: 'https://error.com/feed.xml',
+              category: 'tech',
               active: true,
             },
           });

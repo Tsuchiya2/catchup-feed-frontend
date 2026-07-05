@@ -9,7 +9,7 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { updateSource } from '@/lib/api/endpoints/sources';
-import type { UpdateSourceInput, Source, SourcesResponse } from '@/types/api';
+import type { UpdateSourceInput, SourcesResponse } from '@/types/api';
 
 /**
  * Update source hook return type
@@ -90,6 +90,9 @@ export function useUpdateSource(): UseUpdateSourceReturn {
               ...source,
               name: data.name,
               feed_url: data.feedURL,
+              url: data.feedURL,
+              category: data.category,
+              lang: data.lang ?? source.lang,
               active: data.active,
             };
           }

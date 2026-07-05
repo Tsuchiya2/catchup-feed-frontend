@@ -6,14 +6,16 @@
  * - Edit button (admin only, when onEdit provided)
  * - Delete button (admin only, when onDelete provided)
  * - Feed URL (truncated with tooltip)
+ * - Category and language badges
  * - Active/Inactive status badge (non-admin) or toggle (admin)
- * - Last crawled timestamp
+ * - Added (created_at) timestamp
  * - Cyber/glow theme styling
  */
 import * as React from 'react';
 import { Rss, Pencil, Trash2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { formatRelativeTime } from '@/lib/utils/formatDate';
 import type { Source } from '@/types/api';
@@ -64,9 +66,7 @@ export const SourceCard = React.memo(function SourceCard({
   onEdit,
   onDelete,
 }: SourceCardProps) {
-  const lastCrawled = source.last_crawled_at
-    ? formatRelativeTime(source.last_crawled_at)
-    : 'Never crawled';
+  const createdAt = source.created_at ? formatRelativeTime(source.created_at) : 'Unknown';
 
   const isAdmin = userRole === 'admin';
 
@@ -126,6 +126,18 @@ export const SourceCard = React.memo(function SourceCard({
           </div>
         </div>
 
+        {/* Category and Language */}
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge variant="outline" aria-label={`Category: ${source.category}`}>
+            {source.category}
+          </Badge>
+          {source.lang && (
+            <Badge variant="secondary" aria-label={`Language: ${source.lang}`}>
+              {source.lang}
+            </Badge>
+          )}
+        </div>
+
         {/* Feed URL */}
         <div className="min-w-0">
           <a
@@ -155,10 +167,10 @@ export const SourceCard = React.memo(function SourceCard({
           )}
           <time
             className="text-xs text-muted-foreground"
-            dateTime={source.last_crawled_at || undefined}
-            aria-label={`Last crawled: ${lastCrawled}`}
+            dateTime={source.created_at || undefined}
+            aria-label={`Added: ${createdAt}`}
           >
-            {lastCrawled}
+            Added {createdAt}
           </time>
         </div>
       </CardContent>

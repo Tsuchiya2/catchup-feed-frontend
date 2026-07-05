@@ -10,7 +10,7 @@
     "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
     "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css,md}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json,css,md}\"",
-    "generate:api": "openapi-typescript http://localhost:8080/swagger/doc.json -o src/types/api.d.ts",
+    "generate:api": "node scripts/generate-api.mjs",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
@@ -90,6 +90,7 @@
     "prettier": "^3.7.2",
     "serwist": "^9.0.0",
     "storybook": "^8.5.0",
+    "swagger2openapi": "^7.0.8",
     "tailwindcss": "^4.0.0",
     "typescript": "^5.0.0",
     "vitest": "^4.0.14"

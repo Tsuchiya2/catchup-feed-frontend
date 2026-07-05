@@ -20,8 +20,11 @@ describe('SourceCard', () => {
     id: 1,
     name: 'Test Source',
     feed_url: 'https://example.com/feed.xml',
+    url: 'https://example.com/feed.xml',
+    category: 'dev',
+    lang: 'en',
     active: true,
-    last_crawled_at: new Date(NOW.getTime() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
+    created_at: new Date(NOW.getTime() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
     ...overrides,
   });
 
@@ -46,18 +49,30 @@ describe('SourceCard', () => {
       expect(screen.getByText('Active')).toBeInTheDocument();
     });
 
-    it('should render last crawled time', () => {
+    it('should render added time', () => {
       const source = createMockSource({
-        last_crawled_at: new Date(NOW.getTime() - 2 * 60 * 60 * 1000).toISOString(),
+        created_at: new Date(NOW.getTime() - 2 * 60 * 60 * 1000).toISOString(),
       });
       render(<SourceCard source={source} userRole="user" />);
-      expect(screen.getByText('2 hours ago')).toBeInTheDocument();
+      expect(screen.getByText('Added 2 hours ago')).toBeInTheDocument();
     });
 
-    it('should render "Never crawled" when last_crawled_at is null', () => {
-      const source = createMockSource({ last_crawled_at: null });
+    it('should render category badge', () => {
+      const source = createMockSource({ category: 'ai' });
       render(<SourceCard source={source} userRole="user" />);
-      expect(screen.getByText('Never crawled')).toBeInTheDocument();
+      expect(screen.getByLabelText('Category: ai')).toHaveTextContent('ai');
+    });
+
+    it('should render language badge when lang is set', () => {
+      const source = createMockSource({ lang: 'ja' });
+      render(<SourceCard source={source} userRole="user" />);
+      expect(screen.getByLabelText('Language: ja')).toHaveTextContent('ja');
+    });
+
+    it('should not render language badge when lang is empty', () => {
+      const source = createMockSource({ lang: '' });
+      render(<SourceCard source={source} userRole="user" />);
+      expect(screen.queryByLabelText(/^Language:/)).not.toBeInTheDocument();
     });
   });
 
@@ -132,12 +147,13 @@ describe('SourceCard', () => {
       expect(screen.getByLabelText('Visit feed: https://example.com/feed')).toBeInTheDocument();
     });
 
-    it('should have time element for last crawled', () => {
-      const lastCrawledAt = new Date(NOW.getTime() - 1 * 60 * 60 * 1000).toISOString();
-      const source = createMockSource({ last_crawled_at: lastCrawledAt });
+    it('should have time element for added date', () => {
+      const createdAt = new Date(NOW.getTime() - 1 * 60 * 60 * 1000).toISOString();
+      const source = createMockSource({ created_at: createdAt });
       render(<SourceCard source={source} userRole="user" />);
       const timeElement = screen.getByRole('time');
-      expect(timeElement).toHaveAttribute('datetime', lastCrawledAt);
+      expect(timeElement).toHaveAttribute('datetime', createdAt);
+      expect(timeElement).toHaveAttribute('aria-label', 'Added: 1 hour ago');
     });
 
     it('should have proper title attribute for truncated URL', () => {
@@ -233,37 +249,37 @@ describe('SourceCard', () => {
     });
   });
 
-  describe('Last Crawled Time Formatting', () => {
-    it('should show "Just now" for recent crawl', () => {
+  describe('Added Time Formatting', () => {
+    it('should show "Just now" for recently added source', () => {
       const source = createMockSource({
-        last_crawled_at: new Date(NOW.getTime() - 30 * 1000).toISOString(), // 30 seconds ago
+        created_at: new Date(NOW.getTime() - 30 * 1000).toISOString(), // 30 seconds ago
       });
       render(<SourceCard source={source} userRole="user" />);
-      expect(screen.getByText('Just now')).toBeInTheDocument();
+      expect(screen.getByText('Added Just now')).toBeInTheDocument();
     });
 
-    it('should show minutes for crawl within last hour', () => {
+    it('should show minutes for source added within last hour', () => {
       const source = createMockSource({
-        last_crawled_at: new Date(NOW.getTime() - 45 * 60 * 1000).toISOString(),
+        created_at: new Date(NOW.getTime() - 45 * 60 * 1000).toISOString(),
       });
       render(<SourceCard source={source} userRole="user" />);
-      expect(screen.getByText('45 minutes ago')).toBeInTheDocument();
+      expect(screen.getByText('Added 45 minutes ago')).toBeInTheDocument();
     });
 
-    it('should show hours for crawl within last day', () => {
+    it('should show hours for source added within last day', () => {
       const source = createMockSource({
-        last_crawled_at: new Date(NOW.getTime() - 5 * 60 * 60 * 1000).toISOString(),
+        created_at: new Date(NOW.getTime() - 5 * 60 * 60 * 1000).toISOString(),
       });
       render(<SourceCard source={source} userRole="user" />);
-      expect(screen.getByText('5 hours ago')).toBeInTheDocument();
+      expect(screen.getByText('Added 5 hours ago')).toBeInTheDocument();
     });
 
-    it('should show days for crawl within last week', () => {
+    it('should show days for source added within last week', () => {
       const source = createMockSource({
-        last_crawled_at: new Date(NOW.getTime() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+        created_at: new Date(NOW.getTime() - 3 * 24 * 60 * 60 * 1000).toISOString(),
       });
       render(<SourceCard source={source} userRole="user" />);
-      expect(screen.getByText('3 days ago')).toBeInTheDocument();
+      expect(screen.getByText('Added 3 days ago')).toBeInTheDocument();
     });
   });
 
@@ -272,13 +288,15 @@ describe('SourceCard', () => {
       const source = createMockSource({
         name: 'Minimal',
         feed_url: 'https://min.com',
-        last_crawled_at: null,
+        url: 'https://min.com',
+        lang: '',
+        created_at: '',
       });
       render(<SourceCard source={source} userRole="user" />);
       expect(screen.getByText('Minimal')).toBeInTheDocument();
       const link = screen.getByRole('link', { name: /visit feed:/i });
       expect(link).toHaveTextContent('https://min.com');
-      expect(screen.getByText('Never crawled')).toBeInTheDocument();
+      expect(screen.getByText('Added Unknown')).toBeInTheDocument();
     });
 
     it('should handle special characters in source name', () => {
@@ -295,11 +313,10 @@ describe('SourceCard', () => {
       expect(screen.getByText('日本語のソース名 🎉')).toBeInTheDocument();
     });
 
-    it('should handle undefined last_crawled_at', () => {
-      const source = createMockSource();
-      source.last_crawled_at = undefined as unknown as string | null;
+    it('should show "Unknown" when created_at is empty', () => {
+      const source = createMockSource({ created_at: '' });
       render(<SourceCard source={source} userRole="user" />);
-      expect(screen.getByText('Never crawled')).toBeInTheDocument();
+      expect(screen.getByText('Added Unknown')).toBeInTheDocument();
     });
   });
 
@@ -398,8 +415,9 @@ describe('SourceCard', () => {
           id: 123,
           name: 'Complete Source',
           feed_url: 'https://complete.com/feed',
+          url: 'https://complete.com/feed',
           active: false,
-          last_crawled_at: '2025-01-10T10:00:00Z',
+          created_at: '2025-01-10T10:00:00Z',
         });
 
         render(<SourceCard source={source} userRole="admin" onEdit={mockOnEdit} />);
@@ -411,8 +429,11 @@ describe('SourceCard', () => {
           id: 123,
           name: 'Complete Source',
           feed_url: 'https://complete.com/feed',
+          url: 'https://complete.com/feed',
+          category: 'dev',
+          lang: 'en',
           active: false,
-          last_crawled_at: '2025-01-10T10:00:00Z',
+          created_at: '2025-01-10T10:00:00Z',
         });
       });
     });
@@ -529,8 +550,9 @@ describe('SourceCard', () => {
         const source = createMockSource({
           name: 'Tech Blog',
           feed_url: 'https://example.com/feed',
+          url: 'https://example.com/feed',
           active: true,
-          last_crawled_at: new Date(NOW.getTime() - 1 * 60 * 60 * 1000).toISOString(),
+          created_at: new Date(NOW.getTime() - 1 * 60 * 60 * 1000).toISOString(),
         });
 
         render(<SourceCard source={source} userRole="admin" onEdit={mockOnEdit} />);
@@ -539,7 +561,7 @@ describe('SourceCard', () => {
         expect(screen.getByRole('heading', { name: 'Tech Blog' })).toBeInTheDocument();
         expect(screen.getByTestId('source-edit-button')).toBeInTheDocument();
         expect(screen.getByRole('link', { name: /visit feed:/i })).toBeInTheDocument();
-        expect(screen.getByText('1 hour ago')).toBeInTheDocument();
+        expect(screen.getByText('Added 1 hour ago')).toBeInTheDocument();
       });
     });
 
@@ -672,8 +694,9 @@ describe('SourceCard', () => {
           id: 123,
           name: 'Complete Source',
           feed_url: 'https://complete.com/feed',
+          url: 'https://complete.com/feed',
           active: false,
-          last_crawled_at: '2025-01-10T10:00:00Z',
+          created_at: '2025-01-10T10:00:00Z',
         });
 
         render(<SourceCard source={source} userRole="admin" onDelete={mockOnDelete} />);
@@ -685,8 +708,11 @@ describe('SourceCard', () => {
           id: 123,
           name: 'Complete Source',
           feed_url: 'https://complete.com/feed',
+          url: 'https://complete.com/feed',
+          category: 'dev',
+          lang: 'en',
           active: false,
-          last_crawled_at: '2025-01-10T10:00:00Z',
+          created_at: '2025-01-10T10:00:00Z',
         });
       });
     });
@@ -819,8 +845,9 @@ describe('SourceCard', () => {
         const source = createMockSource({
           name: 'Tech Blog',
           feed_url: 'https://example.com/feed',
+          url: 'https://example.com/feed',
           active: true,
-          last_crawled_at: new Date(NOW.getTime() - 1 * 60 * 60 * 1000).toISOString(),
+          created_at: new Date(NOW.getTime() - 1 * 60 * 60 * 1000).toISOString(),
         });
 
         render(<SourceCard source={source} userRole="admin" onDelete={mockOnDelete} />);
@@ -829,7 +856,7 @@ describe('SourceCard', () => {
         expect(screen.getByRole('heading', { name: 'Tech Blog' })).toBeInTheDocument();
         expect(screen.getByTestId('source-delete-button')).toBeInTheDocument();
         expect(screen.getByRole('link', { name: /visit feed:/i })).toBeInTheDocument();
-        expect(screen.getByText('1 hour ago')).toBeInTheDocument();
+        expect(screen.getByText('Added 1 hour ago')).toBeInTheDocument();
       });
     });
 

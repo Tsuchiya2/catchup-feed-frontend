@@ -60,7 +60,11 @@ const mockSource: Source = {
   id: 1,
   name: 'Tech Blog',
   feed_url: 'https://example.com/feed.xml',
+  url: 'https://example.com/feed.xml',
+  category: 'dev',
+  lang: 'en',
   active: true,
+  created_at: '2025-01-01T00:00:00Z',
 };
 
 const mockSourcesResponse: SourcesResponse = [
@@ -69,7 +73,11 @@ const mockSourcesResponse: SourcesResponse = [
     id: 2,
     name: 'Other Blog',
     feed_url: 'https://other.com/feed.xml',
+    url: 'https://other.com/feed.xml',
+    category: 'news',
+    lang: 'ja',
     active: true,
+    created_at: '2025-01-02T00:00:00Z',
   },
 ];
 

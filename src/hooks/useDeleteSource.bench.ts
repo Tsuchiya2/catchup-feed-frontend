@@ -33,7 +33,11 @@ function generateSources(count: number): Source[] {
     id: i + 1,
     name: `Source ${i + 1}`,
     feed_url: `https://example.com/feed${i + 1}.xml`,
+    url: `https://example.com/feed${i + 1}.xml`,
+    category: 'dev',
+    lang: 'en',
     active: true,
+    created_at: '2025-01-01T00:00:00Z',
   }));
 }
 

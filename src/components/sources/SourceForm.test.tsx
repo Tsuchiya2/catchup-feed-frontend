@@ -16,6 +16,8 @@ describe('SourceForm', () => {
     const initialData: SourceFormData = {
       name: 'Tech Blog',
       feedURL: 'https://example.com/feed.xml',
+      category: 'dev',
+      lang: 'en',
     };
 
     it('should render with pre-populated values from initialData', () => {
@@ -32,9 +34,13 @@ describe('SourceForm', () => {
 
       const nameInput = screen.getByLabelText('Source name');
       const urlInput = screen.getByLabelText('Feed URL');
+      const categoryInput = screen.getByLabelText('Category');
+      const langInput = screen.getByLabelText('Language');
 
       expect(nameInput).toHaveValue('Tech Blog');
       expect(urlInput).toHaveValue('https://example.com/feed.xml');
+      expect(categoryInput).toHaveValue('dev');
+      expect(langInput).toHaveValue('en');
     });
 
     it('should show "Save Changes" button text', () => {
@@ -87,9 +93,13 @@ describe('SourceForm', () => {
 
       const nameInput = screen.getByLabelText('Source name');
       const urlInput = screen.getByLabelText('Feed URL');
+      const categoryInput = screen.getByLabelText('Category');
+      const langInput = screen.getByLabelText('Language');
 
       expect(nameInput).toHaveValue('');
       expect(urlInput).toHaveValue('');
+      expect(categoryInput).toHaveValue('');
+      expect(langInput).toHaveValue('');
     });
 
     it('should show "Add Source" button text', () => {
@@ -196,6 +206,52 @@ describe('SourceForm', () => {
       });
     });
 
+    it('should show error when category field is empty on blur', async () => {
+      const user = userEvent.setup();
+      render(
+        <SourceForm
+          mode="create"
+          onSubmit={mockOnSubmit}
+          isLoading={false}
+          error={null}
+          onCancel={mockOnCancel}
+        />
+      );
+
+      const categoryInput = screen.getByLabelText('Category');
+
+      // Blur without entering any value
+      await user.click(categoryInput);
+      await user.tab();
+
+      await waitFor(() => {
+        expect(screen.getByText(/category is required/i)).toBeInTheDocument();
+      });
+    });
+
+    it('should not show error when lang field is empty on blur (optional)', async () => {
+      const user = userEvent.setup();
+      render(
+        <SourceForm
+          mode="create"
+          onSubmit={mockOnSubmit}
+          isLoading={false}
+          error={null}
+          onCancel={mockOnCancel}
+        />
+      );
+
+      const langInput = screen.getByLabelText('Language');
+
+      // Blur without entering any value
+      await user.click(langInput);
+      await user.tab();
+
+      // Lang is optional, so no error should appear
+      expect(screen.queryByText(/maximum 20 characters allowed/i)).not.toBeInTheDocument();
+      expect(langInput).toHaveAttribute('aria-invalid', 'false');
+    });
+
     it('should clear error when valid input is entered after error', async () => {
       const user = userEvent.setup();
       render(
@@ -277,6 +333,7 @@ describe('SourceForm', () => {
       await waitFor(() => {
         expect(screen.getByText(/name is required/i)).toBeInTheDocument();
         expect(screen.getByText(/feed url is required/i)).toBeInTheDocument();
+        expect(screen.getByText(/category is required/i)).toBeInTheDocument();
       });
 
       // Should not call onSubmit when validation fails
@@ -299,17 +356,50 @@ describe('SourceForm', () => {
 
       const nameInput = screen.getByLabelText('Source name');
       const urlInput = screen.getByLabelText('Feed URL');
+      const categoryInput = screen.getByLabelText('Category');
+      const langInput = screen.getByLabelText('Language');
       const submitButton = screen.getByRole('button', { name: /add source/i });
 
       // Enter values with extra whitespace
       await user.type(nameInput, '  Tech Blog  ');
       await user.type(urlInput, '  https://example.com/feed.xml  ');
+      await user.type(categoryInput, '  dev  ');
+      await user.type(langInput, '  en  ');
       await user.click(submitButton);
 
       await waitFor(() => {
         expect(mockOnSubmit).toHaveBeenCalledWith({
           name: 'Tech Blog',
           feedURL: 'https://example.com/feed.xml',
+          category: 'dev',
+          lang: 'en',
+        });
+      });
+    });
+
+    it('should submit with empty lang (optional field)', async () => {
+      const user = userEvent.setup();
+      render(
+        <SourceForm
+          mode="create"
+          onSubmit={mockOnSubmit}
+          isLoading={false}
+          error={null}
+          onCancel={mockOnCancel}
+        />
+      );
+
+      await user.type(screen.getByLabelText('Source name'), 'Tech Blog');
+      await user.type(screen.getByLabelText('Feed URL'), 'https://example.com/feed.xml');
+      await user.type(screen.getByLabelText('Category'), 'dev');
+      await user.click(screen.getByRole('button', { name: /add source/i }));
+
+      await waitFor(() => {
+        expect(mockOnSubmit).toHaveBeenCalledWith({
+          name: 'Tech Blog',
+          feedURL: 'https://example.com/feed.xml',
+          category: 'dev',
+          lang: '',
         });
       });
     });
@@ -319,6 +409,8 @@ describe('SourceForm', () => {
       const initialData: SourceFormData = {
         name: 'Old Name',
         feedURL: 'https://old-url.com/feed',
+        category: 'dev',
+        lang: 'ja',
       };
 
       render(
@@ -344,6 +436,8 @@ describe('SourceForm', () => {
         expect(mockOnSubmit).toHaveBeenCalledWith({
           name: 'New Name',
           feedURL: 'https://old-url.com/feed',
+          category: 'dev',
+          lang: 'ja',
         });
       });
     });
@@ -361,11 +455,15 @@ describe('SourceForm', () => {
 
       const nameInput = screen.getByLabelText('Source name');
       const urlInput = screen.getByLabelText('Feed URL');
+      const categoryInput = screen.getByLabelText('Category');
+      const langInput = screen.getByLabelText('Language');
       const submitButton = screen.getByRole('button', { name: /add source/i });
       const cancelButton = screen.getByRole('button', { name: /cancel/i });
 
       expect(nameInput).toBeDisabled();
       expect(urlInput).toBeDisabled();
+      expect(categoryInput).toBeDisabled();
+      expect(langInput).toBeDisabled();
       expect(submitButton).toBeDisabled();
       expect(cancelButton).toBeDisabled();
     });
@@ -526,11 +624,18 @@ describe('SourceForm', () => {
 
       const nameInput = screen.getByLabelText('Source name');
       const urlInput = screen.getByLabelText('Feed URL');
+      const categoryInput = screen.getByLabelText('Category');
+      const langInput = screen.getByLabelText('Language');
 
       expect(nameInput).toHaveAttribute('aria-required', 'true');
       expect(nameInput).toHaveAttribute('aria-invalid', 'false');
       expect(urlInput).toHaveAttribute('aria-required', 'true');
       expect(urlInput).toHaveAttribute('aria-invalid', 'false');
+      expect(categoryInput).toHaveAttribute('aria-required', 'true');
+      expect(categoryInput).toHaveAttribute('aria-invalid', 'false');
+      // Lang is optional
+      expect(langInput).not.toHaveAttribute('aria-required');
+      expect(langInput).toHaveAttribute('aria-invalid', 'false');
     });
 
     it('should mark invalid inputs with aria-invalid when errors exist', async () => {
@@ -592,6 +697,8 @@ describe('SourceForm', () => {
 
       expect(screen.getByLabelText('Source name')).toBeInTheDocument();
       expect(screen.getByLabelText('Feed URL')).toBeInTheDocument();
+      expect(screen.getByLabelText('Category')).toBeInTheDocument();
+      expect(screen.getByLabelText('Language')).toBeInTheDocument();
       expect(screen.getByLabelText('Cancel editing')).toBeInTheDocument();
     });
   });
@@ -615,11 +722,13 @@ describe('SourceForm', () => {
 
       const nameInput = screen.getByLabelText('Source name');
       const urlInput = screen.getByLabelText('Feed URL');
+      const categoryInput = screen.getByLabelText('Category');
       const submitButton = screen.getByRole('button', { name: /add source/i });
 
       // Enter valid data
       await user.type(nameInput, 'Test Source');
       await user.type(urlInput, 'https://example.com/feed');
+      await user.type(categoryInput, 'dev');
 
       // First click
       await user.click(submitButton);
@@ -683,11 +792,17 @@ describe('SourceForm', () => {
 
       const nameInput = screen.getByLabelText('Source name');
       const urlInput = screen.getByLabelText('Feed URL');
+      const categoryInput = screen.getByLabelText('Category');
+      const langInput = screen.getByLabelText('Language');
 
       // Name should have maxLength attribute
       expect(nameInput).toHaveAttribute('maxlength', '255');
       // URL should have maxLength attribute
       expect(urlInput).toHaveAttribute('maxlength', '2048');
+      // Category should have maxLength attribute
+      expect(categoryInput).toHaveAttribute('maxlength', '100');
+      // Lang should have maxLength attribute
+      expect(langInput).toHaveAttribute('maxlength', '20');
     });
 
     it('should handle protocol validation for URL', async () => {

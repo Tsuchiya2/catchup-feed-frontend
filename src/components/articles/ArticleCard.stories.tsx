@@ -42,7 +42,7 @@ const mockArticle: Article = {
   summary:
     'Learn how React Server Components can improve your application performance by rendering components on the server side. This comprehensive guide covers the basics and advanced patterns.',
   published_at: '2024-01-15T10:30:00Z',
-  created_at: '2024-01-15T10:35:00Z',
+  crawled_at: '2024-01-15T10:35:00Z',
 };
 
 /**
@@ -139,7 +139,7 @@ export const MinimalData: Story = {
       url: 'https://example.com/article-2',
       summary: '',
       published_at: '2024-01-15T10:30:00Z',
-      created_at: '2024-01-15T10:35:00Z',
+      crawled_at: '2024-01-15T10:35:00Z',
     },
   },
 };

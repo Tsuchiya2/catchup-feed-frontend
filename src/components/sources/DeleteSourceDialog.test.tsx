@@ -18,7 +18,11 @@ describe('DeleteSourceDialog', () => {
     id: 1,
     name: 'Tech Blog',
     feed_url: 'https://example.com/feed.xml',
+    url: 'https://example.com/feed.xml',
+    category: 'dev',
+    lang: 'en',
     active: true,
+    created_at: '2025-01-01T00:00:00Z',
   };
 
   const defaultProps = {
@@ -185,9 +189,11 @@ describe('DeleteSourceDialog', () => {
     it('calls mutateAsync with correct source ID', async () => {
       const user = userEvent.setup();
       const customSource: Source = {
+        ...mockSource,
         id: 42,
         name: 'Custom Blog',
         feed_url: 'https://custom.com/feed.xml',
+        url: 'https://custom.com/feed.xml',
         active: false,
       };
       mockMutateAsync.mockResolvedValueOnce(undefined);
@@ -456,9 +462,11 @@ describe('DeleteSourceDialog', () => {
       mockMutateAsync.mockResolvedValue(undefined);
 
       const source1: Source = {
+        ...mockSource,
         id: 1,
         name: 'First Blog',
         feed_url: 'https://first.com/feed.xml',
+        url: 'https://first.com/feed.xml',
         active: true,
       };
 
@@ -467,9 +475,11 @@ describe('DeleteSourceDialog', () => {
       expect(screen.getByText(/First Blog/)).toBeInTheDocument();
 
       const source2: Source = {
+        ...mockSource,
         id: 2,
         name: 'Second Blog',
         feed_url: 'https://second.com/feed.xml',
+        url: 'https://second.com/feed.xml',
         active: false,
       };
 

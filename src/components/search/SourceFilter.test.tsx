@@ -16,8 +16,11 @@ describe('SourceFilter', () => {
     id: 1,
     name: 'Test Source',
     feed_url: 'https://example.com/feed.xml',
+    url: 'https://example.com/feed.xml',
+    category: 'dev',
+    lang: 'en',
     active: true,
-    last_crawled_at: new Date().toISOString(),
+    created_at: '2025-01-01T00:00:00Z',
     ...overrides,
   });
 
@@ -276,7 +279,10 @@ describe('SourceFilter', () => {
           id: 2,
           name: 'Source Without Active Field',
           feed_url: 'https://example.com/feed2.xml',
-          last_crawled_at: new Date().toISOString(),
+          url: 'https://example.com/feed2.xml',
+          category: 'dev',
+          lang: 'en',
+          created_at: '2025-01-01T00:00:00Z',
         } as Source,
       ];
 

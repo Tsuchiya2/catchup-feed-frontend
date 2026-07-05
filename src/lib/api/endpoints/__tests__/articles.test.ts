@@ -52,7 +52,7 @@ describe('Articles API Endpoints', () => {
       url: 'https://example.com/article1',
       summary: 'Test summary 1',
       published_at: '2025-01-01T10:00:00Z',
-      created_at: '2025-01-01T10:00:00Z',
+      crawled_at: '2025-01-01T10:00:00Z',
     };
 
     const mockArticle2: Article = {
@@ -63,7 +63,7 @@ describe('Articles API Endpoints', () => {
       url: 'https://example.com/article2',
       summary: 'Test summary 2',
       published_at: '2025-01-02T10:00:00Z',
-      created_at: '2025-01-02T10:00:00Z',
+      crawled_at: '2025-01-02T10:00:00Z',
     };
 
     it('should call GET /articles endpoint with no parameters', async () => {
@@ -375,7 +375,7 @@ describe('Articles API Endpoints', () => {
       expect(article!.url).toBeDefined();
       expect(article!.summary).toBeDefined();
       expect(article!.published_at).toBeDefined();
-      expect(article!.created_at).toBeDefined();
+      expect(article!.crawled_at).toBeDefined();
     });
 
     it('should handle multiple search requests sequentially', async () => {

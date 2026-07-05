@@ -52,14 +52,14 @@ function SourcesPageContent() {
 
   // Get search parameters from URL
   const keyword = searchParams.get('keyword') || '';
-  const sourceType = searchParams.get('source_type') || null;
+  const category = searchParams.get('category') || null;
   const activeParam = searchParams.get('active');
   const active = activeParam === null ? null : activeParam === 'true';
 
   // Search state
   const [searchState, setSearchState] = React.useState<SourceSearchState>({
     keyword,
-    sourceType,
+    category,
     active,
   });
 
@@ -81,8 +81,8 @@ function SourcesPageContent() {
     if (searchState.keyword) {
       params.set('keyword', searchState.keyword);
     }
-    if (searchState.sourceType) {
-      params.set('source_type', searchState.sourceType);
+    if (searchState.category) {
+      params.set('category', searchState.category);
     }
     if (searchState.active !== null) {
       params.set('active', searchState.active.toString());

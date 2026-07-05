@@ -27,6 +27,10 @@ export const SOURCE_TEST_IDS = {
   NAME_INPUT: 'source-name-input',
   /** URL input field */
   URL_INPUT: 'source-url-input',
+  /** Category input field */
+  CATEGORY_INPUT: 'source-category-input',
+  /** Lang input field */
+  LANG_INPUT: 'source-lang-input',
   /** Save button */
   SAVE_BUTTON: 'source-save-button',
   /** Cancel button */
@@ -54,6 +58,10 @@ export const SOURCE_ARIA_LABELS = {
   NAME_INPUT: 'Source name',
   /** ARIA label for URL input */
   URL_INPUT: 'Feed URL',
+  /** ARIA label for category input */
+  CATEGORY_INPUT: 'Category',
+  /** ARIA label for lang input */
+  LANG_INPUT: 'Language',
   /** ARIA label for save button */
   SAVE_BUTTON: 'Save changes',
   /** ARIA label for cancel button */

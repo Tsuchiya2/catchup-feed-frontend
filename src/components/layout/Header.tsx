@@ -19,6 +19,8 @@ const mainNavigation = [
   { name: 'Dashboard', href: '/dashboard' },
   { name: 'Articles', href: '/articles' },
   { name: 'Sources', href: '/sources' },
+  { name: 'Friends', href: '/subscribers' },
+  { name: 'Access Logs', href: '/access-logs' },
 ];
 
 const legalNavigation = [

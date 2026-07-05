@@ -20,7 +20,7 @@ describe('articleFactory', () => {
       expect(article).toHaveProperty('url');
       expect(article).toHaveProperty('summary');
       expect(article).toHaveProperty('published_at');
-      expect(article).toHaveProperty('created_at');
+      expect(article).toHaveProperty('crawled_at');
     });
 
     it('should allow overriding properties', () => {

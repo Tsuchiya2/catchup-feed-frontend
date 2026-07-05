@@ -18,7 +18,7 @@ import type {
  */
 export interface SourceSearchParams {
   keyword?: string;
-  source_type?: string;
+  category?: string;
   active?: boolean;
 }
 
@@ -26,7 +26,7 @@ export interface SourceSearchParams {
  * Build query string for source search
  *
  * @param params - Search parameters object
- * @returns Query string (e.g., '?keyword=test&source_type=RSS')
+ * @returns Query string (e.g., '?keyword=test&category=dev')
  */
 function buildSourceSearchQueryString(params?: SourceSearchParams): string {
   if (!params) {
@@ -39,8 +39,8 @@ function buildSourceSearchQueryString(params?: SourceSearchParams): string {
     queryParams.append('keyword', params.keyword);
   }
 
-  if (params.source_type !== undefined) {
-    queryParams.append('source_type', params.source_type);
+  if (params.category !== undefined) {
+    queryParams.append('category', params.category);
   }
 
   if (params.active !== undefined) {
@@ -77,7 +77,7 @@ export async function getSources(): Promise<SourcesResponse> {
 /**
  * Search sources with various filters
  *
- * @param params - Search parameters (keyword, source_type, active)
+ * @param params - Search parameters (keyword, category, active)
  * @returns Promise resolving to sources response
  * @throws {ApiError} When the request fails
  *
@@ -89,7 +89,7 @@ export async function getSources(): Promise<SourcesResponse> {
  * // Search with filters
  * const response = await searchSources({
  *   keyword: 'blog',
- *   source_type: 'RSS',
+ *   category: 'dev',
  *   active: true
  * });
  * ```
@@ -103,44 +103,21 @@ export async function searchSources(params?: SourceSearchParams): Promise<Source
 }
 
 /**
- * Fetch a single source by ID
- *
- * @param id - Source ID (number)
- * @returns Promise resolving to source response
- * @throws {ApiError} When the source is not found or request fails
- *
- * @example
- * ```typescript
- * try {
- *   const source = await getSource(1);
- *   console.log('Source:', source);
- * } catch (error) {
- *   if (error instanceof ApiError && error.status === 404) {
- *     console.error('Source not found');
- *   }
- * }
- * ```
- */
-export async function getSource(id: number): Promise<SourceResponse> {
-  const endpoint = `/sources/${id}`;
-
-  const response = await apiClient.get<SourceResponse>(endpoint);
-  return response;
-}
-
-/**
  * Update source active status
+ *
+ * PUT /sources/:id accepts partial input on the backend (empty fields are
+ * kept as-is), so sending only `active` toggles the status.
+ * The backend responds 204 No Content.
  *
  * @param id - Source ID
  * @param active - New active status
- * @returns Promise resolving to updated source
+ * @returns Promise resolving when the update completes
  * @throws {ApiError} When the request fails
  *
  * @example
  * ```typescript
  * try {
- *   const updatedSource = await updateSourceActive(1, false);
- *   console.log('Source updated:', updatedSource);
+ *   await updateSourceActive(1, false);
  * } catch (error) {
  *   if (error instanceof ApiError && error.status === 403) {
  *     console.error('Permission denied');
@@ -148,10 +125,9 @@ export async function getSource(id: number): Promise<SourceResponse> {
  * }
  * ```
  */
-export async function updateSourceActive(id: number, active: boolean): Promise<SourceResponse> {
+export async function updateSourceActive(id: number, active: boolean): Promise<void> {
   const endpoint = `/sources/${id}`;
-  const response = await apiClient.put<SourceResponse>(endpoint, { active });
-  return response;
+  await apiClient.put<void>(endpoint, { active });
 }
 
 /**
@@ -184,20 +160,23 @@ export async function createSource(data: CreateSourceInput): Promise<void> {
 /**
  * Update an existing source
  *
+ * The backend responds 204 No Content.
+ *
  * @param id - Source ID
- * @param data - Source update input (name, feedURL, and active status)
- * @returns Promise resolving to updated source
+ * @param data - Source update input (name, feedURL, category, lang, active)
+ * @returns Promise resolving when the update completes
  * @throws {ApiError} When the request fails (400, 401, 403, 404, 500)
  *
  * @example
  * ```typescript
  * try {
- *   const updatedSource = await updateSource(1, {
+ *   await updateSource(1, {
  *     name: 'Updated Tech Blog',
  *     feedURL: 'https://techblog.com/new-feed.xml',
+ *     category: 'dev',
+ *     lang: 'en',
  *     active: true
  *   });
- *   console.log('Source updated:', updatedSource);
  * } catch (error) {
  *   if (error instanceof ApiError && error.status === 403) {
  *     console.error('Permission denied - admin access required');
@@ -207,10 +186,9 @@ export async function createSource(data: CreateSourceInput): Promise<void> {
  * }
  * ```
  */
-export async function updateSource(id: number, data: UpdateSourceInput): Promise<SourceResponse> {
+export async function updateSource(id: number, data: UpdateSourceInput): Promise<void> {
   const endpoint = `/sources/${id}`;
-  const response = await apiClient.put<SourceResponse>(endpoint, data);
-  return response;
+  await apiClient.put<void>(endpoint, data);
 }
 
 /**

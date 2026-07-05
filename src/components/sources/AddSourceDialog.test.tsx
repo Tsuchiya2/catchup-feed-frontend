@@ -78,12 +78,15 @@ describe('AddSourceDialog', () => {
 
       await user.type(screen.getByLabelText(/name/i), 'Tech Blog');
       await user.type(screen.getByLabelText(/feed url/i), 'https://example.com/feed.xml');
+      await user.type(screen.getByLabelText('Category'), 'dev');
       await user.click(screen.getByRole('button', { name: /add source/i }));
 
       await waitFor(() => {
         expect(mockMutateAsync).toHaveBeenCalledWith({
           name: 'Tech Blog',
           feedURL: 'https://example.com/feed.xml',
+          category: 'dev',
+          lang: undefined,
         });
       });
     });
@@ -96,6 +99,7 @@ describe('AddSourceDialog', () => {
 
       await user.type(screen.getByLabelText(/name/i), 'Tech Blog');
       await user.type(screen.getByLabelText(/feed url/i), 'https://example.com/feed.xml');
+      await user.type(screen.getByLabelText('Category'), 'dev');
       await user.click(screen.getByRole('button', { name: /add source/i }));
 
       await waitFor(() => {
@@ -112,6 +116,7 @@ describe('AddSourceDialog', () => {
 
       await user.type(screen.getByLabelText(/name/i), 'Tech Blog');
       await user.type(screen.getByLabelText(/feed url/i), 'https://example.com/feed.xml');
+      await user.type(screen.getByLabelText('Category'), 'dev');
       await user.click(screen.getByRole('button', { name: /add source/i }));
 
       await waitFor(() => {
@@ -128,6 +133,7 @@ describe('AddSourceDialog', () => {
 
       await user.type(screen.getByLabelText(/name/i), 'Tech Blog');
       await user.type(screen.getByLabelText(/feed url/i), 'https://example.com/feed.xml');
+      await user.type(screen.getByLabelText('Category'), 'dev');
       await user.click(screen.getByRole('button', { name: /add source/i }));
 
       await waitFor(() => {
@@ -143,6 +149,7 @@ describe('AddSourceDialog', () => {
 
       await user.type(screen.getByLabelText(/name/i), 'Tech Blog');
       await user.type(screen.getByLabelText(/feed url/i), 'https://example.com/feed.xml');
+      await user.type(screen.getByLabelText('Category'), 'dev');
 
       // Should not throw when onSuccess is not provided
       await expect(
@@ -247,6 +254,7 @@ describe('AddSourceDialog', () => {
 
       await user.type(screen.getByLabelText(/name/i), 'Tech Blog');
       await user.type(screen.getByLabelText(/feed url/i), 'https://example.com/feed.xml');
+      await user.type(screen.getByLabelText('Category'), 'dev');
       await user.click(screen.getByRole('button', { name: /add source/i }));
 
       // Wait and verify onClose was not called when submission fails

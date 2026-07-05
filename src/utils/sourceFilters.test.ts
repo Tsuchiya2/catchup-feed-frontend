@@ -21,8 +21,11 @@ const createMockSource = (overrides?: Partial<Source>): Source => ({
   id: 1,
   name: 'Test Source',
   feed_url: 'https://example.com/feed.xml',
-  last_crawled_at: '2026-01-09T00:00:00Z',
+  url: 'https://example.com/feed.xml',
+  category: 'dev',
+  lang: 'en',
   active: true,
+  created_at: '2026-01-09T00:00:00Z',
   ...overrides,
 });
 
@@ -67,9 +70,8 @@ describe('sourceFilters.all', () => {
     expect(sourceFilters.all(inactiveSource)).toBe(true);
   });
 
-  it('should return true even for source with missing fields', () => {
-    const source = createMockSource();
-    delete source.last_crawled_at;
+  it('should return true even for source with empty fields', () => {
+    const source = createMockSource({ lang: '', created_at: '' });
     expect(sourceFilters.all(source)).toBe(true);
   });
 });
@@ -376,34 +378,33 @@ describe('Integration scenarios', () => {
         id: 1,
         name: 'Active Tech Blog',
         active: true,
-        last_crawled_at: '2026-01-09T10:00:00Z',
+        created_at: '2026-01-09T10:00:00Z',
       }),
       createMockSource({
         id: 2,
         name: 'Inactive Tech Blog',
         active: false,
-        last_crawled_at: '2025-12-01T10:00:00Z',
+        created_at: '2025-12-01T10:00:00Z',
       }),
       createMockSource({
         id: 3,
         name: 'Active News Site',
         active: true,
-        last_crawled_at: '2026-01-09T09:00:00Z',
+        created_at: '2026-01-09T09:00:00Z',
       }),
       createMockSource({
         id: 4,
         name: 'Active Old Tech',
         active: true,
-        last_crawled_at: '2025-11-01T10:00:00Z',
+        created_at: '2025-11-01T10:00:00Z',
       }),
     ];
 
-    // Scenario: Active sources that were crawled in 2026
+    // Scenario: Active sources that were added in 2026
     const isActive: SourceFilterPredicate = (s) => s.active === true;
-    const isCrawledIn2026: SourceFilterPredicate = (s) =>
-      s.last_crawled_at?.startsWith('2026') ?? false;
+    const isAddedIn2026: SourceFilterPredicate = (s) => s.created_at.startsWith('2026');
 
-    const composed = composeFilters([isActive, isCrawledIn2026], 'AND');
+    const composed = composeFilters([isActive, isAddedIn2026], 'AND');
     const result = sources.filter(composed);
 
     expect(result).toHaveLength(2);

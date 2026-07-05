@@ -18,7 +18,11 @@ describe('EditSourceDialog', () => {
     id: 1,
     name: 'Tech Blog',
     feed_url: 'https://example.com/feed.xml',
+    url: 'https://example.com/feed.xml',
+    category: 'dev',
+    lang: 'en',
     active: true,
+    created_at: '2025-01-01T00:00:00Z',
   };
 
   const defaultProps = {
@@ -113,6 +117,8 @@ describe('EditSourceDialog', () => {
           data: {
             name: 'Updated Tech Blog',
             feedURL: 'https://example.com/feed.xml',
+            category: 'dev',
+            lang: 'en',
             active: true,
           },
         });
@@ -139,6 +145,8 @@ describe('EditSourceDialog', () => {
           data: {
             name: 'Tech Blog',
             feedURL: 'https://newsite.com/feed.xml',
+            category: 'dev',
+            lang: 'en',
             active: true,
           },
         });
@@ -168,6 +176,8 @@ describe('EditSourceDialog', () => {
           data: {
             name: 'New Name',
             feedURL: 'https://newurl.com/feed.xml',
+            category: 'dev',
+            lang: 'en',
             active: true,
           },
         });

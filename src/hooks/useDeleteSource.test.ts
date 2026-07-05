@@ -22,7 +22,7 @@ vi.mock('@/lib/api/endpoints/sources', () => ({
   deleteSource: vi.fn(),
 }));
 
-// Mock observability dependencies
+// Mock logging dependencies
 vi.mock('@/lib/logger', () => ({
   logger: {
     info: vi.fn(),
@@ -30,30 +30,6 @@ vi.mock('@/lib/logger', () => ({
     warn: vi.fn(),
     error: vi.fn(),
   },
-}));
-
-vi.mock('@/lib/observability/metrics', () => ({
-  metrics: {
-    source: {
-      delete: {
-        attempt: vi.fn(),
-        success: vi.fn(),
-        failure: vi.fn(),
-        cacheRollback: vi.fn(),
-        dialog: vi.fn(),
-      },
-    },
-  },
-}));
-
-vi.mock('@/lib/observability/tracing', () => ({
-  startSpan: vi.fn((_name, _op, callback) => callback()),
-  addBreadcrumb: vi.fn(),
-  addContext: vi.fn(),
-}));
-
-vi.mock('@sentry/nextjs', () => ({
-  captureException: vi.fn(),
 }));
 
 vi.mock('@/lib/api/client', () => ({
@@ -84,7 +60,11 @@ const mockSource: Source = {
   id: 1,
   name: 'Tech Blog',
   feed_url: 'https://example.com/feed.xml',
+  url: 'https://example.com/feed.xml',
+  category: 'dev',
+  lang: 'en',
   active: true,
+  created_at: '2025-01-01T00:00:00Z',
 };
 
 const mockSourcesResponse: SourcesResponse = [
@@ -93,7 +73,11 @@ const mockSourcesResponse: SourcesResponse = [
     id: 2,
     name: 'Other Blog',
     feed_url: 'https://other.com/feed.xml',
+    url: 'https://other.com/feed.xml',
+    category: 'news',
+    lang: 'ja',
     active: true,
+    created_at: '2025-01-02T00:00:00Z',
   },
 ];
 

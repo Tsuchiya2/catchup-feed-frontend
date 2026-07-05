@@ -9,7 +9,6 @@
  * Features:
  * - Listens for beforeinstallprompt event
  * - Shows custom install UI
- * - Tracks install events with metrics
  * - Persists dismissal state in localStorage
  * - Accessible with keyboard navigation
  *
@@ -18,7 +17,6 @@
 
 import { useEffect, useState } from 'react';
 import { X, Download } from 'lucide-react';
-import { metrics } from '@/lib/observability/metrics';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -86,7 +84,6 @@ export function PWAInstallPrompt() {
     const handleAppInstalled = () => {
       setShowPrompt(false);
       setDeferredPrompt(null);
-      metrics.pwa.install();
     };
 
     window.addEventListener('appinstalled', handleAppInstalled);
@@ -110,8 +107,6 @@ export function PWAInstallPrompt() {
 
     if (choiceResult.outcome === 'accepted') {
       console.log('User accepted the install prompt');
-      // Note: metrics.pwa.install() is called by appinstalled event handler
-      // to avoid duplicate metrics
     } else {
       console.log('User dismissed the install prompt');
     }

@@ -16,7 +16,6 @@ import { EditSourceDialog } from '@/components/sources/EditSourceDialog';
 import { DeleteSourceDialog } from '@/components/sources/DeleteSourceDialog';
 import { useSources } from '@/hooks/useSources';
 import { useSourceSearch } from '@/hooks/useSourceSearch';
-import { getUserRole } from '@/lib/auth/role';
 import { updateSourceActive } from '@/lib/api/endpoints/sources';
 import {
   SourceSearch,
@@ -24,7 +23,6 @@ import {
   toSearchParams,
   hasActiveFilters,
 } from '@/components/sources/SourceSearch';
-import type { UserRole } from '@/lib/auth/role';
 import type { Source } from '@/types/api';
 
 /**
@@ -35,9 +33,6 @@ import type { Source } from '@/types/api';
 function SourcesPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-
-  // User role state
-  const [userRole, setUserRole] = React.useState<UserRole>(null);
 
   // Add Source Dialog state
   const [isAddDialogOpen, setIsAddDialogOpen] = React.useState(false);
@@ -52,14 +47,14 @@ function SourcesPageContent() {
 
   // Get search parameters from URL
   const keyword = searchParams.get('keyword') || '';
-  const sourceType = searchParams.get('source_type') || null;
+  const category = searchParams.get('category') || null;
   const activeParam = searchParams.get('active');
   const active = activeParam === null ? null : activeParam === 'true';
 
   // Search state
   const [searchState, setSearchState] = React.useState<SourceSearchState>({
     keyword,
-    sourceType,
+    category,
     active,
   });
 
@@ -81,8 +76,8 @@ function SourcesPageContent() {
     if (searchState.keyword) {
       params.set('keyword', searchState.keyword);
     }
-    if (searchState.sourceType) {
-      params.set('source_type', searchState.sourceType);
+    if (searchState.category) {
+      params.set('category', searchState.category);
     }
     if (searchState.active !== null) {
       params.set('active', searchState.active.toString());
@@ -94,11 +89,6 @@ function SourcesPageContent() {
 
   // Query client for cache manipulation
   const queryClient = useQueryClient();
-
-  // Detect user role on component mount
-  React.useEffect(() => {
-    setUserRole(getUserRole());
-  }, []);
 
   // Mutation for updating source active status with optimistic updates
   const mutation = useMutation({
@@ -195,13 +185,10 @@ function SourcesPageContent() {
       <div className="mb-6 flex items-start justify-between gap-4">
         <PageHeader title="Sources" description="RSS/Atom feeds being tracked" />
 
-        {/* Admin-only Add Source button */}
-        {userRole === 'admin' && (
-          <Button onClick={() => setIsAddDialogOpen(true)}>
-            <Plus className="mr-2 h-4 w-4" />
-            Add Source
-          </Button>
-        )}
+        <Button onClick={() => setIsAddDialogOpen(true)}>
+          <Plus className="mr-2 h-4 w-4" />
+          Add Source
+        </Button>
       </div>
 
       {/* Search and Filter Panel */}
@@ -260,7 +247,6 @@ function SourcesPageContent() {
               <SourceCard
                 key={source.id}
                 source={source}
-                userRole={userRole}
                 onUpdateActive={handleUpdateActive}
                 onEdit={handleEditSource}
                 onDelete={handleDeleteSource}
@@ -308,9 +294,9 @@ function SourcesPageContent() {
  * Sources List Page
  *
  * Protected page that displays a grid of RSS/Atom feed sources.
- * Admin users can toggle source active status.
- * Non-admin users see read-only status badges.
- * Requires authentication - unauthenticated users will be redirected by middleware.
+ * The system has a single administrator (C-7/C-20): any authenticated
+ * user is the admin, so management controls are always shown here.
+ * Requires authentication - unauthenticated users will be redirected by the proxy.
  *
  * Wrapped in Suspense boundary for useSearchParams compatibility with Next.js 15.
  */

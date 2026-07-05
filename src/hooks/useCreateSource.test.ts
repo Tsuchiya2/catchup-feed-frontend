@@ -55,6 +55,7 @@ describe('useCreateSource', () => {
     const inputData = {
       name: 'Test Blog',
       feedURL: 'https://test.com/feed.xml',
+      category: 'dev',
     };
 
     await act(async () => {
@@ -81,6 +82,7 @@ describe('useCreateSource', () => {
       result.current.createSource({
         name: 'Test',
         feedURL: 'https://test.com/feed.xml',
+        category: 'dev',
       });
     });
 
@@ -109,6 +111,7 @@ describe('useCreateSource', () => {
       await result.current.mutateAsync({
         name: 'Test',
         feedURL: 'https://test.com/feed.xml',
+        category: 'dev',
       });
     });
 
@@ -131,6 +134,7 @@ describe('useCreateSource', () => {
         await result.current.mutateAsync({
           name: 'Test',
           feedURL: 'https://test.com/feed.xml',
+          category: 'dev',
         });
       } catch {
         // Expected to throw
@@ -157,6 +161,7 @@ describe('useCreateSource', () => {
         await result.current.mutateAsync({
           name: 'Test',
           feedURL: 'https://test.com/feed.xml',
+          category: 'dev',
         });
       } catch {
         // Expected to throw

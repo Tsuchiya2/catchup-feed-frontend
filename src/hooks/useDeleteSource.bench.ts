@@ -27,37 +27,17 @@ vi.mock('@/lib/logger', () => ({
   },
 }));
 
-vi.mock('@/lib/observability/metrics', () => ({
-  metrics: {
-    source: {
-      delete: {
-        attempt: vi.fn(),
-        success: vi.fn(),
-        failure: vi.fn(),
-        cacheRollback: vi.fn(),
-        dialog: vi.fn(),
-      },
-    },
-  },
-}));
-
-vi.mock('@/lib/observability/tracing', () => ({
-  startSpan: vi.fn((_name, _op, callback) => callback()),
-  addBreadcrumb: vi.fn(),
-  addContext: vi.fn(),
-}));
-
-vi.mock('@sentry/nextjs', () => ({
-  captureException: vi.fn(),
-}));
-
 // Generate mock sources
 function generateSources(count: number): Source[] {
   return Array.from({ length: count }, (_, i) => ({
     id: i + 1,
     name: `Source ${i + 1}`,
     feed_url: `https://example.com/feed${i + 1}.xml`,
+    url: `https://example.com/feed${i + 1}.xml`,
+    category: 'dev',
+    lang: 'en',
     active: true,
+    created_at: '2025-01-01T00:00:00Z',
   }));
 }
 

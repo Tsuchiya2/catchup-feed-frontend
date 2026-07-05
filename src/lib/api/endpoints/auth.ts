@@ -7,7 +7,6 @@
 import { apiClient } from '@/lib/api/client';
 import { appConfig } from '@/config/app.config';
 import { logger } from '@/lib/logger';
-import { metrics } from '@/lib/observability';
 import {
   getRefreshToken,
   setAuthToken,
@@ -97,7 +96,6 @@ export async function refreshToken(): Promise<RefreshTokenResponse> {
   // Check if refresh token is available
   if (!refreshTokenValue) {
     logger.error('No refresh token available');
-    metrics.login.tokenRefresh('failure', 'no_refresh_token');
     throw new Error('No refresh token available');
   }
 
@@ -112,7 +110,6 @@ export async function refreshToken(): Promise<RefreshTokenResponse> {
         gracePeriodMs,
         timeSinceExpiry,
       });
-      metrics.login.tokenRefresh('failure', 'grace_period_exceeded');
       throw new Error('Refresh token expired beyond grace period');
     }
 
@@ -155,8 +152,6 @@ export async function refreshToken(): Promise<RefreshTokenResponse> {
         durationMs: duration,
       });
 
-      metrics.login.tokenRefresh('success');
-
       return response;
     } catch (error) {
       lastError = error instanceof Error ? error : new Error('Unknown error');
@@ -190,8 +185,6 @@ export async function refreshToken(): Promise<RefreshTokenResponse> {
     attempts: maxRetries + 1,
     durationMs: duration,
   });
-
-  metrics.login.tokenRefresh('failure', 'max_retries_exceeded');
 
   throw new Error(`Token refresh failed: ${errorMessage}`);
 }

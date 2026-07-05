@@ -72,9 +72,7 @@ export const sourceFilters = {
  *
  * @example
  * // Use custom predicate
- * const recentSources = filterSources(sources, (s) =>
- *   s.last_crawled_at && new Date(s.last_crawled_at) > yesterday
- * );
+ * const devSources = filterSources(sources, (s) => s.category === 'dev');
  *
  * @example
  * // Show all sources
@@ -96,10 +94,10 @@ export const filterSources = (
  * @returns Combined predicate function
  *
  * @example
- * // AND mode: source must be active AND recently crawled
- * const activeAndRecent = composeFilters([
+ * // AND mode: source must be active AND in the dev category
+ * const activeAndDev = composeFilters([
  *   sourceFilters.active,
- *   (s) => s.last_crawled_at && new Date(s.last_crawled_at) > yesterday
+ *   (s) => s.category === 'dev'
  * ], 'AND');
  *
  * @example

@@ -13,15 +13,6 @@ import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { PWAInstallPrompt } from '../PWAInstallPrompt';
 
-// Mock metrics
-vi.mock('@/lib/observability/metrics', () => ({
-  metrics: {
-    pwa: {
-      install: vi.fn(),
-    },
-  },
-}));
-
 describe('PWAInstallPrompt', () => {
   let localStorageMock: Record<string, string>;
   let mockPromptEvent: {

@@ -14,7 +14,7 @@ const mockArticles = [
       url: 'https://example.com',
     },
     published_at: new Date('2024-01-01').toISOString(),
-    created_at: new Date('2024-01-01').toISOString(),
+    crawled_at: new Date('2024-01-01').toISOString(),
     updated_at: new Date('2024-01-01').toISOString(),
   },
   {
@@ -28,7 +28,7 @@ const mockArticles = [
       url: 'https://example2.com',
     },
     published_at: new Date('2024-01-02').toISOString(),
-    created_at: new Date('2024-01-02').toISOString(),
+    crawled_at: new Date('2024-01-02').toISOString(),
     updated_at: new Date('2024-01-02').toISOString(),
   },
   {
@@ -42,7 +42,7 @@ const mockArticles = [
       url: 'https://example.com',
     },
     published_at: new Date('2024-01-03').toISOString(),
-    created_at: new Date('2024-01-03').toISOString(),
+    crawled_at: new Date('2024-01-03').toISOString(),
     updated_at: new Date('2024-01-03').toISOString(),
   },
 ];

@@ -16,7 +16,6 @@ export {
   type ApiConfig,
   type AuthConfig,
   type FeatureFlags,
-  type ObservabilityConfig,
   type EnvironmentConfig,
 } from './app.config';
 

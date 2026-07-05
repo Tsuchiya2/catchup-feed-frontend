@@ -3,7 +3,6 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import SourcesPage from '../page';
-import * as roleUtils from '@/lib/auth/role';
 import * as sourcesApi from '@/lib/api/endpoints/sources';
 import * as useSources from '@/hooks/useSources';
 import * as useSourceSearch from '@/hooks/useSourceSearch';
@@ -11,7 +10,6 @@ import { ApiError } from '@/lib/api/errors';
 import type { Source } from '@/types/api';
 
 // Mock dependencies
-vi.mock('@/lib/auth/role');
 vi.mock('@/lib/api/endpoints/sources');
 vi.mock('@/hooks/useSources');
 vi.mock('@/hooks/useSourceSearch');
@@ -34,22 +32,31 @@ describe('SourcesPage', () => {
       id: 1,
       name: 'Tech Blog',
       feed_url: 'https://example.com/tech.xml',
+      url: 'https://example.com/tech.xml',
+      category: 'dev',
+      lang: 'en',
       active: true,
-      last_crawled_at: '2025-01-15T10:00:00Z',
+      created_at: '2025-01-15T10:00:00Z',
     },
     {
       id: 2,
       name: 'News Site',
       feed_url: 'https://example.com/news.xml',
+      url: 'https://example.com/news.xml',
+      category: 'news',
+      lang: 'ja',
       active: false,
-      last_crawled_at: '2025-01-14T15:30:00Z',
+      created_at: '2025-01-14T15:30:00Z',
     },
     {
       id: 3,
       name: 'Developer Feed',
       feed_url: 'https://example.com/dev.xml',
+      url: 'https://example.com/dev.xml',
+      category: 'dev',
+      lang: '',
       active: true,
-      last_crawled_at: null,
+      created_at: '2025-01-13T09:00:00Z',
     },
   ];
 
@@ -84,13 +91,8 @@ describe('SourcesPage', () => {
       refetch: vi.fn(),
     });
 
-    vi.mocked(sourcesApi.updateSourceActive).mockResolvedValue({
-      id: 1,
-      name: 'Tech Blog',
-      feed_url: 'https://example.com/tech.xml',
-      active: false,
-      last_crawled_at: '2025-01-15T10:00:00Z',
-    });
+    // Backend responds 204 No Content
+    vi.mocked(sourcesApi.updateSourceActive).mockResolvedValue(undefined);
   });
 
   afterEach(() => {
@@ -101,53 +103,16 @@ describe('SourcesPage', () => {
     return render(<QueryClientProvider client={queryClient}>{component}</QueryClientProvider>);
   };
 
-  describe('Role Detection', () => {
-    it('should detect admin role on mount', async () => {
-      // Arrange
-      vi.mocked(roleUtils.getUserRole).mockReturnValue('admin');
-
+  describe('Management UI (authenticated user)', () => {
+    it('should display the Add Source button', () => {
       // Act
       renderWithClient(<SourcesPage />);
 
-      // Assert
-      await waitFor(() => {
-        expect(roleUtils.getUserRole).toHaveBeenCalled();
-      });
+      // Assert - single-admin system: authenticated users always see management UI
+      expect(screen.getByRole('button', { name: /add source/i })).toBeInTheDocument();
     });
 
-    it('should detect user role on mount', async () => {
-      // Arrange
-      vi.mocked(roleUtils.getUserRole).mockReturnValue('user');
-
-      // Act
-      renderWithClient(<SourcesPage />);
-
-      // Assert
-      await waitFor(() => {
-        expect(roleUtils.getUserRole).toHaveBeenCalled();
-      });
-    });
-
-    it('should handle null role (unauthenticated)', async () => {
-      // Arrange
-      vi.mocked(roleUtils.getUserRole).mockReturnValue(null);
-
-      // Act
-      renderWithClient(<SourcesPage />);
-
-      // Assert
-      await waitFor(() => {
-        expect(roleUtils.getUserRole).toHaveBeenCalled();
-      });
-    });
-  });
-
-  describe('Admin User View', () => {
-    beforeEach(() => {
-      vi.mocked(roleUtils.getUserRole).mockReturnValue('admin');
-    });
-
-    it('should display ActiveToggle on all source cards for admin', async () => {
+    it('should display ActiveToggle on all source cards', async () => {
       // Act
       renderWithClient(<SourcesPage />);
 
@@ -158,7 +123,7 @@ describe('SourcesPage', () => {
       });
     });
 
-    it('should not display StatusBadge for admin users', async () => {
+    it('should not display StatusBadge when toggles are shown', async () => {
       // Act
       renderWithClient(<SourcesPage />);
 
@@ -191,42 +156,7 @@ describe('SourcesPage', () => {
     });
   });
 
-  describe('Non-Admin User View', () => {
-    beforeEach(() => {
-      vi.mocked(roleUtils.getUserRole).mockReturnValue('user');
-    });
-
-    it('should display StatusBadge on all source cards for non-admin', async () => {
-      // Act
-      renderWithClient(<SourcesPage />);
-
-      // Assert
-      await waitFor(() => {
-        // Should show 2 "Active" badges and 1 "Inactive" badge
-        const activeBadges = screen.getAllByText('Active');
-        const inactiveBadges = screen.getAllByText('Inactive');
-
-        expect(activeBadges).toHaveLength(2);
-        expect(inactiveBadges).toHaveLength(1);
-      });
-    });
-
-    it('should not display ActiveToggle for non-admin users', async () => {
-      // Act
-      renderWithClient(<SourcesPage />);
-
-      // Assert
-      await waitFor(() => {
-        expect(screen.queryByRole('switch')).not.toBeInTheDocument();
-      });
-    });
-  });
-
   describe('Toggle Interaction', () => {
-    beforeEach(() => {
-      vi.mocked(roleUtils.getUserRole).mockReturnValue('admin');
-    });
-
     it('should call updateSourceActive API when toggle is clicked', async () => {
       // Arrange
       const user = userEvent.setup();
@@ -250,8 +180,8 @@ describe('SourcesPage', () => {
     it('should update cache optimistically', async () => {
       // Arrange
       const user = userEvent.setup();
-      let resolveUpdate: (value: Source) => void;
-      const updatePromise = new Promise<Source>((resolve) => {
+      let resolveUpdate: () => void;
+      const updatePromise = new Promise<void>((resolve) => {
         resolveUpdate = resolve;
       });
       vi.mocked(sourcesApi.updateSourceActive).mockReturnValue(updatePromise);
@@ -273,14 +203,8 @@ describe('SourcesPage', () => {
         expect(toggles[0]!).not.toBeChecked();
       });
 
-      // Resolve the API call
-      resolveUpdate!({
-        id: 1,
-        name: 'Tech Blog',
-        feed_url: 'https://example.com/tech.xml',
-        active: false,
-        last_crawled_at: '2025-01-15T10:00:00Z',
-      });
+      // Resolve the API call (backend responds 204 No Content)
+      resolveUpdate!();
     });
 
     it('should invalidate query cache after successful update', async () => {
@@ -314,20 +238,8 @@ describe('SourcesPage', () => {
       // Arrange
       const user = userEvent.setup();
       vi.mocked(sourcesApi.updateSourceActive)
-        .mockResolvedValueOnce({
-          id: 1,
-          name: 'Tech Blog',
-          feed_url: 'https://example.com/tech.xml',
-          active: false,
-          last_crawled_at: '2025-01-15T10:00:00Z',
-        })
-        .mockResolvedValueOnce({
-          id: 2,
-          name: 'News Site',
-          feed_url: 'https://example.com/news.xml',
-          active: true,
-          last_crawled_at: '2025-01-14T15:30:00Z',
-        });
+        .mockResolvedValueOnce(undefined)
+        .mockResolvedValueOnce(undefined);
 
       renderWithClient(<SourcesPage />);
 
@@ -357,10 +269,6 @@ describe('SourcesPage', () => {
   });
 
   describe('Error Handling', () => {
-    beforeEach(() => {
-      vi.mocked(roleUtils.getUserRole).mockReturnValue('admin');
-    });
-
     it('should show error message when toggle fails', async () => {
       // Arrange
       const user = userEvent.setup();
@@ -563,9 +471,6 @@ describe('SourcesPage', () => {
 
   describe('Success State', () => {
     it('should render all sources in a grid', () => {
-      // Arrange
-      vi.mocked(roleUtils.getUserRole).mockReturnValue('user');
-
       // Act
       renderWithClient(<SourcesPage />);
 
@@ -619,10 +524,6 @@ describe('SourcesPage', () => {
   });
 
   describe('Accessibility', () => {
-    beforeEach(() => {
-      vi.mocked(roleUtils.getUserRole).mockReturnValue('user');
-    });
-
     it('should have accessible source cards', () => {
       // Act
       renderWithClient(<SourcesPage />);
@@ -653,26 +554,13 @@ describe('SourcesPage', () => {
   });
 
   describe('Integration Scenarios', () => {
-    it('should work correctly with admin toggling from active to inactive and back', async () => {
+    it('should work correctly when toggling from active to inactive and back', async () => {
       // Arrange
       const user = userEvent.setup();
-      vi.mocked(roleUtils.getUserRole).mockReturnValue('admin');
 
       vi.mocked(sourcesApi.updateSourceActive)
-        .mockResolvedValueOnce({
-          id: 1,
-          name: 'Tech Blog',
-          feed_url: 'https://example.com/tech.xml',
-          active: false,
-          last_crawled_at: '2025-01-15T10:00:00Z',
-        })
-        .mockResolvedValueOnce({
-          id: 1,
-          name: 'Tech Blog',
-          feed_url: 'https://example.com/tech.xml',
-          active: true,
-          last_crawled_at: '2025-01-15T10:00:00Z',
-        });
+        .mockResolvedValueOnce(undefined)
+        .mockResolvedValueOnce(undefined);
 
       renderWithClient(<SourcesPage />);
 
@@ -701,30 +589,6 @@ describe('SourcesPage', () => {
         expect(sourcesApi.updateSourceActive).toHaveBeenCalledWith(1, true);
         expect(sourcesApi.updateSourceActive).toHaveBeenCalledTimes(2);
       });
-    });
-
-    it('should handle role change during session', () => {
-      // Arrange
-      vi.mocked(roleUtils.getUserRole).mockReturnValue('user');
-
-      const { rerender } = renderWithClient(<SourcesPage />);
-
-      // Initial render - non-admin
-      expect(screen.getAllByText('Active')).toHaveLength(2);
-      expect(screen.queryByRole('switch')).not.toBeInTheDocument();
-
-      // Change role to admin
-      vi.mocked(roleUtils.getUserRole).mockReturnValue('admin');
-
-      // Re-render (simulating page refresh or role update)
-      rerender(
-        <QueryClientProvider client={queryClient}>
-          <SourcesPage />
-        </QueryClientProvider>
-      );
-
-      // Note: In real implementation, role is detected on mount
-      // This test documents that the component uses role from getUserRole
     });
   });
 });

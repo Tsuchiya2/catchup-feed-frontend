@@ -5,18 +5,13 @@
  * - Catching errors
  * - Custom error handlers
  * - Custom fallback UI
- * - Logging to Sentry
+ * - Logging via the structured logger
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { FeatureErrorBoundary } from '../FeatureErrorBoundary';
-import * as Sentry from '@sentry/nextjs';
-
-// Mock Sentry
-vi.mock('@sentry/nextjs', () => ({
-  captureException: vi.fn(),
-}));
+import { logger } from '@/lib/logger';
 
 // Mock logger
 vi.mock('@/lib/logger', () => ({
@@ -112,56 +107,8 @@ describe('FeatureErrorBoundary', () => {
     });
   });
 
-  describe('logging to Sentry', () => {
-    it('should log error to Sentry when caught', () => {
-      render(
-        <FeatureErrorBoundary featureName="test-feature">
-          <ThrowError />
-        </FeatureErrorBoundary>
-      );
-
-      expect(Sentry.captureException).toHaveBeenCalled();
-      const captureCall = (Sentry.captureException as any).mock.calls[0];
-      expect(captureCall[0].message).toBe('Test error from component');
-    });
-
-    it('should include feature name in Sentry tags', () => {
-      render(
-        <FeatureErrorBoundary featureName="pwa-install">
-          <ThrowError />
-        </FeatureErrorBoundary>
-      );
-
-      expect(Sentry.captureException).toHaveBeenCalled();
-      const captureCall = (Sentry.captureException as any).mock.calls[0];
-      const options = captureCall[1];
-
-      expect(options.tags).toEqual({
-        feature: 'pwa-install',
-        errorBoundary: 'FeatureErrorBoundary',
-      });
-    });
-
-    it('should include component stack in Sentry context', () => {
-      render(
-        <FeatureErrorBoundary featureName="test-feature">
-          <ThrowError />
-        </FeatureErrorBoundary>
-      );
-
-      expect(Sentry.captureException).toHaveBeenCalled();
-      const captureCall = (Sentry.captureException as any).mock.calls[0];
-      const options = captureCall[1];
-
-      expect(options.contexts).toHaveProperty('react');
-      expect(options.contexts.react).toHaveProperty('componentStack');
-    });
-  });
-
-  describe('logging to observability system', () => {
-    it('should log error to logger', async () => {
-      const { logger } = await import('@/lib/logger');
-
+  describe('logging', () => {
+    it('should log error to logger', () => {
       render(
         <FeatureErrorBoundary featureName="test-feature">
           <ThrowError />
@@ -175,9 +122,7 @@ describe('FeatureErrorBoundary', () => {
       expect(logCall[1].message).toBe('Test error from component');
     });
 
-    it('should include feature name in log context', async () => {
-      const { logger } = await import('@/lib/logger');
-
+    it('should include feature name in log context', () => {
       render(
         <FeatureErrorBoundary featureName="dashboard-widget">
           <ThrowError />
@@ -191,9 +136,7 @@ describe('FeatureErrorBoundary', () => {
       expect(context.feature).toBe('dashboard-widget');
     });
 
-    it('should include component stack in log context', async () => {
-      const { logger } = await import('@/lib/logger');
-
+    it('should include component stack in log context', () => {
       render(
         <FeatureErrorBoundary featureName="test-feature">
           <ThrowError />
@@ -232,7 +175,7 @@ describe('FeatureErrorBoundary', () => {
         </FeatureErrorBoundary>
       );
 
-      expect(Sentry.captureException).toHaveBeenCalledTimes(1);
+      expect(logger.error).toHaveBeenCalledTimes(1);
 
       vi.clearAllMocks();
 
@@ -243,7 +186,7 @@ describe('FeatureErrorBoundary', () => {
       );
 
       // Should still be in error state
-      expect(Sentry.captureException).toHaveBeenCalledTimes(0);
+      expect(logger.error).toHaveBeenCalledTimes(0);
     });
   });
 
@@ -255,9 +198,9 @@ describe('FeatureErrorBoundary', () => {
         </FeatureErrorBoundary>
       );
 
-      expect(Sentry.captureException).toHaveBeenCalled();
-      const captureCall = (Sentry.captureException as any).mock.calls[0];
-      expect(captureCall[1].tags.feature).toBe('notifications');
+      expect(logger.error).toHaveBeenCalled();
+      const logCall = (logger.error as any).mock.calls[0];
+      expect(logCall[2].feature).toBe('notifications');
     });
 
     it('should handle complex feature names', () => {
@@ -267,9 +210,9 @@ describe('FeatureErrorBoundary', () => {
         </FeatureErrorBoundary>
       );
 
-      expect(Sentry.captureException).toHaveBeenCalled();
-      const captureCall = (Sentry.captureException as any).mock.calls[0];
-      expect(captureCall[1].tags.feature).toBe('article-search-filters');
+      expect(logger.error).toHaveBeenCalled();
+      const logCall = (logger.error as any).mock.calls[0];
+      expect(logCall[2].feature).toBe('article-search-filters');
     });
   });
 
@@ -291,9 +234,9 @@ describe('FeatureErrorBoundary', () => {
         </FeatureErrorBoundary>
       );
 
-      expect(Sentry.captureException).toHaveBeenCalled();
-      const captureCall = (Sentry.captureException as any).mock.calls[0];
-      expect(captureCall[0].message).toBe('Deep error');
+      expect(logger.error).toHaveBeenCalled();
+      const logCall = (logger.error as any).mock.calls[0];
+      expect(logCall[1].message).toBe('Deep error');
     });
   });
 

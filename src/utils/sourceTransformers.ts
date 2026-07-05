@@ -33,6 +33,8 @@ export function sourceToFormData(source: Source): SourceFormData {
   return {
     name: source.name,
     feedURL: source.feed_url,
+    category: source.category,
+    lang: source.lang,
   };
 }
 
@@ -50,13 +52,17 @@ export function sourceToFormData(source: Source): SourceFormData {
  * ```typescript
  * const formData: SourceFormData = {
  *   name: '  Tech News  ',
- *   feedURL: '  https://example.com/feed.xml  '
+ *   feedURL: '  https://example.com/feed.xml  ',
+ *   category: ' dev ',
+ *   lang: 'en'
  * };
  *
  * const updateInput = formDataToUpdateInput(formData, true);
  * // Result: {
  * //   name: 'Tech News',
  * //   feedURL: 'https://example.com/feed.xml',
+ * //   category: 'dev',
+ * //   lang: 'en',
  * //   active: true
  * // }
  * ```
@@ -65,6 +71,8 @@ export function formDataToUpdateInput(data: SourceFormData, active: boolean): Up
   return {
     name: data.name.trim(),
     feedURL: data.feedURL.trim(),
+    category: data.category.trim(),
+    lang: data.lang.trim() || undefined,
     active,
   };
 }

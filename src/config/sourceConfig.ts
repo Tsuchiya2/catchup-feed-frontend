@@ -27,6 +27,17 @@ export const SOURCE_CONFIG = {
   URL_MAX_LENGTH: 2048,
 
   /**
+   * Maximum length for source category field (characters)
+   */
+  CATEGORY_MAX_LENGTH: 100,
+
+  /**
+   * Maximum length for source lang field (characters)
+   * BCP 47 language tags are short (e.g. "ja", "en", "zh-Hant")
+   */
+  LANG_MAX_LENGTH: 20,
+
+  /**
    * Debounce delay for validation operations (milliseconds)
    * Prevents excessive validation calls during user input
    */

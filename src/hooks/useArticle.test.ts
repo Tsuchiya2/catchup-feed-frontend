@@ -28,7 +28,7 @@ describe('useArticle', () => {
     url: 'https://example.com/article',
     summary: 'Test summary',
     published_at: '2025-01-15T10:00:00Z',
-    created_at: '2025-01-15T10:00:00Z',
+    crawled_at: '2025-01-15T10:00:00Z',
   });
 
   beforeEach(() => {

@@ -1,6 +1,5 @@
 'use client';
 
-import * as React from 'react';
 import {
   Dialog,
   DialogContent,
@@ -12,8 +11,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { useDeleteSource } from '@/hooks/useDeleteSource';
 import { SOURCE_TEST_IDS, SOURCE_ARIA_LABELS } from '@/constants/source';
-import { metrics } from '@/lib/observability/metrics';
-import { addBreadcrumb } from '@/lib/observability/tracing';
 import type { Source } from '@/types/api';
 
 /**
@@ -43,7 +40,6 @@ export interface DeleteSourceDialogProps {
  * - Automatic cache invalidation on success
  * - Focus management (focus moves to dialog on open, returns to trigger on close)
  * - Accessible dialog with ARIA labels
- * - Observability: metrics tracking for dialog interactions
  *
  * @example
  * ```tsx
@@ -72,29 +68,11 @@ export function DeleteSourceDialog({
 }: DeleteSourceDialogProps) {
   const { mutateAsync, isPending, error, reset } = useDeleteSource();
 
-  // Track dialog open
-  React.useEffect(() => {
-    if (isOpen) {
-      metrics.source.delete.dialog('open', source.id);
-      addBreadcrumb('Delete dialog opened', 'ui', 'info', {
-        sourceId: source.id,
-        sourceName: source.name,
-      });
-    }
-  }, [isOpen, source.id, source.name]);
-
   /**
    * Handle delete confirmation
    * Performs the delete mutation and closes dialog on success
    */
   const handleDelete = async () => {
-    // Track confirm action
-    metrics.source.delete.dialog('confirm', source.id);
-    addBreadcrumb('Delete confirmed by user', 'ui', 'info', {
-      sourceId: source.id,
-      sourceName: source.name,
-    });
-
     try {
       await mutateAsync({ id: source.id });
       reset();
@@ -112,12 +90,6 @@ export function DeleteSourceDialog({
    * Resets mutation state to clear any errors
    */
   const handleClose = () => {
-    // Track cancel action
-    metrics.source.delete.dialog('cancel', source.id);
-    addBreadcrumb('Delete cancelled by user', 'ui', 'info', {
-      sourceId: source.id,
-    });
-
     reset();
     onClose();
   };

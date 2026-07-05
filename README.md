@@ -79,7 +79,6 @@
 | **フォーム** | [React Hook Form](https://react-hook-form.com/) + [Zod](https://zod.dev/) | 型安全なバリデーション |
 | **テスト** | [Vitest](https://vitest.dev/) + [Testing Library](https://testing-library.com/) + [Playwright](https://playwright.dev/) | ユニット・統合・E2E テスト |
 | **API型** | [openapi-typescript](https://openapi-ts.pages.dev/) | OpenAPI 仕様からの自動生成 |
-| **監視** | [Sentry](https://sentry.io/) | エラートラッキング・パフォーマンス監視 |
 | **PWA** | [Serwist](https://serwist.pages.dev/) | Service Worker・オフライン対応 |
 | **UIカタログ** | [Storybook](https://storybook.js.org/) | コンポーネント開発・ドキュメント |
 | **リンティング** | [ESLint](https://eslint.org/) + [Prettier](https://prettier.io/) | コード品質 |
@@ -379,12 +378,10 @@ feat!: redesign API response format
 
 | ドキュメント | 説明 |
 |--------------|------|
-| [製品要件](./docs/product-requirements.md) | プロジェクトの要件と仕様 |
-| [機能設計](./docs/functional-design.md) | 機能の詳細設計 |
-| [アーキテクチャ](./docs/architecture.md) | システム構成と設計思想 |
 | [開発ガイドライン](./docs/development-guidelines.md) | コーディング規約とベストプラクティス |
-| [リポジトリ構造](./docs/repository-structure.md) | ディレクトリ構成の説明 |
-| [用語集](./docs/glossary.md) | プロジェクト固有の用語定義 |
+| [レガシー文書](./docs/legacy/README.md) | 旧 catchup-feed 期のアーカイブ(参照非推奨) |
+
+設計・要件の正は親リポジトリの `docs/pulse-phase1-design.md` と `docs/decisions.md`。旧 catchup-feed 期の製品要件・機能設計・アーキテクチャ等の文書は [docs/legacy/](./docs/legacy/README.md) へアーカイブ済み。
 
 ---
 

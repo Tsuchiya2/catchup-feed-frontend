@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { getSources, getSource, updateSourceActive, deleteSource } from '../sources';
+import { getSources, updateSourceActive, deleteSource } from '../sources';
 import { apiClient } from '@/lib/api/client';
 import { ApiError } from '@/lib/api/errors';
-import type { SourcesResponse, SourceResponse } from '@/types/api';
+import type { SourcesResponse } from '@/types/api';
 
 // Mock the API client
 vi.mock('@/lib/api/client', () => ({
@@ -31,8 +31,11 @@ describe('Sources API Endpoints', () => {
           id: 1,
           name: 'Test Source',
           feed_url: 'https://example.com/feed.xml',
+          url: 'https://example.com/feed.xml',
+          category: 'tech',
+          lang: 'en',
           active: true,
-          last_crawled_at: '2025-01-01T12:00:00Z',
+          created_at: '2025-01-01T12:00:00Z',
         },
       ];
 
@@ -71,107 +74,22 @@ describe('Sources API Endpoints', () => {
     });
   });
 
-  describe('getSource', () => {
-    it('should call GET /sources/:id endpoint with correct ID', async () => {
-      // Arrange
-      const mockResponse: SourceResponse = {
-        id: 42,
-        name: 'Specific Source',
-        feed_url: 'https://example.com/specific.xml',
-        active: true,
-        last_crawled_at: '2025-01-01T12:00:00Z',
-      };
-
-      vi.mocked(apiClient.get).mockResolvedValue(mockResponse);
-
-      // Act
-      const result = await getSource(42);
-
-      // Assert
-      expect(apiClient.get).toHaveBeenCalledTimes(1);
-      expect(apiClient.get).toHaveBeenCalledWith('/sources/42');
-      expect(result).toEqual(mockResponse);
-      expect(result.id).toBe(42);
-    });
-
-    it('should throw ApiError when source not found', async () => {
-      // Arrange
-      const mockError = new ApiError('Not Found', 404);
-      vi.mocked(apiClient.get).mockRejectedValue(mockError);
-
-      // Act & Assert
-      await expect(getSource(999)).rejects.toThrow(ApiError);
-      await expect(getSource(999)).rejects.toThrow('Not Found');
-    });
-
-    it('should handle different source IDs correctly', async () => {
-      // Arrange
-      const mockResponse1: SourceResponse = {
-        id: 1,
-        name: 'Source 1',
-        feed_url: 'https://example.com/1.xml',
-        active: true,
-        last_crawled_at: null,
-      };
-
-      const mockResponse2: SourceResponse = {
-        id: 2,
-        name: 'Source 2',
-        feed_url: 'https://example.com/2.xml',
-        active: false,
-        last_crawled_at: '2025-01-01T12:00:00Z',
-      };
-
-      vi.mocked(apiClient.get)
-        .mockResolvedValueOnce(mockResponse1)
-        .mockResolvedValueOnce(mockResponse2);
-
-      // Act
-      const result1 = await getSource(1);
-      const result2 = await getSource(2);
-
-      // Assert
-      expect(apiClient.get).toHaveBeenCalledWith('/sources/1');
-      expect(apiClient.get).toHaveBeenCalledWith('/sources/2');
-      expect(result1.id).toBe(1);
-      expect(result2.id).toBe(2);
-    });
-  });
-
   describe('updateSourceActive', () => {
     it('should call PUT /sources/:id with correct endpoint', async () => {
       // Arrange
-      const mockResponse: SourceResponse = {
-        id: 1,
-        name: 'Test Source',
-        feed_url: 'https://example.com/feed.xml',
-        active: false,
-        last_crawled_at: '2025-01-01T12:00:00Z',
-      };
-
-      vi.mocked(apiClient.put).mockResolvedValue(mockResponse);
+      vi.mocked(apiClient.put).mockResolvedValue(undefined);
 
       // Act
-      const result = await updateSourceActive(1, false);
+      await updateSourceActive(1, false);
 
       // Assert
       expect(apiClient.put).toHaveBeenCalledTimes(1);
       expect(apiClient.put).toHaveBeenCalledWith('/sources/1', { active: false });
-      expect(result).toEqual(mockResponse);
-      expect(result.active).toBe(false);
     });
 
     it('should send correct request body for activating source', async () => {
       // Arrange
-      const mockResponse: SourceResponse = {
-        id: 2,
-        name: 'Test Source',
-        feed_url: 'https://example.com/feed.xml',
-        active: true,
-        last_crawled_at: '2025-01-01T12:00:00Z',
-      };
-
-      vi.mocked(apiClient.put).mockResolvedValue(mockResponse);
+      vi.mocked(apiClient.put).mockResolvedValue(undefined);
 
       // Act
       await updateSourceActive(2, true);
@@ -182,15 +100,7 @@ describe('Sources API Endpoints', () => {
 
     it('should send correct request body for deactivating source', async () => {
       // Arrange
-      const mockResponse: SourceResponse = {
-        id: 3,
-        name: 'Test Source',
-        feed_url: 'https://example.com/feed.xml',
-        active: false,
-        last_crawled_at: '2025-01-01T12:00:00Z',
-      };
-
-      vi.mocked(apiClient.put).mockResolvedValue(mockResponse);
+      vi.mocked(apiClient.put).mockResolvedValue(undefined);
 
       // Act
       await updateSourceActive(3, false);
@@ -199,25 +109,15 @@ describe('Sources API Endpoints', () => {
       expect(apiClient.put).toHaveBeenCalledWith('/sources/3', { active: false });
     });
 
-    it('should return updated source response on success', async () => {
+    it('should resolve void on success (204 No Content)', async () => {
       // Arrange
-      const mockResponse: SourceResponse = {
-        id: 5,
-        name: 'Updated Source',
-        feed_url: 'https://example.com/updated.xml',
-        active: true,
-        last_crawled_at: '2025-01-02T08:00:00Z',
-      };
-
-      vi.mocked(apiClient.put).mockResolvedValue(mockResponse);
+      vi.mocked(apiClient.put).mockResolvedValue(undefined);
 
       // Act
       const result = await updateSourceActive(5, true);
 
       // Assert
-      expect(result).toEqual(mockResponse);
-      expect(result.id).toBe(5);
-      expect(result.active).toBe(true);
+      expect(result).toBeUndefined();
     });
 
     it('should throw ApiError on 403 Forbidden (permission denied)', async () => {
@@ -272,15 +172,7 @@ describe('Sources API Endpoints', () => {
 
     it('should include Authorization header via apiClient', async () => {
       // Arrange
-      const mockResponse: SourceResponse = {
-        id: 1,
-        name: 'Test Source',
-        feed_url: 'https://example.com/feed.xml',
-        active: false,
-        last_crawled_at: '2025-01-01T12:00:00Z',
-      };
-
-      vi.mocked(apiClient.put).mockResolvedValue(mockResponse);
+      vi.mocked(apiClient.put).mockResolvedValue(undefined);
 
       // Act
       await updateSourceActive(1, false);
@@ -293,76 +185,34 @@ describe('Sources API Endpoints', () => {
 
     it('should handle multiple sequential updates', async () => {
       // Arrange
-      const mockResponse1: SourceResponse = {
-        id: 1,
-        name: 'Test Source',
-        feed_url: 'https://example.com/feed.xml',
-        active: false,
-        last_crawled_at: '2025-01-01T12:00:00Z',
-      };
-
-      const mockResponse2: SourceResponse = {
-        id: 1,
-        name: 'Test Source',
-        feed_url: 'https://example.com/feed.xml',
-        active: true,
-        last_crawled_at: '2025-01-01T13:00:00Z',
-      };
-
-      vi.mocked(apiClient.put)
-        .mockResolvedValueOnce(mockResponse1)
-        .mockResolvedValueOnce(mockResponse2);
+      vi.mocked(apiClient.put).mockResolvedValue(undefined);
 
       // Act
-      const result1 = await updateSourceActive(1, false);
-      const result2 = await updateSourceActive(1, true);
+      await updateSourceActive(1, false);
+      await updateSourceActive(1, true);
 
       // Assert
       expect(apiClient.put).toHaveBeenCalledTimes(2);
-      expect(result1.active).toBe(false);
-      expect(result2.active).toBe(true);
+      expect(apiClient.put).toHaveBeenNthCalledWith(1, '/sources/1', { active: false });
+      expect(apiClient.put).toHaveBeenNthCalledWith(2, '/sources/1', { active: true });
     });
 
     it('should handle concurrent updates to different sources', async () => {
       // Arrange
-      const mockResponse1: SourceResponse = {
-        id: 1,
-        name: 'Source 1',
-        feed_url: 'https://example.com/1.xml',
-        active: false,
-        last_crawled_at: '2025-01-01T12:00:00Z',
-      };
-
-      const mockResponse2: SourceResponse = {
-        id: 2,
-        name: 'Source 2',
-        feed_url: 'https://example.com/2.xml',
-        active: true,
-        last_crawled_at: '2025-01-01T12:00:00Z',
-      };
-
-      vi.mocked(apiClient.put).mockImplementation((endpoint, data) => {
-        if (endpoint === '/sources/1') {
-          return Promise.resolve(mockResponse1);
-        }
-        if (endpoint === '/sources/2') {
-          return Promise.resolve(mockResponse2);
+      vi.mocked(apiClient.put).mockImplementation((endpoint) => {
+        if (endpoint === '/sources/1' || endpoint === '/sources/2') {
+          return Promise.resolve(undefined);
         }
         return Promise.reject(new Error('Unknown endpoint'));
       });
 
       // Act
-      const [result1, result2] = await Promise.all([
-        updateSourceActive(1, false),
-        updateSourceActive(2, true),
-      ]);
+      await Promise.all([updateSourceActive(1, false), updateSourceActive(2, true)]);
 
       // Assert
       expect(apiClient.put).toHaveBeenCalledTimes(2);
-      expect(result1.id).toBe(1);
-      expect(result1.active).toBe(false);
-      expect(result2.id).toBe(2);
-      expect(result2.active).toBe(true);
+      expect(apiClient.put).toHaveBeenCalledWith('/sources/1', { active: false });
+      expect(apiClient.put).toHaveBeenCalledWith('/sources/2', { active: true });
     });
   });
 
@@ -409,40 +259,9 @@ describe('Sources API Endpoints', () => {
   });
 
   describe('Type Safety', () => {
-    it('should return properly typed SourceResponse', async () => {
-      // Arrange
-      const mockResponse: SourceResponse = {
-        id: 1,
-        name: 'Test Source',
-        feed_url: 'https://example.com/feed.xml',
-        active: true,
-        last_crawled_at: '2025-01-01T12:00:00Z',
-      };
-
-      vi.mocked(apiClient.put).mockResolvedValue(mockResponse);
-
-      // Act
-      const result = await updateSourceActive(1, true);
-
-      // Assert - TypeScript should allow accessing these properties
-      expect(result.id).toBeDefined();
-      expect(result.name).toBeDefined();
-      expect(result.feed_url).toBeDefined();
-      expect(result.active).toBeDefined();
-      expect(typeof result.active).toBe('boolean');
-    });
-
     it('should accept valid boolean values for active parameter', async () => {
       // Arrange
-      const mockResponse: SourceResponse = {
-        id: 1,
-        name: 'Test Source',
-        feed_url: 'https://example.com/feed.xml',
-        active: true,
-        last_crawled_at: null,
-      };
-
-      vi.mocked(apiClient.put).mockResolvedValue(mockResponse);
+      vi.mocked(apiClient.put).mockResolvedValue(undefined);
 
       // Act & Assert - These should compile and work
       await updateSourceActive(1, true);

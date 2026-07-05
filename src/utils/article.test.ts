@@ -41,7 +41,7 @@ describe('validateArticle', () => {
     url: 'https://example.com',
     summary: 'This is a test',
     published_at: '2025-01-01T00:00:00Z',
-    created_at: '2025-01-01T00:00:00Z',
+    crawled_at: '2025-01-01T00:00:00Z',
   };
 
   it('should return true for valid article', () => {
@@ -117,10 +117,10 @@ describe('validateArticle', () => {
     expect(validateArticle(invalidArticle)).toBe(false);
   });
 
-  it('should return false when created_at is not a string', () => {
+  it('should return false when crawled_at is not a string', () => {
     const invalidArticle = {
       ...validArticle,
-      created_at: null,
+      crawled_at: null,
     };
     expect(validateArticle(invalidArticle)).toBe(false);
   });

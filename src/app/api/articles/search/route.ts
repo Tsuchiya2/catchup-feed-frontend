@@ -26,7 +26,7 @@ function getMockArticles(): Article[] {
       summary:
         'A major AI company has announced the release of their latest language model today, featuring improved performance and efficiency. The new model demonstrates significant improvements in reasoning and coding tasks.',
       published_at: getDateTimeAtHour(0, 9),
-      created_at: getDateTimeAtHour(0, 9),
+      crawled_at: getDateTimeAtHour(0, 9),
     },
     {
       id: 2,
@@ -37,7 +37,7 @@ function getMockArticles(): Article[] {
       summary:
         'The React team has released version 20 today with several new features including improved server components, better TypeScript support, and enhanced performance optimizations for large applications.',
       published_at: getDateTimeAtHour(0, 11),
-      created_at: getDateTimeAtHour(0, 11),
+      crawled_at: getDateTimeAtHour(0, 11),
     },
     {
       id: 3,
@@ -48,7 +48,7 @@ function getMockArticles(): Article[] {
       summary:
         'Industry experts discuss the top cloud computing trends expected to dominate in 2025, including serverless architecture, edge computing, and multi-cloud strategies for enterprise applications.',
       published_at: getDateTimeAtHour(0, 14),
-      created_at: getDateTimeAtHour(0, 14),
+      crawled_at: getDateTimeAtHour(0, 14),
     },
     // Yesterday's articles (2 articles)
     {
@@ -60,7 +60,7 @@ function getMockArticles(): Article[] {
       summary:
         'Microsoft announces TypeScript 6.0 beta with groundbreaking features including improved type inference, faster compilation, and better integration with modern JavaScript frameworks.',
       published_at: getDateTimeAtHour(1, 10),
-      created_at: getDateTimeAtHour(1, 10),
+      crawled_at: getDateTimeAtHour(1, 10),
     },
     {
       id: 5,
@@ -71,7 +71,7 @@ function getMockArticles(): Article[] {
       summary:
         'Security experts share essential cybersecurity practices for remote and hybrid teams, covering VPN usage, multi-factor authentication, and secure communication tools.',
       published_at: getDateTimeAtHour(1, 15),
-      created_at: getDateTimeAtHour(1, 15),
+      crawled_at: getDateTimeAtHour(1, 15),
     },
     // 2 days ago (2 articles)
     {
@@ -83,7 +83,7 @@ function getMockArticles(): Article[] {
       summary:
         'Healthcare institutions are increasingly adopting machine learning solutions for diagnostics, treatment planning, and patient care optimization.',
       published_at: getDateTimeAtHour(2, 9),
-      created_at: getDateTimeAtHour(2, 9),
+      crawled_at: getDateTimeAtHour(2, 9),
     },
     {
       id: 7,
@@ -94,7 +94,7 @@ function getMockArticles(): Article[] {
       summary:
         'A comprehensive guide to building performant and scalable APIs using GraphQL, including best practices for schema design, caching, and error handling.',
       published_at: getDateTimeAtHour(2, 14),
-      created_at: getDateTimeAtHour(2, 14),
+      crawled_at: getDateTimeAtHour(2, 14),
     },
     // 3 days ago (1 article)
     {
@@ -106,7 +106,7 @@ function getMockArticles(): Article[] {
       summary:
         'Researchers discuss recent breakthroughs in quantum computing and potential applications in cryptography, drug discovery, and climate modeling.',
       published_at: getDateTimeAtHour(3, 11),
-      created_at: getDateTimeAtHour(3, 11),
+      crawled_at: getDateTimeAtHour(3, 11),
     },
     // 5 days ago (2 articles)
     {
@@ -118,7 +118,7 @@ function getMockArticles(): Article[] {
       summary:
         'Exploring the latest features in Next.js 15 including improved server actions, enhanced caching strategies, and better developer experience.',
       published_at: getDateTimeAtHour(5, 10),
-      created_at: getDateTimeAtHour(5, 10),
+      crawled_at: getDateTimeAtHour(5, 10),
     },
     {
       id: 10,
@@ -129,7 +129,7 @@ function getMockArticles(): Article[] {
       summary:
         'New research reveals the significant economic impact of open source software, with contributions valued at billions of dollars annually.',
       published_at: getDateTimeAtHour(5, 16),
-      created_at: getDateTimeAtHour(5, 16),
+      crawled_at: getDateTimeAtHour(5, 16),
     },
     // 7 days ago (1 article)
     {
@@ -141,7 +141,7 @@ function getMockArticles(): Article[] {
       summary:
         'An in-depth comparison of microservices and monolithic architectures, helping teams decide which approach best fits their project requirements.',
       published_at: getDateTimeAtHour(7, 13),
-      created_at: getDateTimeAtHour(7, 13),
+      crawled_at: getDateTimeAtHour(7, 13),
     },
     // 10 days ago (older article, outside Last 7 Days)
     {
@@ -153,7 +153,7 @@ function getMockArticles(): Article[] {
       summary:
         'Expert tips on optimizing database performance including indexing strategies, query optimization, and caching mechanisms for high-traffic applications.',
       published_at: getDateTimeAtHour(10, 9),
-      created_at: getDateTimeAtHour(10, 9),
+      crawled_at: getDateTimeAtHour(10, 9),
     },
   ];
 }

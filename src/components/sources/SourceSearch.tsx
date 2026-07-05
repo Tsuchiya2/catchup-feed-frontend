@@ -2,7 +2,7 @@
  * SourceSearch Component
  *
  * Search and filter panel for sources with keyword search,
- * type filter, and active status filter.
+ * category filter, and active status filter.
  */
 
 'use client';
@@ -11,14 +11,14 @@ import * as React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { SearchInput } from '@/components/search/SearchInput';
-import { TypeFilter } from '@/components/search/TypeFilter';
+import { CategoryFilter } from '@/components/search/CategoryFilter';
 import { ActiveFilter } from '@/components/search/ActiveFilter';
 import { cn } from '@/lib/utils';
 import type { SourceSearchParams } from '@/lib/api/endpoints/sources';
 
 export interface SourceSearchState {
   keyword: string;
-  sourceType: string | null;
+  category: string | null;
   active: boolean | null;
 }
 
@@ -39,7 +39,7 @@ export interface SourceSearchProps {
 export function toSearchParams(state: SourceSearchState): SourceSearchParams {
   return {
     keyword: state.keyword || undefined,
-    source_type: state.sourceType ?? undefined,
+    category: state.category ?? undefined,
     active: state.active ?? undefined,
   };
 }
@@ -48,7 +48,7 @@ export function toSearchParams(state: SourceSearchState): SourceSearchParams {
  * Check if any filters are active
  */
 export function hasActiveFilters(state: SourceSearchState): boolean {
-  return !!(state.keyword || state.sourceType || state.active !== null);
+  return !!(state.keyword || state.category || state.active !== null);
 }
 
 /**
@@ -58,7 +58,7 @@ export function hasActiveFilters(state: SourceSearchState): boolean {
  * ```tsx
  * const [searchState, setSearchState] = useState<SourceSearchState>({
  *   keyword: '',
- *   sourceType: null,
+ *   category: null,
  *   active: null,
  * });
  *
@@ -82,9 +82,9 @@ export function SourceSearch({
     [searchState, onSearchChange]
   );
 
-  const handleTypeChange = React.useCallback(
-    (sourceType: string | null) => {
-      onSearchChange({ ...searchState, sourceType });
+  const handleCategoryChange = React.useCallback(
+    (category: string | null) => {
+      onSearchChange({ ...searchState, category });
     },
     [searchState, onSearchChange]
   );
@@ -99,7 +99,7 @@ export function SourceSearch({
   const handleClearAll = React.useCallback(() => {
     onSearchChange({
       keyword: '',
-      sourceType: null,
+      category: null,
       active: null,
     });
   }, [onSearchChange]);
@@ -122,8 +122,8 @@ export function SourceSearch({
 
         {/* Filters */}
         <div className="grid gap-4 sm:grid-cols-2">
-          {/* Type Filter */}
-          <TypeFilter value={searchState.sourceType} onChange={handleTypeChange} />
+          {/* Category Filter */}
+          <CategoryFilter value={searchState.category} onChange={handleCategoryChange} />
 
           {/* Active Filter */}
           <ActiveFilter value={searchState.active} onChange={handleActiveChange} />

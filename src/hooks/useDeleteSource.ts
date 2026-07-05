@@ -7,18 +7,14 @@
  * Features:
  * - Optimistic cache updates for instant UI feedback
  * - Automatic rollback on error
- * - Comprehensive observability (logging, metrics, tracing)
- * - Error tracking with Sentry integration
+ * - Structured logging
  */
 
 'use client';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import * as Sentry from '@sentry/nextjs';
 import { deleteSource } from '@/lib/api/endpoints/sources';
 import { logger } from '@/lib/logger';
-import { metrics } from '@/lib/observability/metrics';
-import { startSpan, addBreadcrumb, addContext } from '@/lib/observability/tracing';
 import type { SourcesResponse } from '@/types/api';
 import { ApiError } from '@/lib/api/errors';
 
@@ -83,11 +79,7 @@ function getErrorStatus(error: unknown): number | undefined {
  * On error, rolls back to the previous state.
  * On success, invalidates the ['sources'] cache to refresh from the server.
  *
- * Includes comprehensive observability:
- * - Structured logging for all operations
- * - Metrics tracking (attempt, success, failure, rollback)
- * - Distributed tracing with Sentry
- * - Error tracking with context
+ * Includes structured logging for all operations.
  *
  * @returns Mutation function, loading state, error, and reset function
  *
@@ -126,22 +118,8 @@ export function useDeleteSource(): UseDeleteSourceReturn {
         operation: 'delete_source',
       });
 
-      // Track metrics
-      metrics.source.delete.attempt(id);
-
-      // Add breadcrumb for tracing
-      addBreadcrumb('Delete source mutation started', 'mutation', 'info', {
-        sourceId: id,
-      });
-
-      // Add context for error tracking
-      addContext('delete_operation', { sourceId: id, startTime });
-
       try {
-        // Execute delete within trace span
-        await startSpan(`Delete Source ${id}`, 'mutation.source.delete', async () => {
-          await deleteSource(id);
-        });
+        await deleteSource(id);
 
         const durationMs = Date.now() - startTime;
 
@@ -150,15 +128,6 @@ export function useDeleteSource(): UseDeleteSourceReturn {
           sourceId: id,
           duration_ms: durationMs,
           operation: 'delete_source',
-        });
-
-        // Track success metrics
-        metrics.source.delete.success(id, durationMs);
-
-        // Add success breadcrumb
-        addBreadcrumb('Delete source mutation succeeded', 'mutation', 'info', {
-          sourceId: id,
-          duration_ms: durationMs,
         });
       } catch (error) {
         const durationMs = Date.now() - startTime;
@@ -173,31 +142,6 @@ export function useDeleteSource(): UseDeleteSourceReturn {
           status,
           operation: 'delete_source',
         });
-
-        // Track failure metrics
-        metrics.source.delete.failure(id, errorType, status);
-
-        // Add error breadcrumb
-        addBreadcrumb('Delete source mutation failed', 'mutation', 'error', {
-          sourceId: id,
-          error_type: errorType,
-          status,
-        });
-
-        // Capture exception in Sentry with context
-        if (error instanceof Error) {
-          Sentry.captureException(error, {
-            tags: {
-              operation: 'source.delete',
-              error_type: errorType,
-            },
-            extra: {
-              sourceId: id,
-              duration_ms: durationMs,
-              status,
-            },
-          });
-        }
 
         throw error;
       }
@@ -236,15 +180,6 @@ export function useDeleteSource(): UseDeleteSourceReturn {
           sourceId: id,
           previousCount: context.previousSources.length,
           operation: 'delete_source',
-        });
-
-        // Track rollback metrics
-        metrics.source.delete.cacheRollback(id);
-
-        // Add rollback breadcrumb
-        addBreadcrumb('Cache rollback applied', 'cache', 'warning', {
-          sourceId: id,
-          previousCount: context.previousSources.length,
         });
       }
     },

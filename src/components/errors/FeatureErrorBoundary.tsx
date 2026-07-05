@@ -2,7 +2,6 @@
 
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { logger } from '@/lib/logger';
-import * as Sentry from '@sentry/nextjs';
 
 /**
  * Props for FeatureErrorBoundary component
@@ -30,7 +29,7 @@ interface FeatureErrorBoundaryState {
  * Feature-specific error boundary component
  *
  * Wraps feature components to prevent their errors from crashing the entire application.
- * Logs errors to the console, Sentry, and observability system.
+ * Logs errors to the console via the structured logger.
  *
  * @example
  * ```tsx
@@ -69,23 +68,10 @@ export class FeatureErrorBoundary extends Component<
   override componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
     const { featureName } = this.props;
 
-    // Log to console and observability system
+    // Log to console
     logger.error(`Feature error: ${featureName}`, error, {
       componentStack: errorInfo.componentStack,
       feature: featureName,
-    });
-
-    // Send to Sentry for error tracking
-    Sentry.captureException(error, {
-      tags: {
-        feature: featureName,
-        errorBoundary: 'FeatureErrorBoundary',
-      },
-      contexts: {
-        react: {
-          componentStack: errorInfo.componentStack,
-        },
-      },
     });
   }
 

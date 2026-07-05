@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/dialog';
 import { SourceForm } from './SourceForm';
 import { useCreateSource } from '@/hooks/useCreateSource';
-import type { CreateSourceInput } from '@/types/api';
+import type { SourceFormData } from '@/types/api';
 
 /**
  * AddSourceDialog Component Props
@@ -54,9 +54,15 @@ export function AddSourceDialog({ isOpen, onClose, onSuccess }: AddSourceDialogP
   /**
    * Handle form submission
    */
-  const handleSubmit = async (data: CreateSourceInput) => {
+  const handleSubmit = async (data: SourceFormData) => {
     try {
-      await mutateAsync(data);
+      await mutateAsync({
+        name: data.name,
+        feedURL: data.feedURL,
+        category: data.category,
+        // Empty lang means "let the backend apply its default"
+        lang: data.lang || undefined,
+      });
       reset();
       onSuccess?.();
       onClose();

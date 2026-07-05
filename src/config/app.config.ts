@@ -64,20 +64,6 @@ export interface FeatureFlags {
 }
 
 /**
- * Observability Configuration
- */
-export interface ObservabilityConfig {
-  /** Sentry DSN for error tracking */
-  sentryDsn: string | null;
-  /** Environment name (development, staging, production) */
-  environment: string;
-  /** Trace sample rate (0.0 to 1.0) */
-  tracesSampleRate: number;
-  /** Enable custom metrics collection */
-  enableMetrics: boolean;
-}
-
-/**
  * Environment Detection
  */
 export interface EnvironmentConfig {
@@ -99,7 +85,6 @@ export interface AppConfig {
   api: ApiConfig;
   auth: AuthConfig;
   features: FeatureFlags;
-  observability: ObservabilityConfig;
   env: EnvironmentConfig;
 }
 
@@ -182,13 +167,6 @@ export const appConfig: AppConfig = {
     darkMode: getEnvBool('NEXT_PUBLIC_FEATURE_DARK_MODE', true),
     aiSummary: getEnvBool('NEXT_PUBLIC_FEATURE_AI_SUMMARY', false),
     tokenRefresh: getEnvBool('NEXT_PUBLIC_FEATURE_TOKEN_REFRESH', true),
-  },
-
-  observability: {
-    sentryDsn: getEnvVar('NEXT_PUBLIC_SENTRY_DSN', '') || null,
-    environment: getEnvVar('NEXT_PUBLIC_SENTRY_ENV', nodeEnv),
-    tracesSampleRate: getEnvNumber('NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE', 0.1),
-    enableMetrics: getEnvBool('NEXT_PUBLIC_ENABLE_METRICS', false),
   },
 
   env: {

@@ -40,6 +40,6 @@ export function validateArticle(article: unknown): article is Article {
     typeof a.url === 'string' &&
     typeof a.summary === 'string' &&
     typeof a.published_at === 'string' &&
-    typeof a.created_at === 'string'
+    typeof a.crawled_at === 'string'
   );
 }

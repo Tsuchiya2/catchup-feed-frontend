@@ -14,7 +14,7 @@ const mockArticle = {
     url: 'https://example.com',
   },
   published_at: new Date('2024-01-01').toISOString(),
-  created_at: new Date('2024-01-01').toISOString(),
+  crawled_at: new Date('2024-01-01').toISOString(),
   updated_at: new Date('2024-01-01').toISOString(),
 };
 

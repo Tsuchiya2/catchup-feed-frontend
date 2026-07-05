@@ -1534,8 +1534,8 @@ npm run storybook        # Start Storybook (http://localhost:6006)
 ### Internal Documentation
 
 - [README.md](../README.md) - Project overview
-- [Architecture Documentation](./architecture.md) - System architecture
-- [API Documentation](./functional-design.md) - API integration details
+- 設計・要件の正: 親リポジトリの `docs/pulse-phase1-design.md` / `docs/decisions.md`
+- [Legacy Documents](./legacy/README.md) - 旧 catchup-feed 期のアーカイブ(参照非推奨)
 
 ---
 

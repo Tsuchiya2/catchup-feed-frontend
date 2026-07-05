@@ -20,21 +20,24 @@ describe('SourceCard', () => {
     id: 1,
     name: 'Test Source',
     feed_url: 'https://example.com/feed.xml',
+    url: 'https://example.com/feed.xml',
+    category: 'dev',
+    lang: 'en',
     active: true,
-    last_crawled_at: new Date(NOW.getTime() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
+    created_at: new Date(NOW.getTime() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
     ...overrides,
   });
 
   describe('Rendering', () => {
     it('should render source name', () => {
       const source = createMockSource({ name: 'Tech Blog' });
-      render(<SourceCard source={source} userRole="user" />);
+      render(<SourceCard source={source} />);
       expect(screen.getByRole('heading', { level: 3, name: 'Tech Blog' })).toBeInTheDocument();
     });
 
     it('should render RSS icon', () => {
       const source = createMockSource();
-      const { container } = render(<SourceCard source={source} userRole="user" />);
+      const { container } = render(<SourceCard source={source} />);
       const icon = container.querySelector('svg');
       expect(icon).toBeInTheDocument();
       expect(icon).toHaveClass('text-primary');
@@ -42,35 +45,47 @@ describe('SourceCard', () => {
 
     it('should render status badge', () => {
       const source = createMockSource({ active: true });
-      render(<SourceCard source={source} userRole="user" />);
+      render(<SourceCard source={source} />);
       expect(screen.getByText('Active')).toBeInTheDocument();
     });
 
-    it('should render last crawled time', () => {
+    it('should render added time', () => {
       const source = createMockSource({
-        last_crawled_at: new Date(NOW.getTime() - 2 * 60 * 60 * 1000).toISOString(),
+        created_at: new Date(NOW.getTime() - 2 * 60 * 60 * 1000).toISOString(),
       });
-      render(<SourceCard source={source} userRole="user" />);
-      expect(screen.getByText('2 hours ago')).toBeInTheDocument();
+      render(<SourceCard source={source} />);
+      expect(screen.getByText('Added 2 hours ago')).toBeInTheDocument();
     });
 
-    it('should render "Never crawled" when last_crawled_at is null', () => {
-      const source = createMockSource({ last_crawled_at: null });
-      render(<SourceCard source={source} userRole="user" />);
-      expect(screen.getByText('Never crawled')).toBeInTheDocument();
+    it('should render category badge', () => {
+      const source = createMockSource({ category: 'ai' });
+      render(<SourceCard source={source} />);
+      expect(screen.getByLabelText('Category: ai')).toHaveTextContent('ai');
+    });
+
+    it('should render language badge when lang is set', () => {
+      const source = createMockSource({ lang: 'ja' });
+      render(<SourceCard source={source} />);
+      expect(screen.getByLabelText('Language: ja')).toHaveTextContent('ja');
+    });
+
+    it('should not render language badge when lang is empty', () => {
+      const source = createMockSource({ lang: '' });
+      render(<SourceCard source={source} />);
+      expect(screen.queryByLabelText(/^Language:/)).not.toBeInTheDocument();
     });
   });
 
   describe('Active Status', () => {
     it('should show Active badge for active source', () => {
       const source = createMockSource({ active: true });
-      render(<SourceCard source={source} userRole="user" />);
+      render(<SourceCard source={source} />);
       expect(screen.getByText('Active')).toBeInTheDocument();
     });
 
     it('should show Inactive badge for inactive source', () => {
       const source = createMockSource({ active: false });
-      render(<SourceCard source={source} userRole="user" />);
+      render(<SourceCard source={source} />);
       expect(screen.getByText('Inactive')).toBeInTheDocument();
     });
   });
@@ -78,29 +93,27 @@ describe('SourceCard', () => {
   describe('Styling', () => {
     it('should apply custom className', () => {
       const source = createMockSource();
-      const { container } = render(
-        <SourceCard source={source} className="custom-class" userRole="user" />
-      );
+      const { container } = render(<SourceCard source={source} className="custom-class" />);
       expect(container.firstChild).toHaveClass('custom-class');
     });
 
     it('should have flex column layout', () => {
       const source = createMockSource();
-      const { container } = render(<SourceCard source={source} userRole="user" />);
+      const { container } = render(<SourceCard source={source} />);
       expect(container.firstChild).toHaveClass('flex');
       expect(container.firstChild).toHaveClass('flex-col');
     });
 
     it('should truncate long source name', () => {
       const source = createMockSource({ name: 'A'.repeat(100) });
-      render(<SourceCard source={source} userRole="user" />);
+      render(<SourceCard source={source} />);
       const heading = screen.getByRole('heading', { level: 3 });
       expect(heading).toHaveClass('truncate');
     });
 
     it('should truncate long feed URL', () => {
       const source = createMockSource({ feed_url: 'https://example.com/' + 'a'.repeat(100) });
-      render(<SourceCard source={source} userRole="user" />);
+      render(<SourceCard source={source} />);
       const link = screen.getByRole('link', { name: /visit feed:/i });
       expect(link).toHaveClass('truncate');
     });
@@ -109,41 +122,42 @@ describe('SourceCard', () => {
   describe('Accessibility', () => {
     it('should have role listitem', () => {
       const source = createMockSource();
-      render(<SourceCard source={source} userRole="user" />);
+      render(<SourceCard source={source} />);
       expect(screen.getByRole('listitem')).toBeInTheDocument();
     });
 
     it('should have aria-label with source name', () => {
       const source = createMockSource({ name: 'Tech Blog' });
-      render(<SourceCard source={source} userRole="user" />);
+      render(<SourceCard source={source} />);
       expect(screen.getByRole('listitem')).toHaveAttribute('aria-label', 'Source: Tech Blog');
     });
 
     it('should hide RSS icon from screen readers', () => {
       const source = createMockSource();
-      const { container } = render(<SourceCard source={source} userRole="user" />);
+      const { container } = render(<SourceCard source={source} />);
       const icon = container.querySelector('svg');
       expect(icon).toHaveAttribute('aria-hidden', 'true');
     });
 
     it('should have accessible feed URL with aria-label', () => {
       const source = createMockSource({ feed_url: 'https://example.com/feed' });
-      render(<SourceCard source={source} userRole="user" />);
+      render(<SourceCard source={source} />);
       expect(screen.getByLabelText('Visit feed: https://example.com/feed')).toBeInTheDocument();
     });
 
-    it('should have time element for last crawled', () => {
-      const lastCrawledAt = new Date(NOW.getTime() - 1 * 60 * 60 * 1000).toISOString();
-      const source = createMockSource({ last_crawled_at: lastCrawledAt });
-      render(<SourceCard source={source} userRole="user" />);
+    it('should have time element for added date', () => {
+      const createdAt = new Date(NOW.getTime() - 1 * 60 * 60 * 1000).toISOString();
+      const source = createMockSource({ created_at: createdAt });
+      render(<SourceCard source={source} />);
       const timeElement = screen.getByRole('time');
-      expect(timeElement).toHaveAttribute('datetime', lastCrawledAt);
+      expect(timeElement).toHaveAttribute('datetime', createdAt);
+      expect(timeElement).toHaveAttribute('aria-label', 'Added: 1 hour ago');
     });
 
     it('should have proper title attribute for truncated URL', () => {
       const longUrl = 'https://example.com/' + 'a'.repeat(100);
       const source = createMockSource({ feed_url: longUrl });
-      render(<SourceCard source={source} userRole="user" />);
+      render(<SourceCard source={source} />);
       const link = screen.getByRole('link', { name: /visit feed:/i });
       expect(link).toHaveAttribute('title', longUrl);
     });
@@ -152,7 +166,7 @@ describe('SourceCard', () => {
   describe('Feed URL Link', () => {
     it('should render feed URL as clickable link', () => {
       const source = createMockSource({ feed_url: 'https://example.com/feed.xml' });
-      render(<SourceCard source={source} userRole="user" />);
+      render(<SourceCard source={source} />);
 
       const link = screen.getByRole('link', { name: /visit feed:/i });
       expect(link).toBeInTheDocument();
@@ -161,7 +175,7 @@ describe('SourceCard', () => {
 
     it('should open link in new tab', () => {
       const source = createMockSource({ feed_url: 'https://example.com/feed.xml' });
-      render(<SourceCard source={source} userRole="user" />);
+      render(<SourceCard source={source} />);
 
       const link = screen.getByRole('link', { name: /visit feed:/i });
       expect(link).toHaveAttribute('target', '_blank');
@@ -169,7 +183,7 @@ describe('SourceCard', () => {
 
     it('should include security attributes', () => {
       const source = createMockSource({ feed_url: 'https://example.com/feed.xml' });
-      render(<SourceCard source={source} userRole="user" />);
+      render(<SourceCard source={source} />);
 
       const link = screen.getByRole('link', { name: /visit feed:/i });
       expect(link).toHaveAttribute('rel', 'noopener noreferrer');
@@ -177,7 +191,7 @@ describe('SourceCard', () => {
 
     it('should have correct accessibility label', () => {
       const source = createMockSource({ feed_url: 'https://example.com/feed.xml' });
-      render(<SourceCard source={source} userRole="user" />);
+      render(<SourceCard source={source} />);
 
       const link = screen.getByRole('link', { name: /visit feed:/i });
       expect(link).toHaveAttribute('aria-label', 'Visit feed: https://example.com/feed.xml');
@@ -185,7 +199,7 @@ describe('SourceCard', () => {
 
     it('should show tooltip with full URL', () => {
       const source = createMockSource({ feed_url: 'https://example.com/feed.xml' });
-      render(<SourceCard source={source} userRole="user" />);
+      render(<SourceCard source={source} />);
 
       const link = screen.getByRole('link', { name: /visit feed:/i });
       expect(link).toHaveAttribute('title', 'https://example.com/feed.xml');
@@ -193,7 +207,7 @@ describe('SourceCard', () => {
 
     it('should truncate long URLs visually', () => {
       const source = createMockSource({ feed_url: 'https://example.com/' + 'a'.repeat(100) });
-      render(<SourceCard source={source} userRole="user" />);
+      render(<SourceCard source={source} />);
 
       const link = screen.getByRole('link', { name: /visit feed:/i });
       expect(link).toHaveClass('truncate');
@@ -201,7 +215,7 @@ describe('SourceCard', () => {
 
     it('should be keyboard accessible', () => {
       const source = createMockSource({ feed_url: 'https://example.com/feed.xml' });
-      render(<SourceCard source={source} userRole="user" />);
+      render(<SourceCard source={source} />);
 
       const link = screen.getByRole('link', { name: /visit feed:/i });
 
@@ -215,7 +229,7 @@ describe('SourceCard', () => {
 
     it('should have hover and focus styles', () => {
       const source = createMockSource({ feed_url: 'https://example.com/feed.xml' });
-      render(<SourceCard source={source} userRole="user" />);
+      render(<SourceCard source={source} />);
 
       const link = screen.getByRole('link', { name: /visit feed:/i });
       expect(link).toHaveClass('hover:text-primary');
@@ -225,7 +239,7 @@ describe('SourceCard', () => {
 
     it('should maintain block-level layout', () => {
       const source = createMockSource({ feed_url: 'https://example.com/feed.xml' });
-      render(<SourceCard source={source} userRole="user" />);
+      render(<SourceCard source={source} />);
 
       const link = screen.getByRole('link', { name: /visit feed:/i });
       expect(link).toHaveClass('block');
@@ -233,37 +247,37 @@ describe('SourceCard', () => {
     });
   });
 
-  describe('Last Crawled Time Formatting', () => {
-    it('should show "Just now" for recent crawl', () => {
+  describe('Added Time Formatting', () => {
+    it('should show "Just now" for recently added source', () => {
       const source = createMockSource({
-        last_crawled_at: new Date(NOW.getTime() - 30 * 1000).toISOString(), // 30 seconds ago
+        created_at: new Date(NOW.getTime() - 30 * 1000).toISOString(), // 30 seconds ago
       });
-      render(<SourceCard source={source} userRole="user" />);
-      expect(screen.getByText('Just now')).toBeInTheDocument();
+      render(<SourceCard source={source} />);
+      expect(screen.getByText('Added Just now')).toBeInTheDocument();
     });
 
-    it('should show minutes for crawl within last hour', () => {
+    it('should show minutes for source added within last hour', () => {
       const source = createMockSource({
-        last_crawled_at: new Date(NOW.getTime() - 45 * 60 * 1000).toISOString(),
+        created_at: new Date(NOW.getTime() - 45 * 60 * 1000).toISOString(),
       });
-      render(<SourceCard source={source} userRole="user" />);
-      expect(screen.getByText('45 minutes ago')).toBeInTheDocument();
+      render(<SourceCard source={source} />);
+      expect(screen.getByText('Added 45 minutes ago')).toBeInTheDocument();
     });
 
-    it('should show hours for crawl within last day', () => {
+    it('should show hours for source added within last day', () => {
       const source = createMockSource({
-        last_crawled_at: new Date(NOW.getTime() - 5 * 60 * 60 * 1000).toISOString(),
+        created_at: new Date(NOW.getTime() - 5 * 60 * 60 * 1000).toISOString(),
       });
-      render(<SourceCard source={source} userRole="user" />);
-      expect(screen.getByText('5 hours ago')).toBeInTheDocument();
+      render(<SourceCard source={source} />);
+      expect(screen.getByText('Added 5 hours ago')).toBeInTheDocument();
     });
 
-    it('should show days for crawl within last week', () => {
+    it('should show days for source added within last week', () => {
       const source = createMockSource({
-        last_crawled_at: new Date(NOW.getTime() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+        created_at: new Date(NOW.getTime() - 3 * 24 * 60 * 60 * 1000).toISOString(),
       });
-      render(<SourceCard source={source} userRole="user" />);
-      expect(screen.getByText('3 days ago')).toBeInTheDocument();
+      render(<SourceCard source={source} />);
+      expect(screen.getByText('Added 3 days ago')).toBeInTheDocument();
     });
   });
 
@@ -272,18 +286,20 @@ describe('SourceCard', () => {
       const source = createMockSource({
         name: 'Minimal',
         feed_url: 'https://min.com',
-        last_crawled_at: null,
+        url: 'https://min.com',
+        lang: '',
+        created_at: '',
       });
-      render(<SourceCard source={source} userRole="user" />);
+      render(<SourceCard source={source} />);
       expect(screen.getByText('Minimal')).toBeInTheDocument();
       const link = screen.getByRole('link', { name: /visit feed:/i });
       expect(link).toHaveTextContent('https://min.com');
-      expect(screen.getByText('Never crawled')).toBeInTheDocument();
+      expect(screen.getByText('Added Unknown')).toBeInTheDocument();
     });
 
     it('should handle special characters in source name', () => {
       const source = createMockSource({ name: '<script>alert("xss")</script>' });
-      render(<SourceCard source={source} userRole="user" />);
+      render(<SourceCard source={source} />);
       expect(screen.getByRole('heading', { level: 3 })).toHaveTextContent(
         '<script>alert("xss")</script>'
       );
@@ -291,15 +307,14 @@ describe('SourceCard', () => {
 
     it('should handle unicode in source name', () => {
       const source = createMockSource({ name: '日本語のソース名 🎉' });
-      render(<SourceCard source={source} userRole="user" />);
+      render(<SourceCard source={source} />);
       expect(screen.getByText('日本語のソース名 🎉')).toBeInTheDocument();
     });
 
-    it('should handle undefined last_crawled_at', () => {
-      const source = createMockSource();
-      source.last_crawled_at = undefined as unknown as string | null;
-      render(<SourceCard source={source} userRole="user" />);
-      expect(screen.getByText('Never crawled')).toBeInTheDocument();
+    it('should show "Unknown" when created_at is empty', () => {
+      const source = createMockSource({ created_at: '' });
+      render(<SourceCard source={source} />);
+      expect(screen.getByText('Added Unknown')).toBeInTheDocument();
     });
   });
 
@@ -311,49 +326,31 @@ describe('SourceCard', () => {
     });
 
     describe('Visibility', () => {
-      it('should show edit button when userRole is admin and onEdit is provided', () => {
+      it('should show edit button when onEdit is provided', () => {
         const source = createMockSource({ name: 'Tech Blog' });
-        render(<SourceCard source={source} userRole="admin" onEdit={mockOnEdit} />);
+        render(<SourceCard source={source} onEdit={mockOnEdit} />);
 
         const editButton = screen.getByTestId('source-edit-button');
         expect(editButton).toBeInTheDocument();
       });
 
-      it('should NOT show edit button when userRole is user', () => {
+      it('should NOT show edit button when onEdit is not provided', () => {
         const source = createMockSource();
-        render(<SourceCard source={source} userRole="user" onEdit={mockOnEdit} />);
+        render(<SourceCard source={source} />);
 
         expect(screen.queryByTestId('source-edit-button')).not.toBeInTheDocument();
       });
 
-      it('should NOT show edit button when userRole is null', () => {
-        const source = createMockSource();
-        render(<SourceCard source={source} userRole={null} onEdit={mockOnEdit} />);
-
-        expect(screen.queryByTestId('source-edit-button')).not.toBeInTheDocument();
-      });
-
-      it('should NOT show edit button when onEdit is not provided (even for admin)', () => {
-        const source = createMockSource();
-        render(<SourceCard source={source} userRole="admin" />);
-
-        expect(screen.queryByTestId('source-edit-button')).not.toBeInTheDocument();
-      });
-
-      it('should show edit button only when both admin role AND onEdit callback are present', () => {
+      it('should toggle edit button visibility with onEdit presence', () => {
         const source = createMockSource();
 
-        // Admin without onEdit - no button
-        const { rerender } = render(<SourceCard source={source} userRole="admin" />);
+        // Without onEdit - no button
+        const { rerender } = render(<SourceCard source={source} />);
         expect(screen.queryByTestId('source-edit-button')).not.toBeInTheDocument();
 
-        // Admin with onEdit - button appears
-        rerender(<SourceCard source={source} userRole="admin" onEdit={mockOnEdit} />);
+        // With onEdit - button appears
+        rerender(<SourceCard source={source} onEdit={mockOnEdit} />);
         expect(screen.getByTestId('source-edit-button')).toBeInTheDocument();
-
-        // User with onEdit - no button
-        rerender(<SourceCard source={source} userRole="user" onEdit={mockOnEdit} />);
-        expect(screen.queryByTestId('source-edit-button')).not.toBeInTheDocument();
       });
     });
 
@@ -366,7 +363,7 @@ describe('SourceCard', () => {
           active: true,
         });
 
-        render(<SourceCard source={source} userRole="admin" onEdit={mockOnEdit} />);
+        render(<SourceCard source={source} onEdit={mockOnEdit} />);
 
         const editButton = screen.getByTestId('source-edit-button');
         fireEvent.click(editButton);
@@ -378,7 +375,7 @@ describe('SourceCard', () => {
       it('should handle multiple clicks correctly', () => {
         const source = createMockSource({ id: 1, name: 'Test Source' });
 
-        render(<SourceCard source={source} userRole="admin" onEdit={mockOnEdit} />);
+        render(<SourceCard source={source} onEdit={mockOnEdit} />);
 
         const editButton = screen.getByTestId('source-edit-button');
 
@@ -398,11 +395,12 @@ describe('SourceCard', () => {
           id: 123,
           name: 'Complete Source',
           feed_url: 'https://complete.com/feed',
+          url: 'https://complete.com/feed',
           active: false,
-          last_crawled_at: '2025-01-10T10:00:00Z',
+          created_at: '2025-01-10T10:00:00Z',
         });
 
-        render(<SourceCard source={source} userRole="admin" onEdit={mockOnEdit} />);
+        render(<SourceCard source={source} onEdit={mockOnEdit} />);
 
         const editButton = screen.getByTestId('source-edit-button');
         fireEvent.click(editButton);
@@ -411,8 +409,11 @@ describe('SourceCard', () => {
           id: 123,
           name: 'Complete Source',
           feed_url: 'https://complete.com/feed',
+          url: 'https://complete.com/feed',
+          category: 'dev',
+          lang: 'en',
           active: false,
-          last_crawled_at: '2025-01-10T10:00:00Z',
+          created_at: '2025-01-10T10:00:00Z',
         });
       });
     });
@@ -420,7 +421,7 @@ describe('SourceCard', () => {
     describe('Accessibility', () => {
       it('should have correct aria-label containing source name', () => {
         const source = createMockSource({ name: 'Tech Blog' });
-        render(<SourceCard source={source} userRole="admin" onEdit={mockOnEdit} />);
+        render(<SourceCard source={source} onEdit={mockOnEdit} />);
 
         const editButton = screen.getByTestId('source-edit-button');
         expect(editButton).toHaveAttribute('aria-label', 'Edit source: Tech Blog');
@@ -428,7 +429,7 @@ describe('SourceCard', () => {
 
       it('should have correct aria-label for different source names', () => {
         const source = createMockSource({ name: 'News Feed 123' });
-        render(<SourceCard source={source} userRole="admin" onEdit={mockOnEdit} />);
+        render(<SourceCard source={source} onEdit={mockOnEdit} />);
 
         const editButton = screen.getByTestId('source-edit-button');
         expect(editButton).toHaveAttribute('aria-label', 'Edit source: News Feed 123');
@@ -436,7 +437,7 @@ describe('SourceCard', () => {
 
       it('should have correct data-testid', () => {
         const source = createMockSource();
-        render(<SourceCard source={source} userRole="admin" onEdit={mockOnEdit} />);
+        render(<SourceCard source={source} onEdit={mockOnEdit} />);
 
         const editButton = screen.queryByTestId('source-edit-button');
         expect(editButton).toBeInTheDocument();
@@ -444,7 +445,7 @@ describe('SourceCard', () => {
 
       it('should be keyboard accessible and focusable', () => {
         const source = createMockSource({ name: 'Test Source' });
-        render(<SourceCard source={source} userRole="admin" onEdit={mockOnEdit} />);
+        render(<SourceCard source={source} onEdit={mockOnEdit} />);
 
         const editButton = screen.getByTestId('source-edit-button');
 
@@ -458,7 +459,7 @@ describe('SourceCard', () => {
 
       it('should have proper button role', () => {
         const source = createMockSource();
-        render(<SourceCard source={source} userRole="admin" onEdit={mockOnEdit} />);
+        render(<SourceCard source={source} onEdit={mockOnEdit} />);
 
         const editButton = screen.getByTestId('source-edit-button');
         // Button element should have role="button" (implicit)
@@ -467,9 +468,7 @@ describe('SourceCard', () => {
 
       it('should render Pencil icon for visual indication', () => {
         const source = createMockSource();
-        const { container } = render(
-          <SourceCard source={source} userRole="admin" onEdit={mockOnEdit} />
-        );
+        const { container } = render(<SourceCard source={source} onEdit={mockOnEdit} />);
 
         const editButton = screen.getByTestId('source-edit-button');
         const icon = editButton.querySelector('svg');
@@ -480,7 +479,7 @@ describe('SourceCard', () => {
     describe('Styling', () => {
       it('should have ghost variant and icon size', () => {
         const source = createMockSource();
-        render(<SourceCard source={source} userRole="admin" onEdit={mockOnEdit} />);
+        render(<SourceCard source={source} onEdit={mockOnEdit} />);
 
         const editButton = screen.getByTestId('source-edit-button');
         expect(editButton).toHaveClass('h-8');
@@ -489,7 +488,7 @@ describe('SourceCard', () => {
 
       it('should not shrink in flex layout', () => {
         const source = createMockSource();
-        render(<SourceCard source={source} userRole="admin" onEdit={mockOnEdit} />);
+        render(<SourceCard source={source} onEdit={mockOnEdit} />);
 
         const editButton = screen.getByTestId('source-edit-button');
         expect(editButton).toHaveClass('shrink-0');
@@ -497,17 +496,12 @@ describe('SourceCard', () => {
     });
 
     describe('Integration with Other Features', () => {
-      it('should coexist with ActiveToggle for admin', () => {
+      it('should coexist with ActiveToggle', () => {
         const mockOnUpdateActive = vi.fn();
         const source = createMockSource({ active: true });
 
         render(
-          <SourceCard
-            source={source}
-            userRole="admin"
-            onEdit={mockOnEdit}
-            onUpdateActive={mockOnUpdateActive}
-          />
+          <SourceCard source={source} onEdit={mockOnEdit} onUpdateActive={mockOnUpdateActive} />
         );
 
         // Both edit button and toggle should be present
@@ -515,38 +509,29 @@ describe('SourceCard', () => {
         expect(screen.getByRole('switch')).toBeInTheDocument();
       });
 
-      it('should not interfere with status badge for non-admin', () => {
-        const source = createMockSource({ active: true });
-
-        render(<SourceCard source={source} userRole="user" onEdit={mockOnEdit} />);
-
-        // Badge should be visible, edit button should not
-        expect(screen.getByText('Active')).toBeInTheDocument();
-        expect(screen.queryByTestId('source-edit-button')).not.toBeInTheDocument();
-      });
-
       it('should render correctly alongside other card elements', () => {
         const source = createMockSource({
           name: 'Tech Blog',
           feed_url: 'https://example.com/feed',
+          url: 'https://example.com/feed',
           active: true,
-          last_crawled_at: new Date(NOW.getTime() - 1 * 60 * 60 * 1000).toISOString(),
+          created_at: new Date(NOW.getTime() - 1 * 60 * 60 * 1000).toISOString(),
         });
 
-        render(<SourceCard source={source} userRole="admin" onEdit={mockOnEdit} />);
+        render(<SourceCard source={source} onEdit={mockOnEdit} />);
 
         // All elements should be present
         expect(screen.getByRole('heading', { name: 'Tech Blog' })).toBeInTheDocument();
         expect(screen.getByTestId('source-edit-button')).toBeInTheDocument();
         expect(screen.getByRole('link', { name: /visit feed:/i })).toBeInTheDocument();
-        expect(screen.getByText('1 hour ago')).toBeInTheDocument();
+        expect(screen.getByText('Added 1 hour ago')).toBeInTheDocument();
       });
     });
 
     describe('Edge Cases', () => {
       it('should handle source with special characters in name', () => {
         const source = createMockSource({ name: '<script>XSS</script>' });
-        render(<SourceCard source={source} userRole="admin" onEdit={mockOnEdit} />);
+        render(<SourceCard source={source} onEdit={mockOnEdit} />);
 
         const editButton = screen.getByTestId('source-edit-button');
         expect(editButton).toHaveAttribute('aria-label', 'Edit source: <script>XSS</script>');
@@ -557,7 +542,7 @@ describe('SourceCard', () => {
 
       it('should handle source with unicode characters in name', () => {
         const source = createMockSource({ name: '日本語ソース 🎉' });
-        render(<SourceCard source={source} userRole="admin" onEdit={mockOnEdit} />);
+        render(<SourceCard source={source} onEdit={mockOnEdit} />);
 
         const editButton = screen.getByTestId('source-edit-button');
         expect(editButton).toHaveAttribute('aria-label', 'Edit source: 日本語ソース 🎉');
@@ -569,7 +554,7 @@ describe('SourceCard', () => {
       it('should handle very long source names', () => {
         const longName = 'A'.repeat(200);
         const source = createMockSource({ name: longName });
-        render(<SourceCard source={source} userRole="admin" onEdit={mockOnEdit} />);
+        render(<SourceCard source={source} onEdit={mockOnEdit} />);
 
         const editButton = screen.getByTestId('source-edit-button');
         expect(editButton).toHaveAttribute('aria-label', `Edit source: ${longName}`);
@@ -585,49 +570,31 @@ describe('SourceCard', () => {
     });
 
     describe('Visibility', () => {
-      it('shows delete button for admin users when onDelete prop provided', () => {
+      it('shows delete button when onDelete prop provided', () => {
         const source = createMockSource({ name: 'Tech Blog' });
-        render(<SourceCard source={source} userRole="admin" onDelete={mockOnDelete} />);
+        render(<SourceCard source={source} onDelete={mockOnDelete} />);
 
         const deleteButton = screen.getByTestId('source-delete-button');
         expect(deleteButton).toBeInTheDocument();
       });
 
-      it('hides delete button for non-admin users', () => {
-        const source = createMockSource();
-        render(<SourceCard source={source} userRole="user" onDelete={mockOnDelete} />);
-
-        expect(screen.queryByTestId('source-delete-button')).not.toBeInTheDocument();
-      });
-
       it('hides delete button when onDelete prop not provided', () => {
         const source = createMockSource();
-        render(<SourceCard source={source} userRole="admin" />);
+        render(<SourceCard source={source} />);
 
         expect(screen.queryByTestId('source-delete-button')).not.toBeInTheDocument();
       });
 
-      it('hides delete button when userRole is null', () => {
-        const source = createMockSource();
-        render(<SourceCard source={source} userRole={null} onDelete={mockOnDelete} />);
-
-        expect(screen.queryByTestId('source-delete-button')).not.toBeInTheDocument();
-      });
-
-      it('shows delete button only when both admin role AND onDelete callback are present', () => {
+      it('toggles delete button visibility with onDelete presence', () => {
         const source = createMockSource();
 
-        // Admin without onDelete - no button
-        const { rerender } = render(<SourceCard source={source} userRole="admin" />);
+        // Without onDelete - no button
+        const { rerender } = render(<SourceCard source={source} />);
         expect(screen.queryByTestId('source-delete-button')).not.toBeInTheDocument();
 
-        // Admin with onDelete - button appears
-        rerender(<SourceCard source={source} userRole="admin" onDelete={mockOnDelete} />);
+        // With onDelete - button appears
+        rerender(<SourceCard source={source} onDelete={mockOnDelete} />);
         expect(screen.getByTestId('source-delete-button')).toBeInTheDocument();
-
-        // User with onDelete - no button
-        rerender(<SourceCard source={source} userRole="user" onDelete={mockOnDelete} />);
-        expect(screen.queryByTestId('source-delete-button')).not.toBeInTheDocument();
       });
     });
 
@@ -640,7 +607,7 @@ describe('SourceCard', () => {
           active: true,
         });
 
-        render(<SourceCard source={source} userRole="admin" onDelete={mockOnDelete} />);
+        render(<SourceCard source={source} onDelete={mockOnDelete} />);
 
         const deleteButton = screen.getByTestId('source-delete-button');
         fireEvent.click(deleteButton);
@@ -652,7 +619,7 @@ describe('SourceCard', () => {
       it('handles multiple clicks correctly', () => {
         const source = createMockSource({ id: 1, name: 'Test Source' });
 
-        render(<SourceCard source={source} userRole="admin" onDelete={mockOnDelete} />);
+        render(<SourceCard source={source} onDelete={mockOnDelete} />);
 
         const deleteButton = screen.getByTestId('source-delete-button');
 
@@ -672,11 +639,12 @@ describe('SourceCard', () => {
           id: 123,
           name: 'Complete Source',
           feed_url: 'https://complete.com/feed',
+          url: 'https://complete.com/feed',
           active: false,
-          last_crawled_at: '2025-01-10T10:00:00Z',
+          created_at: '2025-01-10T10:00:00Z',
         });
 
-        render(<SourceCard source={source} userRole="admin" onDelete={mockOnDelete} />);
+        render(<SourceCard source={source} onDelete={mockOnDelete} />);
 
         const deleteButton = screen.getByTestId('source-delete-button');
         fireEvent.click(deleteButton);
@@ -685,8 +653,11 @@ describe('SourceCard', () => {
           id: 123,
           name: 'Complete Source',
           feed_url: 'https://complete.com/feed',
+          url: 'https://complete.com/feed',
+          category: 'dev',
+          lang: 'en',
           active: false,
-          last_crawled_at: '2025-01-10T10:00:00Z',
+          created_at: '2025-01-10T10:00:00Z',
         });
       });
     });
@@ -694,7 +665,7 @@ describe('SourceCard', () => {
     describe('Accessibility', () => {
       it('delete button has correct ARIA label', () => {
         const source = createMockSource({ name: 'Tech Blog' });
-        render(<SourceCard source={source} userRole="admin" onDelete={mockOnDelete} />);
+        render(<SourceCard source={source} onDelete={mockOnDelete} />);
 
         const deleteButton = screen.getByTestId('source-delete-button');
         expect(deleteButton).toHaveAttribute('aria-label', 'Delete source: Tech Blog');
@@ -702,7 +673,7 @@ describe('SourceCard', () => {
 
       it('delete button has correct aria-label for different source names', () => {
         const source = createMockSource({ name: 'News Feed 123' });
-        render(<SourceCard source={source} userRole="admin" onDelete={mockOnDelete} />);
+        render(<SourceCard source={source} onDelete={mockOnDelete} />);
 
         const deleteButton = screen.getByTestId('source-delete-button');
         expect(deleteButton).toHaveAttribute('aria-label', 'Delete source: News Feed 123');
@@ -710,7 +681,7 @@ describe('SourceCard', () => {
 
       it('delete button has correct data-testid', () => {
         const source = createMockSource();
-        render(<SourceCard source={source} userRole="admin" onDelete={mockOnDelete} />);
+        render(<SourceCard source={source} onDelete={mockOnDelete} />);
 
         const deleteButton = screen.queryByTestId('source-delete-button');
         expect(deleteButton).toBeInTheDocument();
@@ -718,7 +689,7 @@ describe('SourceCard', () => {
 
       it('delete button is keyboard accessible and focusable', () => {
         const source = createMockSource({ name: 'Test Source' });
-        render(<SourceCard source={source} userRole="admin" onDelete={mockOnDelete} />);
+        render(<SourceCard source={source} onDelete={mockOnDelete} />);
 
         const deleteButton = screen.getByTestId('source-delete-button');
 
@@ -732,7 +703,7 @@ describe('SourceCard', () => {
 
       it('delete button has proper button role', () => {
         const source = createMockSource();
-        render(<SourceCard source={source} userRole="admin" onDelete={mockOnDelete} />);
+        render(<SourceCard source={source} onDelete={mockOnDelete} />);
 
         const deleteButton = screen.getByTestId('source-delete-button');
         // Button element should have role="button" (implicit)
@@ -741,7 +712,7 @@ describe('SourceCard', () => {
 
       it('delete button renders Trash2 icon for visual indication', () => {
         const source = createMockSource();
-        render(<SourceCard source={source} userRole="admin" onDelete={mockOnDelete} />);
+        render(<SourceCard source={source} onDelete={mockOnDelete} />);
 
         const deleteButton = screen.getByTestId('source-delete-button');
         const icon = deleteButton.querySelector('svg');
@@ -752,7 +723,7 @@ describe('SourceCard', () => {
     describe('Styling', () => {
       it('delete button has ghost variant and icon size', () => {
         const source = createMockSource();
-        render(<SourceCard source={source} userRole="admin" onDelete={mockOnDelete} />);
+        render(<SourceCard source={source} onDelete={mockOnDelete} />);
 
         const deleteButton = screen.getByTestId('source-delete-button');
         expect(deleteButton).toHaveClass('h-8');
@@ -761,7 +732,7 @@ describe('SourceCard', () => {
 
       it('delete button does not shrink in flex layout', () => {
         const source = createMockSource();
-        render(<SourceCard source={source} userRole="admin" onDelete={mockOnDelete} />);
+        render(<SourceCard source={source} onDelete={mockOnDelete} />);
 
         const deleteButton = screen.getByTestId('source-delete-button');
         expect(deleteButton).toHaveClass('shrink-0');
@@ -769,35 +740,23 @@ describe('SourceCard', () => {
     });
 
     describe('Integration with Other Features', () => {
-      it('coexists with edit button for admin', () => {
+      it('coexists with edit button', () => {
         const mockOnEdit = vi.fn();
         const source = createMockSource({ active: true });
 
-        render(
-          <SourceCard
-            source={source}
-            userRole="admin"
-            onEdit={mockOnEdit}
-            onDelete={mockOnDelete}
-          />
-        );
+        render(<SourceCard source={source} onEdit={mockOnEdit} onDelete={mockOnDelete} />);
 
         // Both edit and delete buttons should be present
         expect(screen.getByTestId('source-edit-button')).toBeInTheDocument();
         expect(screen.getByTestId('source-delete-button')).toBeInTheDocument();
       });
 
-      it('coexists with ActiveToggle for admin', () => {
+      it('coexists with ActiveToggle', () => {
         const mockOnUpdateActive = vi.fn();
         const source = createMockSource({ active: true });
 
         render(
-          <SourceCard
-            source={source}
-            userRole="admin"
-            onDelete={mockOnDelete}
-            onUpdateActive={mockOnUpdateActive}
-          />
+          <SourceCard source={source} onDelete={mockOnDelete} onUpdateActive={mockOnUpdateActive} />
         );
 
         // Both delete button and toggle should be present
@@ -805,38 +764,29 @@ describe('SourceCard', () => {
         expect(screen.getByRole('switch')).toBeInTheDocument();
       });
 
-      it('does not interfere with status badge for non-admin', () => {
-        const source = createMockSource({ active: true });
-
-        render(<SourceCard source={source} userRole="user" onDelete={mockOnDelete} />);
-
-        // Badge should be visible, delete button should not
-        expect(screen.getByText('Active')).toBeInTheDocument();
-        expect(screen.queryByTestId('source-delete-button')).not.toBeInTheDocument();
-      });
-
       it('renders correctly alongside other card elements', () => {
         const source = createMockSource({
           name: 'Tech Blog',
           feed_url: 'https://example.com/feed',
+          url: 'https://example.com/feed',
           active: true,
-          last_crawled_at: new Date(NOW.getTime() - 1 * 60 * 60 * 1000).toISOString(),
+          created_at: new Date(NOW.getTime() - 1 * 60 * 60 * 1000).toISOString(),
         });
 
-        render(<SourceCard source={source} userRole="admin" onDelete={mockOnDelete} />);
+        render(<SourceCard source={source} onDelete={mockOnDelete} />);
 
         // All elements should be present
         expect(screen.getByRole('heading', { name: 'Tech Blog' })).toBeInTheDocument();
         expect(screen.getByTestId('source-delete-button')).toBeInTheDocument();
         expect(screen.getByRole('link', { name: /visit feed:/i })).toBeInTheDocument();
-        expect(screen.getByText('1 hour ago')).toBeInTheDocument();
+        expect(screen.getByText('Added 1 hour ago')).toBeInTheDocument();
       });
     });
 
     describe('Edge Cases', () => {
       it('handles source with special characters in name', () => {
         const source = createMockSource({ name: '<script>XSS</script>' });
-        render(<SourceCard source={source} userRole="admin" onDelete={mockOnDelete} />);
+        render(<SourceCard source={source} onDelete={mockOnDelete} />);
 
         const deleteButton = screen.getByTestId('source-delete-button');
         expect(deleteButton).toHaveAttribute('aria-label', 'Delete source: <script>XSS</script>');
@@ -847,7 +797,7 @@ describe('SourceCard', () => {
 
       it('handles source with unicode characters in name', () => {
         const source = createMockSource({ name: '日本語ソース 🎉' });
-        render(<SourceCard source={source} userRole="admin" onDelete={mockOnDelete} />);
+        render(<SourceCard source={source} onDelete={mockOnDelete} />);
 
         const deleteButton = screen.getByTestId('source-delete-button');
         expect(deleteButton).toHaveAttribute('aria-label', 'Delete source: 日本語ソース 🎉');
@@ -859,7 +809,7 @@ describe('SourceCard', () => {
       it('handles very long source names', () => {
         const longName = 'A'.repeat(200);
         const source = createMockSource({ name: longName });
-        render(<SourceCard source={source} userRole="admin" onDelete={mockOnDelete} />);
+        render(<SourceCard source={source} onDelete={mockOnDelete} />);
 
         const deleteButton = screen.getByTestId('source-delete-button');
         expect(deleteButton).toHaveAttribute('aria-label', `Delete source: ${longName}`);
@@ -867,38 +817,16 @@ describe('SourceCard', () => {
     });
   });
 
-  describe('Role-Based Rendering', () => {
+  describe('Status Rendering', () => {
     const mockOnUpdateActive = vi.fn();
 
     beforeEach(() => {
       vi.clearAllMocks();
     });
 
-    it('should render StatusBadge when userRole is "user"', () => {
+    it('should render ActiveToggle when onUpdateActive is provided', () => {
       const source = createMockSource({ active: true });
-      render(<SourceCard source={source} userRole="user" />);
-
-      // Should show badge
-      expect(screen.getByText('Active')).toBeInTheDocument();
-
-      // Should NOT show toggle
-      expect(screen.queryByRole('switch')).not.toBeInTheDocument();
-    });
-
-    it('should render StatusBadge when userRole is null', () => {
-      const source = createMockSource({ active: false });
-      render(<SourceCard source={source} userRole={null} />);
-
-      // Should show badge
-      expect(screen.getByText('Inactive')).toBeInTheDocument();
-
-      // Should NOT show toggle
-      expect(screen.queryByRole('switch')).not.toBeInTheDocument();
-    });
-
-    it('should render ActiveToggle when userRole is "admin" with onUpdateActive', () => {
-      const source = createMockSource({ active: true });
-      render(<SourceCard source={source} userRole="admin" onUpdateActive={mockOnUpdateActive} />);
+      render(<SourceCard source={source} onUpdateActive={mockOnUpdateActive} />);
 
       // Should show toggle
       expect(screen.getByRole('switch')).toBeInTheDocument();
@@ -907,9 +835,9 @@ describe('SourceCard', () => {
       expect(screen.queryByText('Active')).not.toBeInTheDocument();
     });
 
-    it('should render StatusBadge when userRole is "admin" but no onUpdateActive', () => {
+    it('should render StatusBadge when onUpdateActive is not provided', () => {
       const source = createMockSource({ active: true });
-      render(<SourceCard source={source} userRole="admin" />);
+      render(<SourceCard source={source} />);
 
       // Should show badge (fallback when no callback provided)
       expect(screen.getByText('Active')).toBeInTheDocument();
@@ -925,7 +853,7 @@ describe('SourceCard', () => {
         active: false,
       });
 
-      render(<SourceCard source={source} userRole="admin" onUpdateActive={mockOnUpdateActive} />);
+      render(<SourceCard source={source} onUpdateActive={mockOnUpdateActive} />);
 
       const toggle = screen.getByRole('switch');
 
@@ -941,7 +869,7 @@ describe('SourceCard', () => {
 
     it('should pass correct props to StatusBadge for active source', () => {
       const source = createMockSource({ active: true });
-      render(<SourceCard source={source} userRole="user" />);
+      render(<SourceCard source={source} />);
 
       expect(screen.getByText('Active')).toBeInTheDocument();
       expect(screen.getByLabelText('Status: Active')).toBeInTheDocument();
@@ -949,7 +877,7 @@ describe('SourceCard', () => {
 
     it('should pass correct props to StatusBadge for inactive source', () => {
       const source = createMockSource({ active: false });
-      render(<SourceCard source={source} userRole="user" />);
+      render(<SourceCard source={source} />);
 
       expect(screen.getByText('Inactive')).toBeInTheDocument();
       expect(screen.getByLabelText('Status: Inactive')).toBeInTheDocument();
@@ -958,7 +886,7 @@ describe('SourceCard', () => {
     it('should pass onUpdateActive callback to ActiveToggle', () => {
       const source = createMockSource({ id: 5, active: true });
 
-      render(<SourceCard source={source} userRole="admin" onUpdateActive={mockOnUpdateActive} />);
+      render(<SourceCard source={source} onUpdateActive={mockOnUpdateActive} />);
 
       // Verify toggle is rendered (ActiveToggle receives the callback)
       const toggle = screen.getByRole('switch');
@@ -969,7 +897,7 @@ describe('SourceCard', () => {
     it('should render ActiveToggle with correct initial state for inactive source', () => {
       const source = createMockSource({ active: false });
 
-      render(<SourceCard source={source} userRole="admin" onUpdateActive={mockOnUpdateActive} />);
+      render(<SourceCard source={source} onUpdateActive={mockOnUpdateActive} />);
 
       const toggle = screen.getByRole('switch');
       expect(toggle).toBeInTheDocument();
@@ -980,49 +908,31 @@ describe('SourceCard', () => {
       const source = createMockSource();
 
       const { rerender } = render(
-        <SourceCard source={source} userRole="admin" onUpdateActive={mockOnUpdateActive} />
+        <SourceCard source={source} onUpdateActive={mockOnUpdateActive} />
       );
 
       // Re-render with same onUpdateActive
-      rerender(<SourceCard source={source} userRole="admin" onUpdateActive={mockOnUpdateActive} />);
+      rerender(<SourceCard source={source} onUpdateActive={mockOnUpdateActive} />);
 
       // Should not cause unnecessary re-renders
       expect(screen.getByRole('switch')).toBeInTheDocument();
     });
 
-    it('should handle switching between admin and non-admin roles', () => {
+    it('should switch between badge and toggle when onUpdateActive changes', () => {
       const source = createMockSource({ active: true });
 
-      const { rerender } = render(<SourceCard source={source} userRole="user" />);
+      const { rerender } = render(<SourceCard source={source} />);
 
-      // Initial: non-admin - should show badge
+      // Initial: no callback - should show badge
       expect(screen.getByText('Active')).toBeInTheDocument();
       expect(screen.queryByRole('switch')).not.toBeInTheDocument();
 
-      // Re-render as admin
-      rerender(<SourceCard source={source} userRole="admin" onUpdateActive={mockOnUpdateActive} />);
+      // Re-render with onUpdateActive
+      rerender(<SourceCard source={source} onUpdateActive={mockOnUpdateActive} />);
 
       // Should now show toggle
       expect(screen.queryByText('Active')).not.toBeInTheDocument();
       expect(screen.getByRole('switch')).toBeInTheDocument();
-    });
-
-    it('should render correctly for admin with active source', () => {
-      const source = createMockSource({ active: true });
-
-      render(<SourceCard source={source} userRole="admin" onUpdateActive={mockOnUpdateActive} />);
-
-      const toggle = screen.getByRole('switch');
-      expect(toggle).toBeChecked();
-    });
-
-    it('should render correctly for admin with inactive source', () => {
-      const source = createMockSource({ active: false });
-
-      render(<SourceCard source={source} userRole="admin" onUpdateActive={mockOnUpdateActive} />);
-
-      const toggle = screen.getByRole('switch');
-      expect(toggle).not.toBeChecked();
     });
   });
 });

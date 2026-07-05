@@ -2,6 +2,8 @@ import { describe, it, expect } from 'vitest';
 import {
   validateSourceName,
   validateSourceFeedURL,
+  validateSourceCategory,
+  validateSourceLang,
   validateSourceForm,
   hasValidationErrors,
   type SourceFormData,
@@ -286,12 +288,109 @@ describe('validateSourceFeedURL', () => {
   });
 });
 
+describe('validateSourceCategory', () => {
+  describe('Valid Categories', () => {
+    it('should return undefined for valid category', () => {
+      const result = validateSourceCategory('dev');
+      expect(result).toBeUndefined();
+    });
+
+    it('should return undefined for category with exactly max length', () => {
+      const maxLengthCategory = 'a'.repeat(SOURCE_CONFIG.CATEGORY_MAX_LENGTH);
+      const result = validateSourceCategory(maxLengthCategory);
+      expect(result).toBeUndefined();
+    });
+
+    it('should return undefined for category with Unicode characters', () => {
+      const result = validateSourceCategory('技術');
+      expect(result).toBeUndefined();
+    });
+  });
+
+  describe('Invalid Categories - Empty/Whitespace', () => {
+    it('should return error for empty string', () => {
+      const result = validateSourceCategory('');
+      expect(result).toBe(ERROR_MESSAGES.CATEGORY_REQUIRED);
+    });
+
+    it('should return error for whitespace only', () => {
+      const result = validateSourceCategory('   ');
+      expect(result).toBe(ERROR_MESSAGES.CATEGORY_REQUIRED);
+    });
+
+    it('should return error for whitespace only (tabs and newlines)', () => {
+      const result = validateSourceCategory(' \t\n ');
+      expect(result).toBe(ERROR_MESSAGES.CATEGORY_REQUIRED);
+    });
+  });
+
+  describe('Invalid Categories - Maximum Length', () => {
+    it('should return error for category exceeding max length by one', () => {
+      const overMaxCategory = 'a'.repeat(SOURCE_CONFIG.CATEGORY_MAX_LENGTH + 1);
+      const result = validateSourceCategory(overMaxCategory);
+      expect(result).toBe(ERROR_MESSAGES.CATEGORY_MAX_LENGTH);
+    });
+
+    it('should return error for very long category', () => {
+      const longCategory = 'a'.repeat(500);
+      const result = validateSourceCategory(longCategory);
+      expect(result).toBe(ERROR_MESSAGES.CATEGORY_MAX_LENGTH);
+    });
+  });
+});
+
+describe('validateSourceLang', () => {
+  describe('Valid Langs', () => {
+    it('should return undefined for valid lang', () => {
+      const result = validateSourceLang('ja');
+      expect(result).toBeUndefined();
+    });
+
+    it('should return undefined for empty string (optional field)', () => {
+      const result = validateSourceLang('');
+      expect(result).toBeUndefined();
+    });
+
+    it('should return undefined for whitespace only (treated as empty)', () => {
+      const result = validateSourceLang('   ');
+      expect(result).toBeUndefined();
+    });
+
+    it('should return undefined for lang with exactly max length', () => {
+      const maxLengthLang = 'a'.repeat(SOURCE_CONFIG.LANG_MAX_LENGTH);
+      const result = validateSourceLang(maxLengthLang);
+      expect(result).toBeUndefined();
+    });
+
+    it('should return undefined for BCP 47 style tag', () => {
+      const result = validateSourceLang('zh-Hant');
+      expect(result).toBeUndefined();
+    });
+  });
+
+  describe('Invalid Langs - Maximum Length', () => {
+    it('should return error for lang exceeding max length by one', () => {
+      const overMaxLang = 'a'.repeat(SOURCE_CONFIG.LANG_MAX_LENGTH + 1);
+      const result = validateSourceLang(overMaxLang);
+      expect(result).toBe(ERROR_MESSAGES.LANG_MAX_LENGTH);
+    });
+
+    it('should return error for very long lang', () => {
+      const longLang = 'a'.repeat(100);
+      const result = validateSourceLang(longLang);
+      expect(result).toBe(ERROR_MESSAGES.LANG_MAX_LENGTH);
+    });
+  });
+});
+
 describe('validateSourceForm', () => {
   describe('Valid Form Data', () => {
     it('should return empty errors object for valid data', () => {
       const data: SourceFormData = {
         name: 'Tech News',
         feedURL: 'https://example.com/feed',
+        category: 'tech',
+        lang: 'en',
       };
       const result = validateSourceForm(data);
       expect(result).toEqual({});
@@ -301,6 +400,8 @@ describe('validateSourceForm', () => {
       const data: SourceFormData = {
         name: 'a'.repeat(SOURCE_CONFIG.NAME_MAX_LENGTH),
         feedURL: 'https://example.com/feed?query=' + 'a'.repeat(2000),
+        category: 'tech',
+        lang: 'en',
       };
       const result = validateSourceForm(data);
       expect(result).toEqual({});
@@ -310,6 +411,8 @@ describe('validateSourceForm', () => {
       const data: SourceFormData = {
         name: 'Tech News 2024 - #1 Source!',
         feedURL: 'https://example.com/feed?format=rss&limit=10',
+        category: 'tech',
+        lang: 'en',
       };
       const result = validateSourceForm(data);
       expect(result).toEqual({});
@@ -321,6 +424,8 @@ describe('validateSourceForm', () => {
       const data: SourceFormData = {
         name: '',
         feedURL: 'https://example.com/feed',
+        category: 'tech',
+        lang: 'en',
       };
       const result = validateSourceForm(data);
       expect(result).toEqual({
@@ -332,6 +437,8 @@ describe('validateSourceForm', () => {
       const data: SourceFormData = {
         name: '   ',
         feedURL: 'https://example.com/feed',
+        category: 'tech',
+        lang: 'en',
       };
       const result = validateSourceForm(data);
       expect(result).toEqual({
@@ -343,6 +450,8 @@ describe('validateSourceForm', () => {
       const data: SourceFormData = {
         name: 'a'.repeat(SOURCE_CONFIG.NAME_MAX_LENGTH + 1),
         feedURL: 'https://example.com/feed',
+        category: 'tech',
+        lang: 'en',
       };
       const result = validateSourceForm(data);
       expect(result).toEqual({
@@ -354,6 +463,8 @@ describe('validateSourceForm', () => {
       const data: SourceFormData = {
         name: 'Valid Name',
         feedURL: '',
+        category: 'tech',
+        lang: 'en',
       };
       const result = validateSourceForm(data);
       expect(result).toEqual({
@@ -365,6 +476,8 @@ describe('validateSourceForm', () => {
       const data: SourceFormData = {
         name: 'Valid Name',
         feedURL: '   ',
+        category: 'tech',
+        lang: 'en',
       };
       const result = validateSourceForm(data);
       expect(result).toEqual({
@@ -376,6 +489,8 @@ describe('validateSourceForm', () => {
       const data: SourceFormData = {
         name: 'Valid Name',
         feedURL: 'not-a-url',
+        category: 'tech',
+        lang: 'en',
       };
       const result = validateSourceForm(data);
       expect(result).toEqual({
@@ -387,6 +502,8 @@ describe('validateSourceForm', () => {
       const data: SourceFormData = {
         name: 'Valid Name',
         feedURL: 'ftp://example.com/feed',
+        category: 'tech',
+        lang: 'en',
       };
       const result = validateSourceForm(data);
       expect(result).toEqual({
@@ -400,6 +517,8 @@ describe('validateSourceForm', () => {
       const data: SourceFormData = {
         name: 'Valid Name',
         feedURL: baseURL + padding,
+        category: 'tech',
+        lang: 'en',
       };
       const result = validateSourceForm(data);
       expect(result).toEqual({
@@ -408,11 +527,81 @@ describe('validateSourceForm', () => {
     });
   });
 
+  describe('Invalid Form Data - Category and Lang', () => {
+    it('should return category error for empty category', () => {
+      const data: SourceFormData = {
+        name: 'Valid Name',
+        feedURL: 'https://example.com/feed',
+        category: '',
+        lang: 'en',
+      };
+      const result = validateSourceForm(data);
+      expect(result).toEqual({
+        category: ERROR_MESSAGES.CATEGORY_REQUIRED,
+      });
+    });
+
+    it('should return category error for category exceeding max length', () => {
+      const data: SourceFormData = {
+        name: 'Valid Name',
+        feedURL: 'https://example.com/feed',
+        category: 'a'.repeat(SOURCE_CONFIG.CATEGORY_MAX_LENGTH + 1),
+        lang: 'en',
+      };
+      const result = validateSourceForm(data);
+      expect(result).toEqual({
+        category: ERROR_MESSAGES.CATEGORY_MAX_LENGTH,
+      });
+    });
+
+    it('should return no lang error for empty lang (optional)', () => {
+      const data: SourceFormData = {
+        name: 'Valid Name',
+        feedURL: 'https://example.com/feed',
+        category: 'tech',
+        lang: '',
+      };
+      const result = validateSourceForm(data);
+      expect(result).toEqual({});
+    });
+
+    it('should return lang error for lang exceeding max length', () => {
+      const data: SourceFormData = {
+        name: 'Valid Name',
+        feedURL: 'https://example.com/feed',
+        category: 'tech',
+        lang: 'a'.repeat(SOURCE_CONFIG.LANG_MAX_LENGTH + 1),
+      };
+      const result = validateSourceForm(data);
+      expect(result).toEqual({
+        lang: ERROR_MESSAGES.LANG_MAX_LENGTH,
+      });
+    });
+  });
+
   describe('Invalid Form Data - Multiple Fields', () => {
+    it('should return errors for all invalid fields', () => {
+      const data: SourceFormData = {
+        name: '',
+        feedURL: '',
+        category: '',
+        lang: 'a'.repeat(SOURCE_CONFIG.LANG_MAX_LENGTH + 1),
+      };
+      const result = validateSourceForm(data);
+      expect(result).toEqual({
+        name: ERROR_MESSAGES.NAME_REQUIRED,
+        feedURL: ERROR_MESSAGES.URL_REQUIRED,
+        category: ERROR_MESSAGES.CATEGORY_REQUIRED,
+        lang: ERROR_MESSAGES.LANG_MAX_LENGTH,
+      });
+    });
+
     it('should return both errors for both invalid fields (empty)', () => {
       const data: SourceFormData = {
         name: '',
         feedURL: '',
+        category: 'tech',
+        lang: 'en',
       };
       const result = validateSourceForm(data);
       expect(result).toEqual({
@@ -425,6 +614,8 @@ describe('validateSourceForm', () => {
       const data: SourceFormData = {
         name: '   ',
         feedURL: '   ',
+        category: 'tech',
+        lang: 'en',
       };
       const result = validateSourceForm(data);
       expect(result).toEqual({
@@ -437,6 +628,8 @@ describe('validateSourceForm', () => {
       const data: SourceFormData = {
         name: 'a'.repeat(SOURCE_CONFIG.NAME_MAX_LENGTH + 1),
         feedURL: 'not-a-url',
+        category: 'tech',
+        lang: 'en',
       };
       const result = validateSourceForm(data);
       expect(result).toEqual({
@@ -449,6 +642,8 @@ describe('validateSourceForm', () => {
       const data: SourceFormData = {
         name: '',
         feedURL: 'ftp://example.com/feed',
+        category: 'tech',
+        lang: 'en',
       };
       const result = validateSourceForm(data);
       expect(result).toEqual({
@@ -461,6 +656,8 @@ describe('validateSourceForm', () => {
       const data: SourceFormData = {
         name: 'a'.repeat(300),
         feedURL: '',
+        category: 'tech',
+        lang: 'en',
       };
       const result = validateSourceForm(data);
       expect(result).toEqual({
@@ -476,6 +673,8 @@ describe('validateSourceForm', () => {
       const data1: SourceFormData = {
         name: 'Valid Name',
         feedURL: 'invalid',
+        category: 'tech',
+        lang: 'en',
       };
       expect(validateSourceForm(data1)).toEqual({
         feedURL: ERROR_MESSAGES.URL_INVALID,
@@ -485,6 +684,8 @@ describe('validateSourceForm', () => {
       const data2: SourceFormData = {
         name: '',
         feedURL: 'https://example.com/feed',
+        category: 'tech',
+        lang: 'en',
       };
       expect(validateSourceForm(data2)).toEqual({
         name: ERROR_MESSAGES.NAME_REQUIRED,
@@ -561,6 +762,8 @@ describe('hasValidationErrors', () => {
       const data: SourceFormData = {
         name: 'Valid Name',
         feedURL: 'https://example.com/feed',
+        category: 'tech',
+        lang: 'en',
       };
       const errors = validateSourceForm(data);
       const result = hasValidationErrors(errors);
@@ -571,6 +774,8 @@ describe('hasValidationErrors', () => {
       const data: SourceFormData = {
         name: '',
         feedURL: '',
+        category: 'tech',
+        lang: 'en',
       };
       const errors = validateSourceForm(data);
       const result = hasValidationErrors(errors);

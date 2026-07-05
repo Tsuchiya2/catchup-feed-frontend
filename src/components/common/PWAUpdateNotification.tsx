@@ -10,15 +10,13 @@
  * - Detects service worker updates
  * - Shows notification when update is available
  * - Allows user to reload and apply update
- * - Tracks update events with metrics
  * - Can be dismissed
  *
  * @module components/common/PWAUpdateNotification
  */
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { RefreshCw, X } from 'lucide-react';
-import { metrics } from '@/lib/observability/metrics';
 
 /**
  * PWA Update Notification Component
@@ -29,15 +27,6 @@ import { metrics } from '@/lib/observability/metrics';
 export function PWAUpdateNotification() {
   const [showNotification, setShowNotification] = useState(false);
   const [waitingWorker, setWaitingWorker] = useState<ServiceWorker | null>(null);
-  const hasRecordedUpdate = useRef(false);
-
-  // Helper to record update metric only once
-  const recordUpdateMetric = () => {
-    if (!hasRecordedUpdate.current) {
-      hasRecordedUpdate.current = true;
-      metrics.pwa.update();
-    }
-  };
 
   useEffect(() => {
     // Only run in browser and when service workers are supported
@@ -62,7 +51,6 @@ export function PWAUpdateNotification() {
           console.log('New service worker is waiting');
           setWaitingWorker(event.sw ?? null);
           setShowNotification(true);
-          recordUpdateMetric();
         });
 
         // Listen for controlling event (new SW has taken control)
@@ -88,7 +76,6 @@ export function PWAUpdateNotification() {
           if (registration?.waiting) {
             setWaitingWorker(registration.waiting);
             setShowNotification(true);
-            recordUpdateMetric();
           }
         })
         .catch((error) => {

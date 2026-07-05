@@ -1,5 +1,30 @@
 # Changelog
 
+## [1.8.0](https://github.com/Tsuchiya2/catchup-feed-frontend/compare/catchup-feed-frontend-v1.7.3...catchup-feed-frontend-v1.8.0) (2026-07-05)
+
+
+### Features
+
+* add subscriber, token and access-log admin screens with generated API types ([fee78fa](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/fee78fa415e76f046abe1b0b65a19c68d297bacc))
+
+
+### Code Refactoring
+
+* derive source input types from generated request schemas ([cc5461d](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/cc5461d198c3d8a66229b4477700fe673e69da8c))
+* remove role-based UI gating for single-admin model (C-20) ([a761800](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/a76180059ed303ec57a1318d0fa6912052689637))
+* remove Sentry integration (D-8) ([c54aed6](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/c54aed6b12aa83e710317385e1d389c2c0f4ad83))
+
+
+### Documentation
+
+* add pulse-era repository instructions (CLAUDE.md) ([eb0504d](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/eb0504dbe020e10fb5ebd646384bbfcbd5572a5d))
+
+
+### Miscellaneous
+
+* fix favicon build failure and archive EDAF-era docs ([eaa8aa1](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/eaa8aa15e0f5b78fde7f3e426b7db1806abf06ce))
+* remove EDAF-era .claude assets ([f561c53](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/f561c5344fccad9d39f5beab27c27bb06114ed63))
+
 ## [1.7.3](https://github.com/Tsuchiya2/catchup-feed-frontend/compare/catchup-feed-frontend-v1.7.2...catchup-feed-frontend-v1.7.3) (2026-01-22)
 
 

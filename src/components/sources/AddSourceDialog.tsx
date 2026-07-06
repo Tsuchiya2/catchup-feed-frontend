@@ -62,6 +62,7 @@ export function AddSourceDialog({ isOpen, onClose, onSuccess }: AddSourceDialogP
         category: data.category,
         // Empty lang means "let the backend apply its default"
         lang: data.lang || undefined,
+        kind: data.kind,
       });
       reset();
       onSuccess?.();

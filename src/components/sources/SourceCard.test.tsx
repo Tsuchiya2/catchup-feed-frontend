@@ -69,6 +69,12 @@ describe('SourceCard', () => {
       expect(screen.getByLabelText('Language: ja')).toHaveTextContent('ja');
     });
 
+    it('should fall back to the RSS kind badge when kind is missing (pre-Phase 2 backend)', () => {
+      const source = createMockSource(); // createMockSource omits `kind`
+      render(<SourceCard source={source} />);
+      expect(screen.getByTestId('source-kind-badge')).toHaveTextContent('RSS');
+    });
+
     it('should not render language badge when lang is empty', () => {
       const source = createMockSource({ lang: '' });
       render(<SourceCard source={source} />);

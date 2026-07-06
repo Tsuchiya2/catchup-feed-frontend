@@ -305,6 +305,7 @@ export class ApiMock {
         feed_url: feedUrl,
         category: body.category ?? '',
         lang: body.lang ?? '',
+        kind: body.kind ?? 'rss',
         active: true,
         created_at: new Date().toISOString(),
       };

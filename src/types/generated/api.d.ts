@@ -45,7 +45,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
                 /** @description Authentication required */
@@ -54,7 +54,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
                 /** @description サーバーエラー */
@@ -63,7 +63,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
             };
@@ -111,7 +111,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
                 /** @description サーバーエラー */
@@ -120,7 +120,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
             };
@@ -173,7 +173,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
                 /** @description Authentication required - missing or invalid JWT token */
@@ -182,7 +182,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
                 /** @description サーバーエラー */
@@ -191,7 +191,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
             };
@@ -228,7 +228,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
                 /** @description Authentication required - missing or invalid JWT token */
@@ -237,7 +237,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
             };
@@ -296,7 +296,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
                 /** @description Authentication required */
@@ -305,7 +305,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
                 /** @description Too many requests - rate limit exceeded */
@@ -314,7 +314,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
                 /** @description Server error */
@@ -323,7 +323,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
             };
@@ -374,7 +374,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
                 /** @description Authentication required - missing or invalid JWT token */
@@ -383,7 +383,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
                 /** @description Not found - article not found */
@@ -392,7 +392,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
                 /** @description サーバーエラー */
@@ -401,7 +401,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
             };
@@ -440,7 +440,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
                 /** @description Authentication required - missing or invalid JWT token */
@@ -449,7 +449,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
                 /** @description Not found - article not found */
@@ -458,7 +458,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
             };
@@ -493,7 +493,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "*/*": string;
+                        "*/*": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
                 /** @description Authentication required - missing or invalid JWT token */
@@ -502,7 +502,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "*/*": string;
+                        "*/*": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
                 /** @description サーバーエラー */
@@ -511,7 +511,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "*/*": string;
+                        "*/*": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
             };
@@ -532,7 +532,7 @@ export interface paths {
         put?: never;
         /**
          * JWT トークン取得
-         * @description ユーザー名とパスワードで認証し、JWT トークンを発行します
+         * @description 管理者のユーザー名とパスワードで認証し、JWT トークンを発行します
          */
         post: {
             parameters: {
@@ -636,7 +636,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
                 /** @description サーバーエラー */
@@ -645,7 +645,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
             };
@@ -682,7 +682,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
                 /** @description Authentication required - missing or invalid JWT token */
@@ -691,7 +691,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
             };
@@ -744,7 +744,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
                 /** @description Authentication required */
@@ -753,7 +753,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
                 /** @description Too many requests - rate limit exceeded */
@@ -762,7 +762,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
                 /** @description Server error */
@@ -771,7 +771,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
             };
@@ -826,7 +826,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
                 /** @description Authentication required - missing or invalid JWT token */
@@ -835,7 +835,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
                 /** @description Not found - source not found */
@@ -844,7 +844,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
             };
@@ -879,7 +879,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "*/*": string;
+                        "*/*": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
                 /** @description Authentication required - missing or invalid JWT token */
@@ -888,7 +888,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "*/*": string;
+                        "*/*": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
                 /** @description サーバーエラー */
@@ -897,7 +897,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "*/*": string;
+                        "*/*": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
             };
@@ -942,7 +942,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
                 /** @description サーバーエラー */
@@ -951,7 +951,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
             };
@@ -990,7 +990,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
                 /** @description Authentication required */
@@ -999,7 +999,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
             };
@@ -1048,7 +1048,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
                 /** @description Authentication required */
@@ -1057,7 +1057,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
                 /** @description Not found - subscriber not found */
@@ -1066,7 +1066,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
             };
@@ -1107,7 +1107,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
                 /** @description Authentication required */
@@ -1116,7 +1116,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
                 /** @description Not found - subscriber not found */
@@ -1125,7 +1125,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
             };
@@ -1160,7 +1160,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "*/*": string;
+                        "*/*": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
                 /** @description Authentication required */
@@ -1169,7 +1169,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "*/*": string;
+                        "*/*": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
                 /** @description Not found - subscriber not found */
@@ -1178,7 +1178,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "*/*": string;
+                        "*/*": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
             };
@@ -1226,7 +1226,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
                 /** @description Authentication required */
@@ -1235,7 +1235,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
                 /** @description Not found - subscriber not found */
@@ -1244,7 +1244,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
             };
@@ -1281,7 +1281,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
                 /** @description Authentication required */
@@ -1290,7 +1290,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
                 /** @description Not found - subscriber not found */
@@ -1299,7 +1299,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
                 /** @description Conflict - subscriber is deactivated */
@@ -1308,7 +1308,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
             };
@@ -1360,7 +1360,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
                 /** @description Authentication required */
@@ -1369,7 +1369,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
                 /** @description Not found - token not found */
@@ -1378,7 +1378,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": string;
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
                     };
                 };
             };
@@ -1407,6 +1407,10 @@ export interface components {
             data?: components["schemas"]["internal_handler_http_article.DTO"][];
             /** @description Pagination metadata (total, page, limit, etc.) */
             pagination?: components["schemas"]["catchup-feed_internal_common_pagination.Metadata"];
+        };
+        "catchup-feed_internal_handler_http_respond.ErrorResponse": {
+            /** @example invalid input */
+            error?: string;
         };
         "internal_handler_http_accesslog.DTO": {
             accessed_at?: string;
@@ -1494,6 +1498,11 @@ export interface components {
             category?: string;
             /** @example https://go.dev/blog/feed.atom */
             feedURL?: string;
+            /**
+             * @example rss
+             * @enum {string}
+             */
+            kind?: "rss" | "youtube" | "podcast";
             /** @example en */
             lang?: string;
             /** @example Go Blog */
@@ -1505,6 +1514,11 @@ export interface components {
             created_at?: string;
             feed_url?: string;
             id?: number;
+            /**
+             * @example rss
+             * @enum {string}
+             */
+            kind?: "rss" | "youtube" | "podcast";
             lang?: string;
             name?: string;
             /** @description Mapped from FeedURL for frontend compatibility */
@@ -1517,6 +1531,11 @@ export interface components {
             category?: string;
             /** @example https://go.dev/blog/feed.atom */
             feedURL?: string;
+            /**
+             * @example rss
+             * @enum {string}
+             */
+            kind?: "rss" | "youtube" | "podcast";
             /** @example en */
             lang?: string;
             /** @example Go Blog */

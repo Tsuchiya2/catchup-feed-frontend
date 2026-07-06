@@ -14,6 +14,7 @@ describe('SourceForm', () => {
 
   describe('Edit Mode Tests', () => {
     const initialData: SourceFormData = {
+      kind: 'rss',
       name: 'Tech Blog',
       feedURL: 'https://example.com/feed.xml',
       category: 'dev',
@@ -341,6 +342,95 @@ describe('SourceForm', () => {
     });
   });
 
+  describe('Kind Selection Tests', () => {
+    it('should default to rss and hide the YouTube help text', () => {
+      render(
+        <SourceForm
+          mode="create"
+          onSubmit={mockOnSubmit}
+          isLoading={false}
+          error={null}
+          onCancel={mockOnCancel}
+        />
+      );
+
+      expect(screen.getByLabelText('Source type')).toHaveValue('rss');
+      expect(screen.queryByText(/youtube\.com\/feeds\/videos\.xml/i)).not.toBeInTheDocument();
+    });
+
+    it('should show the feed URL format help when youtube is selected', async () => {
+      const user = userEvent.setup();
+      render(
+        <SourceForm
+          mode="create"
+          onSubmit={mockOnSubmit}
+          isLoading={false}
+          error={null}
+          onCancel={mockOnCancel}
+        />
+      );
+
+      await user.selectOptions(screen.getByLabelText('Source type'), 'youtube');
+
+      expect(
+        screen.getByText(/https:\/\/www\.youtube\.com\/feeds\/videos\.xml\?channel_id=/i)
+      ).toBeInTheDocument();
+    });
+
+    it('should submit the selected kind', async () => {
+      const user = userEvent.setup();
+      render(
+        <SourceForm
+          mode="create"
+          onSubmit={mockOnSubmit}
+          isLoading={false}
+          error={null}
+          onCancel={mockOnCancel}
+        />
+      );
+
+      await user.type(screen.getByLabelText('Source name'), 'Some Channel');
+      await user.type(
+        screen.getByLabelText('Feed URL'),
+        'https://www.youtube.com/feeds/videos.xml?channel_id=UC123'
+      );
+      await user.type(screen.getByLabelText('Category'), 'tech');
+      await user.selectOptions(screen.getByLabelText('Source type'), 'youtube');
+      await user.click(screen.getByRole('button', { name: /add source/i }));
+
+      await waitFor(() => {
+        expect(mockOnSubmit).toHaveBeenCalledWith({
+          kind: 'youtube',
+          name: 'Some Channel',
+          feedURL: 'https://www.youtube.com/feeds/videos.xml?channel_id=UC123',
+          category: 'tech',
+          lang: '',
+        });
+      });
+    });
+
+    it('should pre-select the kind from initialData in edit mode', () => {
+      render(
+        <SourceForm
+          mode="edit"
+          initialData={{
+            kind: 'podcast',
+            name: 'Some Podcast',
+            feedURL: 'https://podcast.example.com/feed.xml',
+            category: 'tech',
+            lang: 'ja',
+          }}
+          onSubmit={mockOnSubmit}
+          isLoading={false}
+          error={null}
+          onCancel={mockOnCancel}
+        />
+      );
+
+      expect(screen.getByLabelText('Source type')).toHaveValue('podcast');
+    });
+  });
+
   describe('Form Submission Tests', () => {
     it('should call onSubmit with trimmed values on submit', async () => {
       const user = userEvent.setup();
@@ -369,6 +459,7 @@ describe('SourceForm', () => {
 
       await waitFor(() => {
         expect(mockOnSubmit).toHaveBeenCalledWith({
+          kind: 'rss',
           name: 'Tech Blog',
           feedURL: 'https://example.com/feed.xml',
           category: 'dev',
@@ -396,6 +487,7 @@ describe('SourceForm', () => {
 
       await waitFor(() => {
         expect(mockOnSubmit).toHaveBeenCalledWith({
+          kind: 'rss',
           name: 'Tech Blog',
           feedURL: 'https://example.com/feed.xml',
           category: 'dev',
@@ -407,6 +499,7 @@ describe('SourceForm', () => {
     it('should submit form with valid data in edit mode', async () => {
       const user = userEvent.setup();
       const initialData: SourceFormData = {
+        kind: 'rss',
         name: 'Old Name',
         feedURL: 'https://old-url.com/feed',
         category: 'dev',
@@ -434,6 +527,7 @@ describe('SourceForm', () => {
 
       await waitFor(() => {
         expect(mockOnSubmit).toHaveBeenCalledWith({
+          kind: 'rss',
           name: 'New Name',
           feedURL: 'https://old-url.com/feed',
           category: 'dev',
@@ -681,6 +775,35 @@ describe('SourceForm', () => {
 
       await waitFor(() => {
         expect(urlInput).toHaveAttribute('aria-describedby', 'source-feedURL-error');
+      });
+    });
+
+    it('should reference both the error and the YouTube help in aria-describedby', async () => {
+      const user = userEvent.setup();
+      render(
+        <SourceForm
+          mode="create"
+          onSubmit={mockOnSubmit}
+          isLoading={false}
+          error={null}
+          onCancel={mockOnCancel}
+        />
+      );
+
+      // Select the youtube kind so the format help text is shown
+      await user.selectOptions(screen.getByLabelText('Source type'), 'youtube');
+
+      const urlInput = screen.getByLabelText('Feed URL');
+
+      // Trigger validation error while the help text is visible
+      await user.click(urlInput);
+      await user.tab();
+
+      await waitFor(() => {
+        expect(urlInput).toHaveAttribute(
+          'aria-describedby',
+          'source-feedURL-error source-feedURL-help'
+        );
       });
     });
 

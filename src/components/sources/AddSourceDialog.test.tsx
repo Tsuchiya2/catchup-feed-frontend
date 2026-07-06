@@ -83,6 +83,7 @@ describe('AddSourceDialog', () => {
 
       await waitFor(() => {
         expect(mockMutateAsync).toHaveBeenCalledWith({
+          kind: 'rss',
           name: 'Tech Blog',
           feedURL: 'https://example.com/feed.xml',
           category: 'dev',

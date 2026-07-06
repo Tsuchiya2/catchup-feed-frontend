@@ -15,16 +15,26 @@
  * always render management controls, so there is no role branching here.
  */
 import * as React from 'react';
-import { Rss, Pencil, Trash2 } from 'lucide-react';
+import { Rss, Youtube, Podcast, Pencil, Trash2, type LucideIcon } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { formatRelativeTime } from '@/lib/utils/formatDate';
-import type { Source } from '@/types/api';
+import type { Source, SourceKind } from '@/types/api';
 import { StatusBadge } from './StatusBadge';
 import { ActiveToggle } from './ActiveToggle';
 import { SOURCE_TEST_IDS, SOURCE_ARIA_LABELS } from '@/constants/source';
+
+/**
+ * Display metadata per source kind (icon + badge label).
+ * Sources from a pre-Phase 2 backend may omit `kind`; treat them as 'rss'.
+ */
+const KIND_META: Record<SourceKind, { label: string; Icon: LucideIcon }> = {
+  rss: { label: 'RSS', Icon: Rss },
+  youtube: { label: 'YouTube', Icon: Youtube },
+  podcast: { label: 'Podcast', Icon: Podcast },
+};
 
 /**
  * Props for the SourceCard component
@@ -65,6 +75,8 @@ export const SourceCard = React.memo(function SourceCard({
   onDelete,
 }: SourceCardProps) {
   const createdAt = source.created_at ? formatRelativeTime(source.created_at) : 'Unknown';
+  const kindMeta = KIND_META[source.kind ?? 'rss'];
+  const KindIcon = kindMeta.Icon;
 
   /**
    * Handle toggle callback
@@ -89,7 +101,7 @@ export const SourceCard = React.memo(function SourceCard({
         {/* Icon and Name */}
         <div className="flex items-start gap-3">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-primary/30 bg-primary/10 transition-all duration-300 group-hover:border-primary/50 group-hover:shadow-glow-sm">
-            <Rss className="h-5 w-5 text-primary" aria-hidden="true" />
+            <KindIcon className="h-5 w-5 text-primary" aria-hidden="true" />
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
@@ -122,8 +134,15 @@ export const SourceCard = React.memo(function SourceCard({
           </div>
         </div>
 
-        {/* Category and Language */}
+        {/* Kind, Category and Language */}
         <div className="flex flex-wrap items-center gap-2">
+          <Badge
+            variant="secondary"
+            data-testid={SOURCE_TEST_IDS.KIND_BADGE}
+            aria-label={`Type: ${kindMeta.label}`}
+          >
+            {kindMeta.label}
+          </Badge>
           <Badge variant="outline" aria-label={`Category: ${source.category}`}>
             {source.category}
           </Badge>

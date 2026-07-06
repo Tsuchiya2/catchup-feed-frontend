@@ -248,6 +248,12 @@ export interface MockSource {
   feed_url: string;
   category: string;
   lang: string;
+  /**
+   * Phase 2 multi-modal ingestion kind (sources.kind, default 'rss').
+   * Optional: pre-Phase 2 backend responses omit it, and the UI must
+   * fall back to 'rss' (see the Source Kind e2e spec).
+   */
+  kind?: 'rss' | 'youtube' | 'podcast';
   active: boolean;
   created_at: string;
 }
@@ -260,6 +266,7 @@ export const makeSources = (): MockSource[] => [
     feed_url: 'https://go.dev/blog/feed.atom',
     category: 'tech',
     lang: 'en',
+    kind: 'rss',
     active: true,
     created_at: daysAgo(200),
   },
@@ -270,6 +277,7 @@ export const makeSources = (): MockSource[] => [
     feed_url: 'https://news.ycombinator.com/rss',
     category: 'tech',
     lang: 'en',
+    // `kind` deliberately omitted: simulates a pre-Phase 2 backend response.
     active: true,
     created_at: daysAgo(150),
   },
@@ -280,6 +288,7 @@ export const makeSources = (): MockSource[] => [
     feed_url: 'https://old.example.test/rss',
     category: 'news',
     lang: 'ja',
+    kind: 'rss',
     active: false,
     created_at: daysAgo(300),
   },

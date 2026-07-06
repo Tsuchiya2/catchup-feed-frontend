@@ -115,6 +115,7 @@ describe('EditSourceDialog', () => {
         expect(mockMutateAsync).toHaveBeenCalledWith({
           id: 1,
           data: {
+            kind: 'rss',
             name: 'Updated Tech Blog',
             feedURL: 'https://example.com/feed.xml',
             category: 'dev',
@@ -143,6 +144,7 @@ describe('EditSourceDialog', () => {
         expect(mockMutateAsync).toHaveBeenCalledWith({
           id: 1,
           data: {
+            kind: 'rss',
             name: 'Tech Blog',
             feedURL: 'https://newsite.com/feed.xml',
             category: 'dev',
@@ -174,6 +176,7 @@ describe('EditSourceDialog', () => {
         expect(mockMutateAsync).toHaveBeenCalledWith({
           id: 1,
           data: {
+            kind: 'rss',
             name: 'New Name',
             feedURL: 'https://newurl.com/feed.xml',
             category: 'dev',

@@ -55,6 +55,7 @@ docs/designs/
 
 # Storybook build artifacts
 storybook-static/
+*storybook.log
 
 # Serwist generated files
 public/sw.js

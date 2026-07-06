@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { AccessLogSummaryTable } from './AccessLogSummaryTable';
 import type { AccessLogSummary } from '@/types/api';
 

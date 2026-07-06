@@ -1,28 +1,24 @@
-import type { StorybookConfig } from '@storybook/nextjs';
-import path from 'path';
+import { fileURLToPath } from 'node:url';
+import path, { dirname } from 'node:path';
+import type { StorybookConfig } from '@storybook/nextjs-vite';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const config: StorybookConfig = {
   stories: ['../src/**/*.mdx', '../src/**/*.stories.@(js|jsx|mjs|ts|tsx)'],
-  addons: [
-    '@storybook/addon-essentials',
-    '@storybook/addon-interactions',
-    '@storybook/addon-links',
-  ],
+  addons: ['@storybook/addon-links', '@storybook/addon-docs'],
   framework: {
-    name: '@storybook/nextjs',
+    name: '@storybook/nextjs-vite',
     options: {},
   },
-  docs: {
-    autodocs: 'tag',
-  },
   staticDirs: ['../public'],
-  webpackFinal: async (config) => {
-    if (config.resolve) {
-      config.resolve.alias = {
-        ...config.resolve.alias,
-        '@': path.resolve(__dirname, '../src'),
-      };
-    }
+  viteFinal: async (config) => {
+    config.resolve = config.resolve ?? {};
+    config.resolve.alias = {
+      ...(config.resolve.alias as Record<string, string> | undefined),
+      '@': path.resolve(__dirname, '../src'),
+    };
     return config;
   },
 };

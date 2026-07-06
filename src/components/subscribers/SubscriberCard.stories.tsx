@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { SubscriberCard } from './SubscriberCard';
 import type { Subscriber } from '@/types/api';
 

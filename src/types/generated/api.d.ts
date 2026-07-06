@@ -314,7 +314,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                        "application/json": string;
                     };
                 };
                 /** @description Server error */
@@ -762,7 +762,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                        "application/json": string;
                     };
                 };
                 /** @description Server error */

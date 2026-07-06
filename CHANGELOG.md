@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.8.1](https://github.com/Tsuchiya2/catchup-feed-frontend/compare/catchup-feed-frontend-v1.8.0...catchup-feed-frontend-v1.8.1) (2026-07-06)
+
+
+### Miscellaneous
+
+* Storybook 10 更新 + Playwright e2e 整備 ([c91b80c](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/c91b80c8c8153e9402070aea75b22dd39a759455))
+* upgrade Storybook 8.5 to 10.4 for Next.js 16 support ([d0fafe4](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/d0fafe453049584f5c40dcb36229ff40a26967a9))
+
 ## [1.8.0](https://github.com/Tsuchiya2/catchup-feed-frontend/compare/catchup-feed-frontend-v1.7.3...catchup-feed-frontend-v1.8.0) (2026-07-05)
 
 

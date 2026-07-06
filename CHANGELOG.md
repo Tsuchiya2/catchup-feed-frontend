@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.8.2](https://github.com/Tsuchiya2/catchup-feed-frontend/compare/catchup-feed-frontend-v1.8.1...catchup-feed-frontend-v1.8.2) (2026-07-06)
+
+
+### Miscellaneous
+
+* 429 注釈修正(backend [#77](https://github.com/Tsuchiya2/catchup-feed-frontend/issues/77))への生成型追随 ([c245040](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/c24504063d62907582c5a050e4cb9c0030a74324))
+* regenerate API types after 429 annotation fix (backend PR [#77](https://github.com/Tsuchiya2/catchup-feed-frontend/issues/77)) ([ed5190b](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/ed5190bc8c17f4b3ddb634c6b06cadc2a661aafe))
+
 ## [1.8.1](https://github.com/Tsuchiya2/catchup-feed-frontend/compare/catchup-feed-frontend-v1.8.0...catchup-feed-frontend-v1.8.1) (2026-07-06)
 
 

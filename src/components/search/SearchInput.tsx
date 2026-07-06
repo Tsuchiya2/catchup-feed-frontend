@@ -57,18 +57,35 @@ export function SearchInput({
 }: SearchInputProps) {
   const [inputValue, setInputValue] = React.useState(value);
   const debouncedValue = useDebounce(inputValue, debounceDelay);
+  // Last value communicated with the parent (either received via props or
+  // emitted through onChange). Guards against re-emitting a stale debounced
+  // value when the parent changes `value` externally (e.g. "Clear All
+  // Filters"), which used to instantly restore the cleared keyword.
+  const lastSyncedValue = React.useRef(value);
 
   // Sync with external value changes
   React.useEffect(() => {
+    lastSyncedValue.current = value;
     setInputValue(value);
   }, [value]);
 
+  // Previous debounced value: the notify effect below re-runs whenever the
+  // parent re-creates `onChange`, so it must ignore runs where the debounced
+  // value itself did not change (otherwise a stale value still inside the
+  // debounce window would be re-emitted).
+  const prevDebouncedValue = React.useRef(debouncedValue);
+
   // Notify parent when debounced value changes
   React.useEffect(() => {
-    if (debouncedValue !== value) {
+    if (debouncedValue === prevDebouncedValue.current) {
+      return;
+    }
+    prevDebouncedValue.current = debouncedValue;
+    if (debouncedValue !== lastSyncedValue.current) {
+      lastSyncedValue.current = debouncedValue;
       onChange(debouncedValue);
     }
-  }, [debouncedValue, onChange, value]);
+  }, [debouncedValue, onChange]);
 
   const handleInputChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);

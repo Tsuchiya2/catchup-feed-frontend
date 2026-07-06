@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { IssuedTokenDialog } from './IssuedTokenDialog';
 import type { IssuedFeedToken } from '@/types/api';
 

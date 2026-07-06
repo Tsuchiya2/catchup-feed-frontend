@@ -55,9 +55,14 @@ docs/designs/
 
 # Storybook build artifacts
 storybook-static/
+*storybook.log
 
 # Serwist generated files
 public/sw.js
 public/sw.js.map
 public/swe-worker-*.js
 public/swe-worker-*.js.map
+
+# Playwright artifacts
+playwright-report/
+test-results/

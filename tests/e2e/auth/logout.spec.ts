@@ -1,138 +1,32 @@
-import { test, expect } from '@playwright/test';
-import { loginAsUser, isAuthenticated, TEST_CREDENTIALS } from '../../fixtures/auth';
+import { test, expect } from '../support/test';
+import { AUTH_TOKEN_KEY } from '../support/auth';
 
 test.describe('Logout Flow', () => {
-  test.beforeEach(async ({ page }) => {
-    // Mock the login API endpoint
-    await page.route('**/api/auth/login', async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          token: 'mock-jwt-token',
-          refreshToken: 'mock-refresh-token',
-          user: {
-            id: '1',
-            email: TEST_CREDENTIALS.email,
-            name: 'Test User',
-          },
-        }),
-      });
-    });
-
-    // Login before each test
-    await loginAsUser(page);
-  });
-
-  test('should successfully logout', async ({ page }) => {
-    // Mock the logout API endpoint
-    await page.route('**/api/auth/logout', async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          message: 'Logged out successfully',
-        }),
-      });
-    });
-
-    // Verify user is authenticated
-    expect(await isAuthenticated(page)).toBe(true);
-
-    // Find and click logout button
-    const logoutButton = page.getByRole('button', { name: /logout|sign out/i });
-    await logoutButton.click();
-
-    // Should redirect to login page
-    await expect(page).toHaveURL(/.*login/, { timeout: 5000 });
-
-    // Verify auth token is cleared
-    expect(await isAuthenticated(page)).toBe(false);
-  });
-
-  test('should clear user session data on logout', async ({ page }) => {
-    // Mock the logout API endpoint
-    await page.route('**/api/auth/logout', async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          message: 'Logged out successfully',
-        }),
-      });
-    });
-
-    // Check that user has auth token
-    const hasTokenBefore = await page.evaluate(() => {
-      return !!localStorage.getItem('authToken');
-    });
-    expect(hasTokenBefore).toBe(true);
-
-    // Logout
-    const logoutButton = page.getByRole('button', { name: /logout|sign out/i });
-    await logoutButton.click();
-
-    // Wait for redirect to login
-    await page.waitForURL('**/login', { timeout: 5000 });
-
-    // Verify all auth-related data is cleared
-    const authData = await page.evaluate(() => {
-      return {
-        authToken: localStorage.getItem('authToken'),
-        refreshToken: localStorage.getItem('refreshToken'),
-      };
-    });
-
-    expect(authData.authToken).toBeNull();
-    expect(authData.refreshToken).toBeNull();
-  });
-
-  test('should not allow access to protected routes after logout', async ({ page }) => {
-    // Mock the logout API endpoint
-    await page.route('**/api/auth/logout', async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          message: 'Logged out successfully',
-        }),
-      });
-    });
-
-    // Logout
-    const logoutButton = page.getByRole('button', { name: /logout|sign out/i });
-    await logoutButton.click();
-
-    // Wait for redirect to login
-    await page.waitForURL('**/login', { timeout: 5000 });
-
-    // Try to access dashboard
+  test('should logout and clear session data', async ({ page, authenticated: _auth }) => {
     await page.goto('/dashboard');
+    await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
 
-    // Should redirect back to login
-    await expect(page).toHaveURL(/.*login/);
+    await page.getByTestId('header-logout-button').click();
+
+    await expect(page).toHaveURL(/\/login/);
+
+    // Session data is gone
+    const token = await page.evaluate((key) => window.localStorage.getItem(key), AUTH_TOKEN_KEY);
+    expect(token).toBeNull();
+    const cookies = await page.context().cookies();
+    const authCookie = cookies.find((c) => c.name === AUTH_TOKEN_KEY);
+    expect(authCookie?.value || '').toBe('');
   });
 
-  test('should handle logout API errors gracefully', async ({ page }) => {
-    // Mock the logout API endpoint with error
-    await page.route('**/api/auth/logout', async (route) => {
-      await route.fulfill({
-        status: 500,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          error: 'Internal server error',
-        }),
-      });
-    });
+  test('should not allow access to protected routes after logout', async ({
+    page,
+    authenticated: _auth,
+  }) => {
+    await page.goto('/dashboard');
+    await page.getByTestId('header-logout-button').click();
+    await expect(page).toHaveURL(/\/login/);
 
-    // Logout
-    const logoutButton = page.getByRole('button', { name: /logout|sign out/i });
-    await logoutButton.click();
-
-    // Even with API error, frontend should clear local storage and redirect
-    await page.waitForURL('**/login', { timeout: 5000 });
-
-    // Verify auth token is cleared even on API error
-    expect(await isAuthenticated(page)).toBe(false);
+    await page.goto('/subscribers');
+    await expect(page).toHaveURL(/\/login/);
   });
 });

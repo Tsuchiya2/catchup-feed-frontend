@@ -62,3 +62,7 @@ public/sw.js
 public/sw.js.map
 public/swe-worker-*.js
 public/swe-worker-*.js.map
+
+# Playwright artifacts
+playwright-report/
+test-results/

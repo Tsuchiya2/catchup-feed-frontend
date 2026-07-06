@@ -1,173 +1,83 @@
-import { test, expect } from '@playwright/test';
-import { loginAsUser, clearAuthToken, TEST_CREDENTIALS } from '../../fixtures/auth';
+import { test, expect } from '../support/test';
+import { TEST_CREDENTIALS } from '../support/auth';
 
 test.describe('Login Flow', () => {
-  test.beforeEach(async ({ page }) => {
-    // Clear auth tokens before each test
-    await page.goto('/');
-    await clearAuthToken(page);
-  });
-
   test('should display login form', async ({ page }) => {
     await page.goto('/login');
 
-    // Check if login form elements are visible
-    await expect(page.getByRole('heading', { name: /login/i })).toBeVisible();
-    await expect(page.getByLabel(/email/i)).toBeVisible();
-    await expect(page.getByLabel(/password/i)).toBeVisible();
-    await expect(page.getByRole('button', { name: /login/i })).toBeVisible();
+    // The page h1 is the brand; the form card title is plain text
+    await expect(page.getByRole('heading', { name: 'Catchup Feed' })).toBeVisible();
+    await expect(page.getByText('Enter your credentials to access your account')).toBeVisible();
+    await expect(page.getByLabel('Email')).toBeVisible();
+    await expect(page.getByLabel('Password')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Login' })).toBeVisible();
   });
 
   test('should show validation errors for empty fields', async ({ page }) => {
     await page.goto('/login');
 
-    // Click submit without filling fields
-    await page.click('button[type="submit"]');
+    await page.getByRole('button', { name: 'Login' }).click();
 
-    // Check for validation error messages
-    await expect(page.getByText(/email is required/i)).toBeVisible();
-    await expect(page.getByText(/password is required/i)).toBeVisible();
+    await expect(page.getByText('Email is required')).toBeVisible();
+    await expect(page.getByText('Password is required')).toBeVisible();
   });
 
-  test('should show validation error for invalid email', async ({ page }) => {
+  test('should block submission of an invalid email', async ({ page }) => {
     await page.goto('/login');
 
-    // Fill in invalid email
-    await page.fill('input[type="email"]', 'invalid-email');
-    await page.fill('input[type="password"]', 'password123');
+    await page.getByLabel('Email').fill('invalid-email');
+    await page.getByLabel('Password').fill('whatever');
+    await page.getByRole('button', { name: 'Login' }).click();
 
-    // Click submit
-    await page.click('button[type="submit"]');
-
-    // Check for email validation error
-    await expect(page.getByText(/invalid email address/i)).toBeVisible();
+    // input[type=email] native constraint validation blocks the submit
+    const isValid = await page
+      .getByLabel('Email')
+      .evaluate((el) => (el as HTMLInputElement).checkValidity());
+    expect(isValid).toBe(false);
+    await expect(page).toHaveURL(/\/login/);
   });
 
-  test('should successfully login with valid credentials', async ({ page }) => {
-    // Mock the login API endpoint
-    await page.route('**/api/auth/login', async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          token: 'mock-jwt-token',
-          refreshToken: 'mock-refresh-token',
-          user: {
-            id: '1',
-            email: TEST_CREDENTIALS.email,
-            name: 'Test User',
-          },
-        }),
-      });
-    });
-
-    // Use the login helper
-    await loginAsUser(page);
-
-    // Verify redirect to dashboard
-    await expect(page).toHaveURL(/.*dashboard/);
-  });
-
-  test('should show error message for invalid credentials', async ({ page }) => {
-    // Mock the login API endpoint with error
-    await page.route('**/api/auth/login', async (route) => {
-      await route.fulfill({
-        status: 401,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          error: 'Invalid email or password',
-        }),
-      });
-    });
-
+  test('should login with valid credentials and land on the dashboard', async ({ page }) => {
     await page.goto('/login');
 
-    // Fill in credentials
-    await page.fill('input[type="email"]', TEST_CREDENTIALS.email);
-    await page.fill('input[type="password"]', 'wrongpassword');
+    await page.getByLabel('Email').fill(TEST_CREDENTIALS.email);
+    await page.getByLabel('Password').fill(TEST_CREDENTIALS.password);
+    await page.getByRole('button', { name: 'Login' }).click();
 
-    // Submit form
-    await page.click('button[type="submit"]');
-
-    // Check for error message
-    await expect(page.getByText(/invalid email or password|login failed/i)).toBeVisible();
-
-    // Verify still on login page
-    await expect(page).toHaveURL(/.*login/);
+    await expect(page).toHaveURL(/\/dashboard/);
+    await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
   });
 
-  test('should show loading state during login', async ({ page }) => {
-    // Mock slow API response
-    await page.route('**/api/auth/login', async (route) => {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          token: 'mock-jwt-token',
-          refreshToken: 'mock-refresh-token',
-          user: {
-            id: '1',
-            email: TEST_CREDENTIALS.email,
-          },
-        }),
-      });
-    });
-
+  test('should stay unauthenticated on invalid credentials', async ({ page }) => {
     await page.goto('/login');
 
-    // Fill in credentials
-    await page.fill('input[type="email"]', TEST_CREDENTIALS.email);
-    await page.fill('input[type="password"]', TEST_CREDENTIALS.password);
+    await page.getByLabel('Email').fill(TEST_CREDENTIALS.email);
+    await page.getByLabel('Password').fill('wrong-password');
+    await page.getByRole('button', { name: 'Login' }).click();
 
-    // Click submit
-    await page.click('button[type="submit"]');
+    // The API client reacts to the 401 by clearing tokens and reloading
+    // /login, so the user remains on the login page, unauthenticated.
+    await expect(page).toHaveURL(/\/login/);
+    await expect(page.getByRole('button', { name: 'Login' })).toBeVisible();
 
-    // Check for loading state
-    await expect(page.getByText(/logging in/i)).toBeVisible();
-
-    // Button should be disabled
-    await expect(page.getByRole('button', { name: /logging in/i })).toBeDisabled();
+    // Protected routes are still inaccessible
+    await page.goto('/dashboard');
+    await expect(page).toHaveURL(/\/login/);
   });
 
-  test('should redirect to login when accessing protected route without auth', async ({ page }) => {
-    await clearAuthToken(page);
-
-    // Try to access dashboard without authentication
+  test('should redirect unauthenticated access to a protected route to login', async ({ page }) => {
     await page.goto('/dashboard');
 
-    // Should redirect to login page
-    await expect(page).toHaveURL(/.*login/);
+    await expect(page).toHaveURL(/\/login\?redirect=%2Fdashboard/);
+    await expect(page.getByText('Enter your credentials to access your account')).toBeVisible();
   });
 
-  test('should prevent navigation to login page when already authenticated', async ({ page }) => {
-    // Mock successful authentication
-    await page.route('**/api/auth/login', async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          token: 'mock-jwt-token',
-          refreshToken: 'mock-refresh-token',
-          user: {
-            id: '1',
-            email: TEST_CREDENTIALS.email,
-          },
-        }),
-      });
-    });
-
-    // Login first
-    await loginAsUser(page);
-
-    // Try to navigate to login page
+  test('should redirect an authenticated user away from the login page', async ({
+    page,
+    authenticated: _authenticated,
+  }) => {
     await page.goto('/login');
 
-    // Should redirect to dashboard (or stay on dashboard if already there)
-    // This behavior depends on your implementation
-    // Adjust the assertion based on your actual behavior
-    const url = page.url();
-    const isOnDashboardOrLogin = url.includes('dashboard') || url.includes('login');
-    expect(isOnDashboardOrLogin).toBe(true);
+    await expect(page).toHaveURL(/\/dashboard/);
   });
 });

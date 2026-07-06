@@ -12,9 +12,17 @@ test.describe('Source Kind', () => {
     await expect(page.getByRole('heading', { name: 'Go Blog' })).toBeVisible();
   });
 
-  test('shows the kind badge on existing sources (backward compatible rss)', async ({ page }) => {
+  test('shows the kind badge on existing sources (explicit rss)', async ({ page }) => {
     const goBlogCard = page.getByRole('listitem', { name: 'Source: Go Blog' });
     await expect(goBlogCard.getByTestId('source-kind-badge')).toHaveText('RSS');
+  });
+
+  test('falls back to the RSS badge when kind is missing (pre-Phase 2 backend)', async ({
+    page,
+  }) => {
+    // The Hacker News mock omits `kind` on purpose (see mock-data.ts).
+    const hnCard = page.getByRole('listitem', { name: 'Source: Hacker News' });
+    await expect(hnCard.getByTestId('source-kind-badge')).toHaveText('RSS');
   });
 
   test('creates a YouTube source with kind and format help', async ({ page }) => {

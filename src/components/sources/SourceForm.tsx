@@ -246,11 +246,13 @@ export function SourceForm({
           aria-required="true"
           aria-invalid={!!errors.feedURL}
           aria-describedby={
-            errors.feedURL
-              ? 'source-feedURL-error'
-              : formData.kind === 'youtube'
-                ? 'source-feedURL-help'
-                : undefined
+            // Error and YouTube help can coexist; point at every visible description.
+            [
+              errors.feedURL ? 'source-feedURL-error' : null,
+              formData.kind === 'youtube' ? 'source-feedURL-help' : null,
+            ]
+              .filter(Boolean)
+              .join(' ') || undefined
           }
           disabled={isLoading}
           maxLength={SOURCE_CONFIG.URL_MAX_LENGTH}

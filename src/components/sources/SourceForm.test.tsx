@@ -778,6 +778,35 @@ describe('SourceForm', () => {
       });
     });
 
+    it('should reference both the error and the YouTube help in aria-describedby', async () => {
+      const user = userEvent.setup();
+      render(
+        <SourceForm
+          mode="create"
+          onSubmit={mockOnSubmit}
+          isLoading={false}
+          error={null}
+          onCancel={mockOnCancel}
+        />
+      );
+
+      // Select the youtube kind so the format help text is shown
+      await user.selectOptions(screen.getByLabelText('Source type'), 'youtube');
+
+      const urlInput = screen.getByLabelText('Feed URL');
+
+      // Trigger validation error while the help text is visible
+      await user.click(urlInput);
+      await user.tab();
+
+      await waitFor(() => {
+        expect(urlInput).toHaveAttribute(
+          'aria-describedby',
+          'source-feedURL-error source-feedURL-help'
+        );
+      });
+    });
+
     it('should have proper labels for screen readers', () => {
       render(
         <SourceForm

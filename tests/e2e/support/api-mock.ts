@@ -17,6 +17,7 @@ import { makeMockJwt, TEST_CREDENTIALS } from './auth';
 import {
   ISSUED_FEED_URL,
   ISSUED_PLAINTEXT_TOKEN,
+  REVOKE_NOTE,
   makeAccessLogs,
   makeAccessLogSummary,
   makeArticles,
@@ -65,8 +66,24 @@ export class ApiMock {
     });
   }
 
+  /**
+   * Error body matching the real backend: respond.SafeError writes
+   * `{"error": message}` (no `message` key), which is what every handler
+   * except POST /auth/token uses. The auth handler goes through http.Error
+   * and returns text/plain instead — see the auth branch in handle().
+   */
   private fulfillError(route: Route, status: number, message: string): Promise<void> {
-    return this.fulfillJson(route, { error: message, message }, status);
+    return this.fulfillJson(route, { error: message }, status);
+  }
+
+  /** Plain-text error exactly as Go's http.Error writes it (message + LF). */
+  private fulfillPlainTextError(route: Route, status: number, message: string): Promise<void> {
+    return route.fulfill({
+      status,
+      contentType: 'text/plain; charset=utf-8',
+      headers: CORS_HEADERS,
+      body: `${message}\n`,
+    });
   }
 
   // -- dispatcher -----------------------------------------------------------
@@ -91,7 +108,8 @@ export class ApiMock {
       if (body.email === TEST_CREDENTIALS.email && body.password === TEST_CREDENTIALS.password) {
         await this.fulfillJson(route, { token: makeMockJwt() });
       } else {
-        await this.fulfillError(route, 401, 'Invalid email or password');
+        // The real handler rejects credentials via http.Error → plain text.
+        await this.fulfillPlainTextError(route, 401, 'unauthorized');
       }
       return;
     }
@@ -191,7 +209,8 @@ export class ApiMock {
       }
       token.active = false;
       token.revoked_at = new Date().toISOString();
-      await this.fulfillJson(route, token);
+      // RevokedTokenDTO = TokenDTO + note (the §5.2 irreversibility notice).
+      await this.fulfillJson(route, { ...token, note: REVOKE_NOTE });
       return;
     }
 

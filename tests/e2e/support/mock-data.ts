@@ -82,6 +82,13 @@ export const makeTokens = (): MockFeedToken[] => [
   { id: 103, subscriber_id: 2, active: true, created_at: daysAgo(49), revoked_at: null },
 ];
 
+/**
+ * `note` on the DELETE /tokens/:id response (RevokedTokenDTO), pinning the
+ * §5.2 irreversibility semantics. Mirrors the backend's revokeNote constant.
+ */
+export const REVOKE_NOTE =
+  'revocation is irreversible; issue a new token to restore access (§5.2)';
+
 /** One-time plaintext returned by POST /subscribers/:id/tokens (D-5). */
 export const ISSUED_PLAINTEXT_TOKEN = 'e2e-plain-token-abc123';
 export const ISSUED_FEED_URL = `https://feeds.example.test/feeds/${ISSUED_PLAINTEXT_TOKEN}/feed.xml`;

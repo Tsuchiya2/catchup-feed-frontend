@@ -44,7 +44,7 @@ test.describe('Source Delete', () => {
         status: 400,
         contentType: 'application/json',
         headers: { 'access-control-allow-origin': '*' },
-        body: JSON.stringify({ error: 'delete failed', message: 'delete failed' }),
+        body: JSON.stringify({ error: 'delete failed' }),
       })
     );
 

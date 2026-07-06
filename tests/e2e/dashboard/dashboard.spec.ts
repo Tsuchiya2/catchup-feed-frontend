@@ -43,7 +43,7 @@ test.describe('Dashboard', () => {
         status: 400,
         contentType: 'application/json',
         headers: { 'access-control-allow-origin': '*' },
-        body: JSON.stringify({ error: 'bad request', message: 'bad request' }),
+        body: JSON.stringify({ error: 'bad request' }),
       })
     );
 

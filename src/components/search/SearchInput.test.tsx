@@ -203,6 +203,44 @@ describe('SearchInput', () => {
 
       expect(screen.getByRole('textbox')).toHaveValue('updated');
     });
+
+    // Regression test for the stale-debounce bug: after a value was typed and
+    // confirmed through the debounce, clearing `value` externally (e.g. a
+    // "Clear All Filters" button) used to re-emit the old confirmed value via
+    // onChange, instantly restoring the cleared keyword. The onChange spy must
+    // keep the same identity across rerenders and timers must be advanced,
+    // otherwise the buggy notify effect never gets the chance to fire.
+    it('should not re-emit the stale confirmed value when cleared externally', async () => {
+      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+      const onChange = vi.fn();
+      const { rerender } = render(<SearchInput value="" onChange={onChange} />);
+
+      // Type and let the debounce confirm the value.
+      await user.type(screen.getByRole('textbox'), 'test');
+      await act(async () => {
+        vi.advanceTimersByTime(300);
+      });
+      await waitFor(() => {
+        expect(onChange).toHaveBeenCalledWith('test');
+      });
+
+      // Parent adopts the confirmed value...
+      rerender(<SearchInput value="test" onChange={onChange} />);
+      onChange.mockClear();
+
+      // ...then clears it externally.
+      rerender(<SearchInput value="" onChange={onChange} />);
+      expect(screen.getByRole('textbox')).toHaveValue('');
+
+      // Let any pending debounce timer fire.
+      await act(async () => {
+        vi.advanceTimersByTime(300);
+      });
+
+      // The buggy implementation called onChange('test') here.
+      expect(onChange).not.toHaveBeenCalled();
+      expect(screen.getByRole('textbox')).toHaveValue('');
+    });
   });
 
   describe('Accessibility', () => {

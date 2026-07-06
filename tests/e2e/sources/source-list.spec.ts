@@ -27,7 +27,7 @@ test.describe('Source List', () => {
         status: 400,
         contentType: 'application/json',
         headers: { 'access-control-allow-origin': '*' },
-        body: JSON.stringify({ error: 'boom', message: 'boom' }),
+        body: JSON.stringify({ error: 'boom' }),
       })
     );
     await page.goto('/sources');

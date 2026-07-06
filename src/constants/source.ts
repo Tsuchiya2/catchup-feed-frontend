@@ -31,6 +31,10 @@ export const SOURCE_TEST_IDS = {
   CATEGORY_INPUT: 'source-category-input',
   /** Lang input field */
   LANG_INPUT: 'source-lang-input',
+  /** Kind select field */
+  KIND_SELECT: 'source-kind-select',
+  /** Kind badge on the source card */
+  KIND_BADGE: 'source-kind-badge',
   /** Save button */
   SAVE_BUTTON: 'source-save-button',
   /** Cancel button */
@@ -62,6 +66,8 @@ export const SOURCE_ARIA_LABELS = {
   CATEGORY_INPUT: 'Category',
   /** ARIA label for lang input */
   LANG_INPUT: 'Language',
+  /** ARIA label for kind select */
+  KIND_SELECT: 'Source type',
   /** ARIA label for save button */
   SAVE_BUTTON: 'Save changes',
   /** ARIA label for cancel button */

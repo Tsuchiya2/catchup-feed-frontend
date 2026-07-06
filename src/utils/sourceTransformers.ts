@@ -35,6 +35,8 @@ export function sourceToFormData(source: Source): SourceFormData {
     feedURL: source.feed_url,
     category: source.category,
     lang: source.lang,
+    // Sources fetched from a pre-Phase 2 backend may omit kind (= rss).
+    kind: source.kind ?? 'rss',
   };
 }
 
@@ -73,6 +75,7 @@ export function formDataToUpdateInput(data: SourceFormData, active: boolean): Up
     feedURL: data.feedURL.trim(),
     category: data.category.trim(),
     lang: data.lang.trim() || undefined,
+    kind: data.kind,
     active,
   };
 }

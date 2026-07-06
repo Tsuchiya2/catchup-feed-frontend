@@ -9,6 +9,7 @@
 
 import { SOURCE_CONFIG } from '@/config/sourceConfig';
 import { ERROR_MESSAGES } from '@/utils/errorMessages';
+import type { SourceKind } from '@/types/api';
 
 /**
  * Source form data interface
@@ -23,6 +24,11 @@ export interface SourceFormData {
   category: string;
   /** Content language (optional, e.g. "ja", "en") */
   lang: string;
+  /**
+   * Source kind (rss / youtube / podcast; defaults to 'rss').
+   * Constrained by a select, so it needs no validation.
+   */
+  kind: SourceKind;
 }
 
 /**

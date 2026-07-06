@@ -16,6 +16,23 @@ import {
   type SourceFormErrors,
 } from '@/utils/validation/sourceValidation';
 import { SOURCE_CONFIG } from '@/config/sourceConfig';
+import type { SourceKind } from '@/types/api';
+
+/**
+ * Text form fields (validated as strings); `kind` is handled separately
+ * because it is a constrained select and needs no validation.
+ */
+type TextField = Exclude<keyof SourceFormData, 'kind'>;
+
+/**
+ * Selectable source kinds with display labels.
+ * 'rss' first: it is the default and the overwhelmingly common case.
+ */
+const KIND_OPTIONS: ReadonlyArray<{ value: SourceKind; label: string }> = [
+  { value: 'rss', label: 'RSS' },
+  { value: 'youtube', label: 'YouTube' },
+  { value: 'podcast', label: 'Podcast' },
+];
 
 /**
  * SourceForm Component Props
@@ -43,6 +60,7 @@ const defaultFormData: SourceFormData = {
   feedURL: '',
   category: '',
   lang: '',
+  kind: 'rss',
 };
 
 /**
@@ -94,7 +112,7 @@ export function SourceForm({
   /**
    * Validate a single field
    */
-  const validateField = (field: keyof SourceFormData, value: string): string | undefined => {
+  const validateField = (field: TextField, value: string): string | undefined => {
     if (field === 'name') {
       return validateSourceName(value);
     }
@@ -117,14 +135,21 @@ export function SourceForm({
   /**
    * Handle field value change
    */
-  const handleChange = (field: keyof SourceFormData, value: string) => {
+  const handleChange = (field: TextField, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  /**
+   * Handle kind selection change (no validation: values are constrained)
+   */
+  const handleKindChange = (kind: SourceKind) => {
+    setFormData((prev) => ({ ...prev, kind }));
   };
 
   /**
    * Handle field blur for validation
    */
-  const handleBlur = (field: keyof SourceFormData) => {
+  const handleBlur = (field: TextField) => {
     const fieldValue = formData[field];
     const error = validateField(field, fieldValue);
     setErrors((prev) => ({ ...prev, [field]: error }));
@@ -157,6 +182,7 @@ export function SourceForm({
       feedURL: formData.feedURL.trim(),
       category: formData.category.trim(),
       lang: formData.lang.trim(),
+      kind: formData.kind,
     });
   };
 
@@ -187,6 +213,25 @@ export function SourceForm({
         />
       </FormField>
 
+      {/* Kind Field (constrained select; native element for the mobile picker) */}
+      <FormField label="Type" required htmlFor="source-kind">
+        <select
+          id="source-kind"
+          data-testid={SOURCE_TEST_IDS.KIND_SELECT}
+          aria-label={SOURCE_ARIA_LABELS.KIND_SELECT}
+          value={formData.kind}
+          onChange={(e) => handleKindChange(e.target.value as SourceKind)}
+          disabled={isLoading}
+          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:border-primary/50 focus-visible:shadow-glow-sm disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+        >
+          {KIND_OPTIONS.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      </FormField>
+
       {/* Feed URL Field */}
       <FormField label="Feed URL" required htmlFor="source-feedURL" error={errors.feedURL}>
         <Input
@@ -200,10 +245,22 @@ export function SourceForm({
           placeholder="https://example.com/feed.xml"
           aria-required="true"
           aria-invalid={!!errors.feedURL}
-          aria-describedby={errors.feedURL ? 'source-feedURL-error' : undefined}
+          aria-describedby={
+            errors.feedURL
+              ? 'source-feedURL-error'
+              : formData.kind === 'youtube'
+                ? 'source-feedURL-help'
+                : undefined
+          }
           disabled={isLoading}
           maxLength={SOURCE_CONFIG.URL_MAX_LENGTH}
         />
+        {formData.kind === 'youtube' && (
+          <p id="source-feedURL-help" className="text-xs text-muted-foreground">
+            For YouTube channels, use the RSS form:
+            https://www.youtube.com/feeds/videos.xml?channel_id=...
+          </p>
+        )}
       </FormField>
 
       {/* Category Field */}

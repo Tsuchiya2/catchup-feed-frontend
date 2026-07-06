@@ -135,9 +135,19 @@ export type ArticleResponse = Article;
 // ============================================================================
 
 /**
- * Source entity
+ * Source kind: how the source is ingested (Phase 2 multi-modal).
+ * 'rss' = regular RSS/Atom feed, 'youtube' / 'podcast' = transcription path.
  */
-export type Source = Full<Schemas['internal_handler_http_source.DTO']>;
+export type SourceKind = NonNullable<Schemas['internal_handler_http_source.DTO']['kind']>;
+
+/**
+ * Source entity.
+ * `kind` stays optional for backward compatibility: responses from a backend
+ * that predates the Phase 2 migration may omit it, in which case the UI must
+ * treat it as 'rss'.
+ */
+export type Source = Full<Omit<Schemas['internal_handler_http_source.DTO'], 'kind'>> &
+  Pick<Schemas['internal_handler_http_source.DTO'], 'kind'>;
 
 /**
  * Sources list response (backend returns a bare array)
@@ -152,23 +162,24 @@ export type SourceResponse = Source;
 /**
  * Input data for creating a new source (POST /sources).
  * Derived from the generated CreateRequest schema; name/feedURL/category are
- * required by backend validation, lang stays optional.
+ * required by backend validation. lang and kind stay optional (the backend
+ * defaults omitted kind to 'rss'), though the form always sends kind.
  */
 export type CreateSourceInput = Full<
-  Omit<Schemas['internal_handler_http_source.CreateRequest'], 'lang'>
+  Omit<Schemas['internal_handler_http_source.CreateRequest'], 'lang' | 'kind'>
 > &
-  Pick<Schemas['internal_handler_http_source.CreateRequest'], 'lang'>;
+  Pick<Schemas['internal_handler_http_source.CreateRequest'], 'lang' | 'kind'>;
 
 /**
  * Input data for updating an existing source (PUT /sources/:id).
  * Derived from the generated UpdateRequest schema; the backend accepts
  * partial input (empty fields are kept as-is), but the edit form always
- * sends the full set, so only lang stays optional here.
+ * sends the full set, so only lang and kind stay optional here.
  */
 export type UpdateSourceInput = Full<
-  Omit<Schemas['internal_handler_http_source.UpdateRequest'], 'lang'>
+  Omit<Schemas['internal_handler_http_source.UpdateRequest'], 'lang' | 'kind'>
 > &
-  Pick<Schemas['internal_handler_http_source.UpdateRequest'], 'lang'>;
+  Pick<Schemas['internal_handler_http_source.UpdateRequest'], 'lang' | 'kind'>;
 
 /**
  * Form field state for source creation and editing
@@ -183,6 +194,8 @@ export interface SourceFormData {
   category: string;
   /** Content language (optional) */
   lang: string;
+  /** Source kind (rss / youtube / podcast; defaults to 'rss') */
+  kind: SourceKind;
 }
 
 /**

@@ -387,6 +387,7 @@ describe('validateSourceForm', () => {
   describe('Valid Form Data', () => {
     it('should return empty errors object for valid data', () => {
       const data: SourceFormData = {
+        kind: 'rss',
         name: 'Tech News',
         feedURL: 'https://example.com/feed',
         category: 'tech',
@@ -398,6 +399,7 @@ describe('validateSourceForm', () => {
 
     it('should return empty errors object for valid data with max lengths', () => {
       const data: SourceFormData = {
+        kind: 'rss',
         name: 'a'.repeat(SOURCE_CONFIG.NAME_MAX_LENGTH),
         feedURL: 'https://example.com/feed?query=' + 'a'.repeat(2000),
         category: 'tech',
@@ -409,6 +411,7 @@ describe('validateSourceForm', () => {
 
     it('should return empty errors object for valid data with special characters', () => {
       const data: SourceFormData = {
+        kind: 'rss',
         name: 'Tech News 2024 - #1 Source!',
         feedURL: 'https://example.com/feed?format=rss&limit=10',
         category: 'tech',
@@ -422,6 +425,7 @@ describe('validateSourceForm', () => {
   describe('Invalid Form Data - Single Field', () => {
     it('should return name error for empty name', () => {
       const data: SourceFormData = {
+        kind: 'rss',
         name: '',
         feedURL: 'https://example.com/feed',
         category: 'tech',
@@ -435,6 +439,7 @@ describe('validateSourceForm', () => {
 
     it('should return name error for whitespace-only name', () => {
       const data: SourceFormData = {
+        kind: 'rss',
         name: '   ',
         feedURL: 'https://example.com/feed',
         category: 'tech',
@@ -448,6 +453,7 @@ describe('validateSourceForm', () => {
 
     it('should return name error for name exceeding max length', () => {
       const data: SourceFormData = {
+        kind: 'rss',
         name: 'a'.repeat(SOURCE_CONFIG.NAME_MAX_LENGTH + 1),
         feedURL: 'https://example.com/feed',
         category: 'tech',
@@ -461,6 +467,7 @@ describe('validateSourceForm', () => {
 
     it('should return URL error for empty URL', () => {
       const data: SourceFormData = {
+        kind: 'rss',
         name: 'Valid Name',
         feedURL: '',
         category: 'tech',
@@ -474,6 +481,7 @@ describe('validateSourceForm', () => {
 
     it('should return URL error for whitespace-only URL', () => {
       const data: SourceFormData = {
+        kind: 'rss',
         name: 'Valid Name',
         feedURL: '   ',
         category: 'tech',
@@ -487,6 +495,7 @@ describe('validateSourceForm', () => {
 
     it('should return URL error for invalid URL format', () => {
       const data: SourceFormData = {
+        kind: 'rss',
         name: 'Valid Name',
         feedURL: 'not-a-url',
         category: 'tech',
@@ -500,6 +509,7 @@ describe('validateSourceForm', () => {
 
     it('should return URL error for non-http(s) protocol', () => {
       const data: SourceFormData = {
+        kind: 'rss',
         name: 'Valid Name',
         feedURL: 'ftp://example.com/feed',
         category: 'tech',
@@ -515,6 +525,7 @@ describe('validateSourceForm', () => {
       const baseURL = 'https://example.com/feed?query=';
       const padding = 'a'.repeat(SOURCE_CONFIG.URL_MAX_LENGTH - baseURL.length + 1);
       const data: SourceFormData = {
+        kind: 'rss',
         name: 'Valid Name',
         feedURL: baseURL + padding,
         category: 'tech',
@@ -530,6 +541,7 @@ describe('validateSourceForm', () => {
   describe('Invalid Form Data - Category and Lang', () => {
     it('should return category error for empty category', () => {
       const data: SourceFormData = {
+        kind: 'rss',
         name: 'Valid Name',
         feedURL: 'https://example.com/feed',
         category: '',
@@ -543,6 +555,7 @@ describe('validateSourceForm', () => {
 
     it('should return category error for category exceeding max length', () => {
       const data: SourceFormData = {
+        kind: 'rss',
         name: 'Valid Name',
         feedURL: 'https://example.com/feed',
         category: 'a'.repeat(SOURCE_CONFIG.CATEGORY_MAX_LENGTH + 1),
@@ -556,6 +569,7 @@ describe('validateSourceForm', () => {
 
     it('should return no lang error for empty lang (optional)', () => {
       const data: SourceFormData = {
+        kind: 'rss',
         name: 'Valid Name',
         feedURL: 'https://example.com/feed',
         category: 'tech',
@@ -567,6 +581,7 @@ describe('validateSourceForm', () => {
 
     it('should return lang error for lang exceeding max length', () => {
       const data: SourceFormData = {
+        kind: 'rss',
         name: 'Valid Name',
         feedURL: 'https://example.com/feed',
         category: 'tech',
@@ -582,6 +597,7 @@ describe('validateSourceForm', () => {
   describe('Invalid Form Data - Multiple Fields', () => {
     it('should return errors for all invalid fields', () => {
       const data: SourceFormData = {
+        kind: 'rss',
         name: '',
         feedURL: '',
         category: '',
@@ -598,6 +614,7 @@ describe('validateSourceForm', () => {
 
     it('should return both errors for both invalid fields (empty)', () => {
       const data: SourceFormData = {
+        kind: 'rss',
         name: '',
         feedURL: '',
         category: 'tech',
@@ -612,6 +629,7 @@ describe('validateSourceForm', () => {
 
     it('should return both errors for both invalid fields (whitespace)', () => {
       const data: SourceFormData = {
+        kind: 'rss',
         name: '   ',
         feedURL: '   ',
         category: 'tech',
@@ -626,6 +644,7 @@ describe('validateSourceForm', () => {
 
     it('should return both errors for both invalid fields (different validation rules)', () => {
       const data: SourceFormData = {
+        kind: 'rss',
         name: 'a'.repeat(SOURCE_CONFIG.NAME_MAX_LENGTH + 1),
         feedURL: 'not-a-url',
         category: 'tech',
@@ -640,6 +659,7 @@ describe('validateSourceForm', () => {
 
     it('should return both errors for name empty and URL invalid', () => {
       const data: SourceFormData = {
+        kind: 'rss',
         name: '',
         feedURL: 'ftp://example.com/feed',
         category: 'tech',
@@ -654,6 +674,7 @@ describe('validateSourceForm', () => {
 
     it('should return both errors for name too long and URL empty', () => {
       const data: SourceFormData = {
+        kind: 'rss',
         name: 'a'.repeat(300),
         feedURL: '',
         category: 'tech',
@@ -671,6 +692,7 @@ describe('validateSourceForm', () => {
     it('should validate fields independently', () => {
       // Valid name with invalid URL
       const data1: SourceFormData = {
+        kind: 'rss',
         name: 'Valid Name',
         feedURL: 'invalid',
         category: 'tech',
@@ -682,6 +704,7 @@ describe('validateSourceForm', () => {
 
       // Invalid name with valid URL
       const data2: SourceFormData = {
+        kind: 'rss',
         name: '',
         feedURL: 'https://example.com/feed',
         category: 'tech',
@@ -760,6 +783,7 @@ describe('hasValidationErrors', () => {
   describe('Edge Cases', () => {
     it('should handle errors object created from validateSourceForm (valid data)', () => {
       const data: SourceFormData = {
+        kind: 'rss',
         name: 'Valid Name',
         feedURL: 'https://example.com/feed',
         category: 'tech',
@@ -772,6 +796,7 @@ describe('hasValidationErrors', () => {
 
     it('should handle errors object created from validateSourceForm (invalid data)', () => {
       const data: SourceFormData = {
+        kind: 'rss',
         name: '',
         feedURL: '',
         category: 'tech',

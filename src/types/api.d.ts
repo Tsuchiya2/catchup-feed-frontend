@@ -286,6 +286,78 @@ export type AccessLogSummary = Nullable<
 >;
 
 // ============================================================================
+// Learning (spaced repetition) Types
+// ============================================================================
+
+/**
+ * Self-grading result for a review (○△×).
+ * `good` = remembered, `fuzzy` = partial, `forgot` = missed.
+ *
+ * Note: the backend swagger marks `result` optional, but grading always
+ * sends one of these three values (backend is tightening `required`). The
+ * UI treats it as a mandatory field regardless of how the type generates.
+ */
+export type GradeResult = NonNullable<
+  Schemas['internal_handler_http_learning.GradeRequest']['result']
+>;
+
+/**
+ * A pending (ungraded) review shown one card at a time on /learning.
+ * Carries the item's concept / question / answer so the card is
+ * self-contained.
+ */
+export type PendingReview = Full<Schemas['internal_handler_http_learning.PendingReviewDTO']>;
+
+/**
+ * Response of POST /learning/reviews/:id/grade. Reflects the item's new
+ * spaced-repetition state after the grade is applied.
+ */
+export type GradeResponse = Full<Schemas['internal_handler_http_learning.GradeResponse']>;
+
+/**
+ * Learning item kind: derived from a broadcast article or a book chunk.
+ */
+export type LearningItemKind = NonNullable<
+  Schemas['internal_handler_http_learning.ItemDTO']['kind']
+>;
+
+/**
+ * Filter for the tracker list: current (active) vs graduated/archived.
+ */
+export type LearningItemStatus = 'active' | 'retired';
+
+/**
+ * A learning item in the tracker.
+ * `article_id` / `book_id` are set per `kind` (one is null). `retired_at`
+ * null = still active. `last_result` / `last_asked_on` are null until the
+ * item has been asked at least once.
+ */
+export type LearningItem = Nullable<
+  Schemas['internal_handler_http_learning.ItemDTO'],
+  'article_id' | 'book_id' | 'retired_at' | 'last_result' | 'last_asked_on'
+>;
+
+/**
+ * Response of POST /learning/items/:id/retire (idempotent archive).
+ */
+export type RetireResponse = Full<Schemas['internal_handler_http_learning.RetireResponse']>;
+
+/**
+ * book_review progression status.
+ * `idle` = not selected / paused (cursor kept), `active` = in progress
+ * (at most one book at a time), `finished` = fully read.
+ */
+export type BookReviewStatus = NonNullable<
+  Schemas['internal_handler_http_learning.BookDTO']['review_status']
+>;
+
+/**
+ * An ingested book managed from the dashboard (D-20).
+ * `review_cursor` / `total_chunks` drive the progress percentage.
+ */
+export type LearningBook = Full<Schemas['internal_handler_http_learning.BookDTO']>;
+
+// ============================================================================
 // Error Types
 // ============================================================================
 

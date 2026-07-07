@@ -21,6 +21,7 @@ const mainNavigation = [
   { name: 'Sources', href: '/sources' },
   { name: 'Friends', href: '/subscribers' },
   { name: 'Access Logs', href: '/access-logs' },
+  { name: 'Review', href: '/learning' },
 ];
 
 const legalNavigation = [

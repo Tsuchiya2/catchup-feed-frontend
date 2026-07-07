@@ -601,6 +601,479 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/learning/books": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 書籍一覧取得(book review 管理)
+         * @description ingest 済み書籍の一覧を返します(D-20)。review_status(idle=未対象/一時停止、active=進行中・常に最大1冊、finished=読了)と review_cursor / total_chunks(進捗率の素材)を含みます
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 書籍一覧 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["internal_handler_http_learning.BookDTO"][];
+                    };
+                };
+                /** @description Authentication required - missing or invalid JWT token */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+                /** @description サーバーエラー */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/learning/books/{id}/activate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 書籍を進行中に指定
+         * @description 書籍を review_status='active'(book_review コーナーの対象、§7.3)にします。既存の active 書籍があれば同一トランザクションで idle に落とします — 入れ替えが1操作で完結し、active は常に最大1冊です(D-20)。idle からの activate はカーソル保持(一時停止からの再開)、finished からの activate は review_cursor を 0 にリセット(再読開始)。冪等
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 書籍ID */
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 進行中になった書籍 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["internal_handler_http_learning.BookDTO"];
+                    };
+                };
+                /** @description Bad request - invalid ID */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+                /** @description Authentication required - missing or invalid JWT token */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+                /** @description Not found - book not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/learning/books/{id}/deactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 書籍の一時停止/対象から除外
+         * @description 進行中の書籍を review_status='idle' に戻します。review_cursor は保持されるため、再度 activate すると続きから再開します(D-20)。冪等: idle の書籍への再実行は 200、finished の書籍は読了マーカーを保持したまま何もしません
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 書籍ID */
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 現在の書籍状態 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["internal_handler_http_learning.BookDTO"];
+                    };
+                };
+                /** @description Bad request - invalid ID */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+                /** @description Authentication required - missing or invalid JWT token */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+                /** @description Not found - book not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/learning/items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 学習項目一覧取得
+         * @description 学習項目(トラッカー)を取得します。status=active(デフォルト)は現役項目を期日順(due_on ASC)、status=retired は卒業・手動アーカイブ済み項目を新しい順(retired_at DESC)で返します。履歴サマリは出題回数と直近結果のみです(§8.1 — 過剰な集計はしない)
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description フィルタ(デフォルト active) */
+                    status?: "active" | "retired";
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 学習項目一覧 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["internal_handler_http_learning.ItemDTO"][];
+                    };
+                };
+                /** @description Bad request - invalid status */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+                /** @description Authentication required - missing or invalid JWT token */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+                /** @description サーバーエラー */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/learning/items/{id}/retire": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 学習項目の手動アーカイブ
+         * @description 項目を手動でアーカイブします(「もう追わなくていい」)。retired_at をセットするのみで、以後の出題選定から外れます。冪等: アーカイブ済み項目への再実行は元の retired_at をそのまま返します(200)
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 学習項目ID */
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description アーカイブ後の項目(冪等) */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["internal_handler_http_learning.RetireResponse"];
+                    };
+                };
+                /** @description Bad request - invalid ID */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+                /** @description Authentication required - missing or invalid JWT token */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+                /** @description Not found - learning item not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/learning/reviews/pending": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 未採点の出題一覧取得
+         * @description 未採点の出題(review log)を古い出題日から順に返します。採点画面(§8.2)用に項目の concept/question/answer を含みます。空配列は正常系です(「今日は採点するものがありません」)— 件数バッジ・期日超過集計は設計で禁止されています(§2 Out)
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 未採点の出題一覧(古い順) */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["internal_handler_http_learning.PendingReviewDTO"][];
+                    };
+                };
+                /** @description Authentication required - missing or invalid JWT token */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+                /** @description サーバーエラー */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/learning/reviews/{id}/grade": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 採点(一発確定)
+         * @description 出題(review log)に自己採点 ○△×(good/fuzzy/forgot)を記録し、項目のステージ遷移(§6.1、due 起点は採点日 JST)を適用します。**採点は一発確定**: 採点済み(手動・48h 自動解決 result=auto とも)への再採点は 409 を返し、上書きはできません
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 出題ログID(pending の log_id) */
+                    id: number;
+                };
+                cookie?: never;
+            };
+            /** @description 採点結果 */
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["internal_handler_http_learning.GradeRequest"];
+                };
+            };
+            responses: {
+                /** @description 遷移後の項目状態 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["internal_handler_http_learning.GradeResponse"];
+                    };
+                };
+                /** @description Bad request - invalid ID or result */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+                /** @description Authentication required - missing or invalid JWT token */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+                /** @description Not found - review log not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+                /** @description Conflict - already graded (manual, auto-resolved or concurrent) */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/sources": {
         parameters: {
             query?: never;
@@ -1492,6 +1965,93 @@ export interface components {
         "internal_handler_http_auth.tokenResponse": {
             /** @example eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9... */
             token?: string;
+        };
+        "internal_handler_http_learning.BookDTO": {
+            /** @example 7 */
+            id?: number;
+            /** @example 12 */
+            review_cursor?: number;
+            /**
+             * @example active
+             * @enum {string}
+             */
+            review_status?: "idle" | "active" | "finished";
+            /** @example リーダブルコード */
+            title?: string;
+            /** @example 180 */
+            total_chunks?: number;
+        };
+        "internal_handler_http_learning.GradeRequest": {
+            /**
+             * @example good
+             * @enum {string}
+             */
+            result?: "good" | "fuzzy" | "forgot";
+        };
+        "internal_handler_http_learning.GradeResponse": {
+            /** @example 2026-07-14 */
+            due_on?: string;
+            /** @example 3 */
+            item_id?: number;
+            /** @example 12 */
+            log_id?: number;
+            /**
+             * @example good
+             * @enum {string}
+             */
+            result?: "good" | "fuzzy" | "forgot";
+            /** @example false */
+            retired?: boolean;
+            /** @example 1 */
+            stage?: number;
+        };
+        "internal_handler_http_learning.ItemDTO": {
+            answer?: string;
+            /** @example 42 */
+            article_id?: number;
+            /** @example 7 */
+            book_id?: number;
+            /** @example goroutine リーク検出 */
+            concept?: string;
+            created_at?: string;
+            /** @example 2026-07-14 */
+            due_on?: string;
+            /** @example 3 */
+            id?: number;
+            /**
+             * @example article
+             * @enum {string}
+             */
+            kind?: "article" | "book";
+            /** @example 2026-07-07 */
+            last_asked_on?: string;
+            /** @example good */
+            last_result?: string;
+            /** @example gemini */
+            provider?: string;
+            question?: string;
+            retired_at?: string;
+            /** @example 1 */
+            stage?: number;
+            /** @example 2 */
+            times_asked?: number;
+        };
+        "internal_handler_http_learning.PendingReviewDTO": {
+            answer?: string;
+            /** @example 2026-07-07 */
+            asked_on?: string;
+            /** @example goroutine リーク検出 */
+            concept?: string;
+            /** @example 3 */
+            item_id?: number;
+            /** @example 12 */
+            log_id?: number;
+            question?: string;
+        };
+        "internal_handler_http_learning.RetireResponse": {
+            /** @example 3 */
+            id?: number;
+            retired_at?: string;
         };
         "internal_handler_http_source.CreateRequest": {
             /** @example go */

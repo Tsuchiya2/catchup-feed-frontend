@@ -1986,7 +1986,7 @@ export interface components {
              * @example good
              * @enum {string}
              */
-            result?: "good" | "fuzzy" | "forgot";
+            result: "good" | "fuzzy" | "forgot";
         };
         "internal_handler_http_learning.GradeResponse": {
             /** @example 2026-07-14 */

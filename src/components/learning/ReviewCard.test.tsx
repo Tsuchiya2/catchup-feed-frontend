@@ -26,9 +26,7 @@ describe('ReviewCard', () => {
   it('does not show grade buttons before the answer is revealed', () => {
     render(<ReviewCard review={review} onGrade={vi.fn()} />);
 
-    expect(
-      screen.queryByTestId(`${LEARNING_TEST_IDS.GRADE_BUTTON}-good`)
-    ).not.toBeInTheDocument();
+    expect(screen.queryByTestId(`${LEARNING_TEST_IDS.GRADE_BUTTON}-good`)).not.toBeInTheDocument();
   });
 
   it('reveals the answer and grade buttons on tap', async () => {

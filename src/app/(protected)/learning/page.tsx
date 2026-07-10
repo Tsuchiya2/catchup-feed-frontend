@@ -57,10 +57,7 @@ export default function LearningPage() {
       )}
 
       {!isLoading && !error && (
-        <GradingDeck
-          reviews={reviews}
-          onGrade={(logId, result) => grade({ logId, result })}
-        />
+        <GradingDeck reviews={reviews} onGrade={(logId, result) => grade({ logId, result })} />
       )}
     </div>
   );

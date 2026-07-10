@@ -6,7 +6,14 @@ import { LEARNING_TEST_IDS } from '@/constants/learning';
 import type { PendingReview } from '@/types/api';
 
 const reviews: PendingReview[] = [
-  { log_id: 1, item_id: 10, asked_on: '2026-07-07', concept: 'First', question: 'q1', answer: 'a1' },
+  {
+    log_id: 1,
+    item_id: 10,
+    asked_on: '2026-07-07',
+    concept: 'First',
+    question: 'q1',
+    answer: 'a1',
+  },
   {
     log_id: 2,
     item_id: 11,

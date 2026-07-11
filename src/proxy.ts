@@ -41,6 +41,7 @@ const PROTECTED_ROUTES = [
   '/subscribers',
   '/access-logs',
   '/books',
+  '/learning',
 ];
 
 /**

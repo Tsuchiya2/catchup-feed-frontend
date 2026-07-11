@@ -54,10 +54,12 @@ describe('Books API Endpoints', () => {
       const file = new File(['%PDF-1.7'], 'golang-book.pdf', { type: 'application/pdf' });
       const result = await uploadBook({ file, title: '実用 Go 言語' });
 
+      // The 10-minute timeout is load-bearing: with the default 30s a
+      // 100MB upload over the tunnel would be aborted mid-flight.
       expect(apiClient.post).toHaveBeenCalledWith(
         '/books',
         expect.any(FormData),
-        expect.objectContaining({ retry: false })
+        expect.objectContaining({ retry: false, timeout: 600000 })
       );
       const call = vi.mocked(apiClient.post).mock.lastCall;
       if (!call) {
@@ -92,20 +94,27 @@ describe('Books API Endpoints', () => {
   });
 
   describe('deleteBook', () => {
-    it('calls DELETE /books/:filename with the filename URL-encoded', async () => {
+    it('calls DELETE /books/:filename URL-encoded, with retries disabled', async () => {
       vi.mocked(apiClient.delete).mockResolvedValue(undefined);
 
       await deleteBook('go 実践入門.pdf');
 
       expect(apiClient.delete).toHaveBeenCalledWith(
-        `/books/${encodeURIComponent('go 実践入門.pdf')}`
+        `/books/${encodeURIComponent('go 実践入門.pdf')}`,
+        expect.objectContaining({ retry: false })
       );
     });
 
-    it('propagates a 404 error', async () => {
+    it('treats a 404 as success (book already gone)', async () => {
       vi.mocked(apiClient.delete).mockRejectedValue(new ApiError('Not Found', 404));
 
-      await expect(deleteBook('missing.pdf')).rejects.toMatchObject({ status: 404 });
+      await expect(deleteBook('missing.pdf')).resolves.toBeUndefined();
+    });
+
+    it('propagates non-404 errors', async () => {
+      vi.mocked(apiClient.delete).mockRejectedValue(new ApiError('Server Error', 500));
+
+      await expect(deleteBook('golang-book.pdf')).rejects.toMatchObject({ status: 500 });
     });
   });
 });

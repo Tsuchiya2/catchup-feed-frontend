@@ -16,6 +16,7 @@
  */
 
 import { apiClient } from '@/lib/api/client';
+import { ApiError } from '@/lib/api/errors';
 import type { PdfBook, UploadBookInput } from '@/types/api';
 
 /**
@@ -62,11 +63,24 @@ export async function uploadBook(input: UploadBookInput): Promise<PdfBook> {
  * (with chunks and learning items), the PDF on the Pi, and any pending
  * ingest job. Only works for `deletable: true` entries.
  *
+ * Retries are disabled and a 404 resolves as success: if a first attempt
+ * times out client-side after the server already deleted the book, the
+ * follow-up hits 404 even though the desired state (book gone) is reached —
+ * surfacing that as a failure would only mislead. The caller invalidates
+ * the list either way.
+ *
  * @param filename - Canonical filename (e.g. "golang-book.pdf")
- * @throws {ApiError} When the request fails (400, 401, 404 nothing to delete)
+ * @throws {ApiError} When the request fails (400, 401)
  */
 export async function deleteBook(filename: string): Promise<void> {
-  await apiClient.delete(`/books/${encodeURIComponent(filename)}`);
+  try {
+    await apiClient.delete(`/books/${encodeURIComponent(filename)}`, { retry: false });
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) {
+      return; // Already gone — treat as success (idempotent delete).
+    }
+    throw error;
+  }
 }
 
 /**

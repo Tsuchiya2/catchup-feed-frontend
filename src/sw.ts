@@ -42,7 +42,10 @@ const SENSITIVE_API_SEGMENTS = ['/subscribers', '/tokens', '/access-logs', '/lea
  */
 function isSensitiveApiPath(pathname: string): boolean {
   return SENSITIVE_API_SEGMENTS.some(
-    (segment) => pathname === segment || pathname.startsWith(`${segment}/`) || pathname.startsWith(`/api${segment}`)
+    (segment) =>
+      pathname === segment ||
+      pathname.startsWith(`${segment}/`) ||
+      pathname.startsWith(`/api${segment}`)
   );
 }
 

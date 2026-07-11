@@ -160,13 +160,17 @@ describe('ArticleHeader', () => {
       const article = createMockArticle({ url: '' });
       render(<ArticleHeader article={article} />);
       // A dead "#" link is dropped: no safe external URL → no button at all.
-      expect(screen.queryByRole('link', { name: /Read Original Article/i })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('link', { name: /Read Original Article/i })
+      ).not.toBeInTheDocument();
     });
 
     it('should not render the link for javascript: scheme URLs (H-2)', () => {
       const article = createMockArticle({ url: 'javascript:alert(document.cookie)' });
       render(<ArticleHeader article={article} />);
-      expect(screen.queryByRole('link', { name: /Read Original Article/i })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('link', { name: /Read Original Article/i })
+      ).not.toBeInTheDocument();
     });
 
     it('should handle null published_at', () => {

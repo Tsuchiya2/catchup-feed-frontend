@@ -1,15 +1,16 @@
-# Catchup Feed Web
+# catchup-feed — 運用ダッシュボード (Frontend)
 
 <p align="center">
-  <strong>AIによる記事要約機能を備えたモダンなRSS/Atomフィードリーダー</strong>
+  <strong>毎朝10〜15分の音声ラジオ番組をポッドキャストアプリへ配信する、個人向け学習システム「catchup-feed」の運用ダッシュボード</strong>
 </p>
 
 <p align="center">
-  <a href="#機能">機能</a> •
+  <a href="#概要">概要</a> •
+  <a href="#主な画面機能">画面/機能</a> •
   <a href="#技術スタック">技術スタック</a> •
-  <a href="#アーキテクチャ">アーキテクチャ</a> •
-  <a href="#スクリーンショット">スクリーンショット</a> •
   <a href="#セットアップ">セットアップ</a> •
+  <a href="#api-型生成">API 型生成</a> •
+  <a href="#環境変数">環境変数</a> •
   <a href="#テスト">テスト</a>
 </p>
 
@@ -17,380 +18,217 @@
 
 ## 概要
 
-**Catchup Feed Frontend** は、[Catchup Feed Backend](https://github.com/Tsuchiya2/catchup-feed-backend) と連携する Next.js フロントエンドアプリケーションです。RSS/Atom フィードの自動収集と AI による記事要約機能を提供します。
+現行の **catchup-feed** は、初代 catchup-feed(ニュースアグリゲータ)の後継システムです。初代の反省 —「配信した記事数」を最適化しても要約は読まれない — を踏まえ、本システムが最適化する目標は **理解の定着** です。
 
-本プロジェクトは、クリーンなマイクロサービスアーキテクチャ、包括的なテスト、型安全な API 連携を通じて、モダンなフルスタック開発のベストプラクティスを実践しています。
+収集した記事の要約を素材に、毎朝10〜15分の **音声ラジオ番組** を生成し、ポッドキャストアプリへ配信します。可処分時間が細切れなユーザーが、移動中や家事の合間に耳で消化できることを狙いとしています。同じ番組を友人にも配信し、フィードバックを得ます。
 
-### 主な特徴
+本リポジトリはそのフロントエンド、すなわち **Next.js 製の PWA 運用ダッシュボード** です。番組の再生 UI ではなく、**運用管理 UI** に特化しています:
 
-- **マイクロサービスアーキテクチャ**: フロントエンドとバックエンドを分離し、独立したスケーリングとデプロイを実現
-- **型安全な開発**: OpenAPI 仕様から生成された API 型による End-to-End の TypeScript 活用
-- **モダンな React パターン**: Server Components、TanStack Query、カスタムフック
-- **本番環境対応**: 認証、エラーハンドリング、アクセシビリティ対応
+- **ソース管理** — クロール対象の RSS/Atom ソースの追加・有効/無効・カテゴリ/言語設定
+- **友人(購読者)/トークン管理** — ポッドキャスト購読トークンの発行・失効。購読 URL は発行時に一度だけ表示
+- **アクセスログ閲覧** — 誰がいつどのエピソードを取得したか。放置(一定期間アクセスなし)の検知
 
----
+音声番組の生成・配信そのものはバックエンド([catchup-feed-backend](https://github.com/Tsuchiya2/catchup-feed-backend))が担います。本フロントエンドは、そのバックエンドの管理エンドポイントを叩く画面です。
 
-## スクリーンショット
+### 設計原則
 
-### ソース管理
-![Sources](docs/images/screenshots/sources.webp)
-*RSS/Atomフィードの管理画面。Active/Inactiveステータスの切り替えが可能*
-
-### 記事一覧
-![Articles](docs/images/screenshots/articles-list.webp)
-*ソース・日付・キーワードによる検索・フィルタ機能*
-
-### 記事詳細（AI要約）
-![Article Detail](docs/images/screenshots/article-detail.webp)
-*AIによる日本語要約と元記事へのリンク*
+- **単一ユーザー右サイズ** — 単一管理者向け。過度な分散化・監視/分析基盤を持ち込まない。認証は JWT のみ(認証済み=管理者に単純化。role クレームは廃止済み)
+- **ゼロ円運用** — 新規の固定費を増やさない。Sentry など外部の可観測性 SaaS は削除済み(再導入しない)
+- **API 契約はバックエンドが正** — 手書きの API 型を作らず、バックエンドの Swagger から `npm run generate:api` で TypeScript 型を再生成する
 
 ---
 
-## 機能
+## 主な画面/機能
 
-### 認証・セキュリティ
-- セキュアなトークン管理による JWT ベースの認証
-- ミドルウェアレベルのアクセス制御による保護されたルート
-- 自動セッション管理とリダイレクトフロー
+ナビゲーション上の各画面(認証後):
 
-### コンテンツ管理
-- **ダッシュボード**: 統計概要と最新記事フィード
-- **記事一覧**: レスポンシブなカードレイアウトによるページネーション付きリスト
-- **記事詳細**: AI 生成要約付きの全文表示
-- **ソースカタログ**: 登録済み RSS/Atom フィードソースの閲覧
+| 画面 | パス | 内容 |
+|------|------|------|
+| **Dashboard** | `/dashboard` | 概況 |
+| **Sources** | `/sources` | クロール対象 RSS/Atom ソースの CRUD、有効/無効・カテゴリ/言語設定 |
+| **Friends** | `/subscribers`, `/subscribers/[id]` | 購読者(友人)の管理。無効化は論理削除(履歴を残したまま非アクティブ化) |
+| **Access Logs** | `/access-logs` | 購読者ごとのアクセス概況(放置検知)と、時系列アクセスログ。友人単位で絞り込み可 |
+| **Review** | `/learning` | 学習ループ関連(Phase 2、開発中) |
 
-### ユーザーエクスペリエンス
-- レスポンシブデザイン（モバイルファーストアプローチ）
-- スケルトンプレースホルダーによるローディング状態
-- リトライ機能付きエラーバウンダリ
-- 全シナリオに対応した空状態のハンドリング
+### トークン発行と一度きり表示
+
+友人詳細画面から購読トークンを発行すると、購読 URL(`https://<feed domain>/feeds/{token}/feed.xml` 形式)が **その場で一度だけ** 表示されます。バックエンドはトークンをハッシュ(SHA-256)で保存するため、平文の URL は二度と取得できません(設計上の決定 D-5)。ダイアログは Escape / 背景クリックで閉じられないようにガードし、「閉じると URL は失われ、再取得はできない(復旧は失効+再発行のみ)」ことを明示します。失効は取り消せない操作であることも UI 上で明示しています。
+
+### PWA / モバイル
+
+ユーザーの主要動線はスマホです。本アプリは [Serwist](https://serwist.pages.dev/) による PWA(Service Worker)対応で、モバイルファーストのレスポンシブ UI を維持します。
 
 ---
 
 ## 技術スタック
 
-| カテゴリ | 技術 | 目的 |
-|----------|------|------|
-| **フレームワーク** | [Next.js 16](https://nextjs.org/) (App Router) | サーバーサイドレンダリング・ルーティング |
-| **言語** | [TypeScript](https://www.typescriptlang.org/) (Strict) | 型安全性 |
-| **スタイリング** | [Tailwind CSS 4](https://tailwindcss.com/) | ユーティリティファーストなスタイリング |
-| **UIコンポーネント** | [shadcn/ui](https://ui.shadcn.com/) | アクセシブルでカスタマイズ可能なコンポーネント |
-| **データ取得** | [TanStack Query 5](https://tanstack.com/query) | サーバー状態管理・キャッシング |
-| **フォーム** | [React Hook Form](https://react-hook-form.com/) + [Zod](https://zod.dev/) | 型安全なバリデーション |
-| **テスト** | [Vitest](https://vitest.dev/) + [Testing Library](https://testing-library.com/) + [Playwright](https://playwright.dev/) | ユニット・統合・E2E テスト |
-| **API型** | [openapi-typescript](https://openapi-ts.pages.dev/) | OpenAPI 仕様からの自動生成 |
-| **PWA** | [Serwist](https://serwist.pages.dev/) | Service Worker・オフライン対応 |
-| **UIカタログ** | [Storybook](https://storybook.js.org/) | コンポーネント開発・ドキュメント |
-| **リンティング** | [ESLint](https://eslint.org/) + [Prettier](https://prettier.io/) | コード品質 |
+バージョンは `package.json` を正とします(抜粋)。
 
----
-
-## アーキテクチャ
-
-本プロジェクトは**マイクロサービスアーキテクチャ**を採用し、フロントエンドとバックエンドの関心を分離しています。
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                 フロントエンド（本リポジトリ）                  │
-│                   catchup-feed-frontend                      │
-│                        (Next.js)                             │
-│                                                              │
-│   • サーバーサイドレンダリング (SSR)                           │
-│   • JWT 認証                                                 │
-│   • 型安全な API クライアント                                  │
-│   • デプロイ: Vercel / Cloudflare Pages                      │
-└─────────────────────────────────────────────────────────────┘
-                            │
-                            │ REST API (OpenAPI)
-                            │ JWT Bearer Token
-                            ▼
-┌─────────────────────────────────────────────────────────────┐
-│                        バックエンド                           │
-│            github.com/Tsuchiya2/catchup-feed-backend         │
-│                        (Go API)                              │
-│                                                              │
-│   • 記事・ソース管理                                          │
-│   • AI 要約 (Claude / OpenAI)                                │
-│   • RSS/Atom フィードクローリング                              │
-│   • 通知システム (Discord, Slack)                             │
-└─────────────────────────────────────────────────────────────┘
-                            │
-                            ▼
-                   ┌─────────────────┐
-                   │   PostgreSQL    │
-                   └─────────────────┘
-```
-
-### API 連携
-
-以下の方法で型安全な API 通信を実現しています：
-
-1. **型の自動生成**: バックエンドの OpenAPI 仕様から API 型を自動生成
-2. **カスタム HTTP クライアント**: 自動トークン注入とエラーハンドリングを備えた統一クライアント
-3. **ドメイン別エンドポイント**: 認証・記事・ソース用に整理されたエンドポイント関数
+| カテゴリ | 技術 |
+|----------|------|
+| **フレームワーク** | [Next.js 16](https://nextjs.org/) (App Router) / [React 19](https://react.dev/) |
+| **言語** | [TypeScript 5](https://www.typescriptlang.org/) (Strict) |
+| **ランタイム** | Node.js 24 |
+| **スタイリング** | [Tailwind CSS 4](https://tailwindcss.com/) |
+| **UI コンポーネント** | [Radix UI](https://www.radix-ui.com/) primitives + shadcn/ui スタイル(cva / clsx / tailwind-merge) |
+| **アイコン** | [lucide-react](https://lucide.dev/) |
+| **データ取得** | [TanStack Query 5](https://tanstack.com/query) |
+| **フォーム** | [React Hook Form](https://react-hook-form.com/) + [Zod](https://zod.dev/) |
+| **認証** | JWT([jose](https://github.com/panva/jose)) |
+| **PWA** | [Serwist](https://serwist.pages.dev/) (Service Worker) |
+| **テーマ** | [next-themes](https://github.com/pacocoursey/next-themes)(ダークモード) |
+| **API 型生成** | [openapi-typescript](https://openapi-ts.pages.dev/) + [swagger2openapi](https://github.com/Mermade/oas-kit)(Swagger 2.0 → OpenAPI 3 変換) |
+| **テスト** | [Vitest 4](https://vitest.dev/) + [Testing Library](https://testing-library.com/) + [Playwright](https://playwright.dev/) |
+| **UI カタログ** | [Storybook 10](https://storybook.js.org/) |
+| **Lint / Format** | [ESLint 9](https://eslint.org/) (flat config) + [Prettier](https://prettier.io/) |
 
 ---
 
 ## セットアップ
 
-### 前提条件
+### 前提
 
-- Docker / Docker Compose
-- [Catchup Feed Backend](https://github.com/Tsuchiya2/catchup-feed-backend) が起動済みであること
-  - バックエンドの Docker ネットワーク `catchup-feed_backend` が必要
+- Node.js 24 系
+- バックエンド([catchup-feed-backend](https://github.com/Tsuchiya2/catchup-feed-backend))が起動していること(API 型生成・実データ表示に必要)
 
-### セットアップ
+### ローカル(Node で直接起動)
 
 ```bash
-# リポジトリをクローン
-git clone https://github.com/Tsuchiya2/catchup-feed-frontend.git
-cd catchup-feed-frontend
+git clone https://github.com/Tsuchiya2/catchup-feed-front.git
+cd catchup-feed-front
 
-# 環境変数ファイルを作成
+cp .env.example .env   # 環境変数を用意
+npm install
+npm run dev            # http://localhost:3000
+```
+
+### Docker Compose(任意)
+
+`compose.yml` を使う場合。バックエンドが作成する外部ネットワーク `catchup-feed_backend` が存在している必要があります。
+
+```bash
 cp .env.example .env
-```
-
-### 環境変数
-
-主要な環境変数（詳細は `.env.example` を参照）：
-
-```bash
-# .env
-NEXT_PUBLIC_API_URL=http://app:8080  # Docker ネットワーク経由のバックエンド API URL
-```
-
-### 開発サーバーの起動
-
-```bash
-# Docker Compose で開発環境を起動
 docker compose up -d
-
-# ログを確認
 docker compose logs -f web
 ```
 
-ブラウザで [http://localhost:3001](http://localhost:3001) を開いてください。
+コンテナはポート `3001` で公開されます(ホストの `3000` を Grafana 等と競合させないため、`3001:3000` にマッピング)。
 
-> **Note**: ポート 3001 を使用しています（Grafana との競合回避のため）
+### 主なスクリプト
 
-### その他のコマンド
+| コマンド | 内容 |
+|----------|------|
+| `npm run dev` | 開発サーバー起動 |
+| `npm run build` / `npm run start` | 本番ビルド / 本番起動 |
+| `npm run lint` | ESLint(`--max-warnings 0`。警告ゼロが完了条件) |
+| `npm run lint:fix` | ESLint 自動修正 |
+| `npm run format` / `npm run format:check` | Prettier 整形 / チェック |
+| `npm run generate:api` | Swagger から API 型を再生成 |
+| `npm run test` | Vitest(ユニット/統合) |
+| `npm run test:coverage` | カバレッジ付きテスト |
+| `npm run test:e2e` | Playwright(E2E) |
+| `npm run storybook` / `npm run build-storybook` | Storybook 起動 / ビルド |
+| `npm run analyze` | バンドル解析ビルド |
+
+---
+
+## API 型生成
+
+API の型は手書きしません。バックエンドの Swagger 定義を正とし、`scripts/generate-api.mjs` が Swagger 2.0 → OpenAPI 3 変換を挟んで TypeScript 型を生成します。
 
 ```bash
-# コンテナを停止
-docker compose down
+# バックエンドがローカル起動している場合(既定: http://localhost:8080/swagger/doc.json)
+npm run generate:api
 
-# コンテナを再ビルド（依存関係更新時など）
-docker compose up -d --build
+# 明示的に spec を指定する場合(URL でもファイルパスでも可)
+npm run generate:api -- http://localhost:8080/swagger/doc.json
 ```
+
+- 生成物: `src/types/generated/api.d.ts`(**手で編集しない**)
+- アプリ側で使う読みやすいエイリアスは `src/types/api.d.ts` に置き、生成ファイルから導出します
+
+---
+
+## 環境変数
+
+`.env.example` をコピーして `.env` を作成します。主なもの(全量は `.env.example` を参照):
+
+| 変数 | 既定 / 例 | 用途 |
+|------|-----------|------|
+| `NODE_ENV` | `development` | 実行環境 |
+| `NEXT_PUBLIC_API_URL` | `http://app:8080` | バックエンド API の URL |
+| `NEXT_PUBLIC_API_TIMEOUT` | `30000` | API タイムアウト(ms) |
+| `NEXT_PUBLIC_API_RETRY_ATTEMPTS` | `3` | API リトライ回数 |
+| `NEXT_PUBLIC_API_RETRY_DELAY` | `1000` | リトライ間隔(ms) |
+| `NEXT_PUBLIC_APP_NAME` / `NEXT_PUBLIC_APP_SHORT_NAME` | — | アプリ名(メタデータ / PWA マニフェスト) |
+| `NEXT_PUBLIC_APP_URL` | — | 公開 URL(メタデータ / OGP) |
+| `NEXT_PUBLIC_TOKEN_REFRESH_THRESHOLD` | `300` | トークン更新の閾値(秒) |
+| `NEXT_PUBLIC_TOKEN_GRACE_PERIOD` | `60` | 期限後の更新猶予(秒) |
+| `NEXT_PUBLIC_FEATURE_PWA` | `false` | PWA 機能フラグ |
+| `NEXT_PUBLIC_FEATURE_DARK_MODE` | `true` | ダークモード切り替え |
+| `NEXT_PUBLIC_LOG_LEVEL` / `NEXT_PUBLIC_LOG_FORMAT` | `debug` / `pretty` | ロギング |
 
 ---
 
 ## テスト
 
-本プロジェクトは Vitest と Testing Library を使用して包括的なテストカバレッジを維持しています。
-
 ```bash
-# 全テストを実行
-docker compose exec web npm test
-
-# カバレッジレポートを生成
-docker compose exec web npm run test:coverage
-
-# E2E テストを実行（Playwright）
-docker compose exec web npm run test:e2e
+npm run test            # Vitest(ユニット/統合)
+npm run test:coverage   # カバレッジ
+npm run test:e2e        # Playwright(E2E)
+npm run storybook       # Storybook でコンポーネントを確認
 ```
 
-### テストカバレッジ
-
-| 領域 | テスト種別 | 内容 |
-|------|------------|------|
-| コンポーネント | ユニット | UI コンポーネント、フォーム、カード |
-| フック | ユニット | カスタム React フック |
-| API クライアント | 統合 | HTTP クライアントとエラーハンドリング |
-| ユーティリティ | ユニット | 日付フォーマット、トークン管理 |
-| ユーザーフロー | E2E | ログイン、記事閲覧、検索 |
+各画面・コンポーネントには Vitest のテストと Storybook のストーリーを添えます。`npm run lint`(警告ゼロ)と `npm run test` の成功が変更の完了条件です。
 
 ---
 
-## プロジェクト構成
+## プロジェクト構成(抜粋)
 
 ```
 src/
-├── app/                        # Next.js App Router
-│   ├── (auth)/                 # 認証ルート（ログイン）
-│   ├── (legal)/                # 法的ページ（利用規約、プライバシー）
-│   ├── (protected)/            # 保護されたルート
-│   │   ├── articles/           # 記事ページ
-│   │   ├── dashboard/          # ダッシュボード
-│   │   └── sources/            # ソースページ
-│   └── api/                    # API ルート
+├── app/
+│   ├── (auth)/login/               # ログイン
+│   ├── (legal)/                    # 利用規約・プライバシー
+│   ├── (protected)/                # 認証必須ルート
+│   │   ├── dashboard/
+│   │   ├── sources/                # ソース管理
+│   │   ├── subscribers/            # 友人管理
+│   │   │   └── [id]/               # 友人詳細(トークン発行・失効)
+│   │   ├── access-logs/            # アクセスログ
+│   │   ├── articles/
+│   │   └── learning/               # 学習ループ(Phase 2)
+│   └── api/                        # ルートハンドラ(health など)
 ├── components/
-│   ├── ui/                     # shadcn/ui ベースコンポーネント
-│   ├── articles/               # 記事コンポーネント
-│   ├── auth/                   # 認証コンポーネント
-│   ├── common/                 # 共有コンポーネント
-│   ├── dashboard/              # ダッシュボードコンポーネント
-│   ├── errors/                 # エラー表示コンポーネント
-│   ├── layout/                 # レイアウトコンポーネント
-│   ├── search/                 # 検索関連コンポーネント
-│   └── sources/                # ソース関連コンポーネント
-├── config/                     # アプリケーション設定
-├── constants/                  # 定数定義
-├── hooks/                      # カスタム React フック
-├── lib/
-│   ├── api/                    # API クライアント・エンドポイント
-│   ├── auth/                   # 認証ユーティリティ
-│   ├── observability/          # 監視・ロギング
-│   └── security/               # セキュリティ関連
-├── providers/                  # コンテキストプロバイダー
-├── types/                      # TypeScript 型定義
-└── utils/                      # ユーティリティ関数
+│   ├── ui/                         # Radix ベースの UI 部品
+│   ├── subscribers/                # 友人・トークン系ダイアログ
+│   ├── access-logs/                # アクセスログ表示
+│   ├── sources/                    # ソース系
+│   └── ...
+├── hooks/                          # TanStack Query フック
+├── lib/                            # API クライアント・認証など
+├── types/
+│   ├── api.d.ts                    # アプリ用エイリアス
+│   └── generated/api.d.ts          # Swagger からの自動生成(編集禁止)
+└── ...
 ```
 
 ---
 
-## コード品質
+## デプロイ
 
-### 基準・プラクティス
-
-- **TypeScript Strict Mode**: 暗黙的 any を許容しない完全な型カバレッジ
-- **コンポーネントドキュメント**: パブリック API への JSDoc コメント
-- **アクセシビリティ**: WCAG 2.1 AA 準拠を目標
-- **エラーハンドリング**: 包括的なエラーバウンダリとユーザーフィードバック
-
-### リンティング・フォーマット
-
-```bash
-# コード品質をチェック
-docker compose exec web npm run lint
-
-# コードをフォーマット
-docker compose exec web npm run format
-```
-
-### コミット規約
-
-本プロジェクトは自動バージョニングと変更履歴生成のため [Conventional Commits](https://www.conventionalcommits.org/) を使用しています。
-
-| タイプ | 説明 | バージョン影響 |
-|--------|------|----------------|
-| `feat:` | 新機能 | マイナー (0.x.0) |
-| `fix:` | バグ修正 | パッチ (0.0.x) |
-| `docs:` | ドキュメントのみ | パッチ |
-| `style:` | コードスタイル（フォーマット） | リリースなし |
-| `refactor:` | コードリファクタリング | パッチ |
-| `perf:` | パフォーマンス改善 | パッチ |
-| `test:` | テスト追加 | リリースなし |
-| `chore:` | メンテナンスタスク | リリースなし |
-| `ci:` | CI/CD 変更 | リリースなし |
-
-**破壊的変更**: メジャーバージョンアップには、コミット本文に `BREAKING CHANGE:` を追加するか、タイプの後に `!` を付けます（例：`feat!:`）。
-
-**例**:
-```bash
-feat: add article bookmarking
-fix: resolve authentication redirect loop
-feat!: redesign API response format
-```
+現状は Vercel Edge で配信。今後、バックエンドが動作する Raspberry Pi 5 上のローカル配信(Tailscale / Cloudflare Tunnel 経由)へ移行予定です。`next build` がスタンドアロンで動く構成を維持します。
 
 ---
 
-## API エンドポイント
+## 関連
 
-| エンドポイント | メソッド | 認証 | 説明 |
-|----------------|----------|------|------|
-| `/auth/token` | POST | 不要 | JWT トークンの取得 |
-| `/articles` | GET | 必要 | 記事一覧（ページネーション） |
-| `/articles/{id}` | GET | 必要 | AI 要約付き記事詳細 |
-| `/sources` | GET | 必要 | フィードソース一覧 |
-| `/sources/{id}` | GET | 必要 | ソース詳細 |
-| `/health` | GET | 不要 | ヘルスチェック |
-
----
-
-## ロードマップ
-
-### 実装済み機能
-
-- [x] ダークモード切り替え（next-themes）
-- [x] PWA 対応（Serwist）
-- [x] トークンリフレッシュ機構
-- [x] Playwright による E2E テスト
-- [x] 記事・ソース検索機能
-
----
-
-## 本番環境
-
-### デモサイト
-
-本プロジェクトは実際に稼働しているサービスです。
-
-| 環境 | URL |
-|------|-----|
-| **フロントエンド** | [pulse.catchup-feed.com](https://pulse.catchup-feed.com) |
-| **バックエンド API** | [catchup.catchup-feed.com](https://catchup.catchup-feed.com) |
-
-### インフラ構成
-
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                         catchup-feed.com                                 │
-│                      (Cloudflare DNS Zone)                               │
-├─────────────────────────────────────────────────────────────────────────┤
-│                                                                          │
-│  ┌───────────────────────┐         ┌───────────────────────┐            │
-│  │pulse.catchup-feed.com │         │catchup.catchup-feed.com│            │
-│  │       (CNAME)         │         │       (CNAME)          │            │
-│  │          ↓            │         │          ↓             │            │
-│  │    Vercel Edge        │         │   Cloudflare Tunnel    │            │
-│  │    (Next.js SSR)      │         │          ↓             │            │
-│  │                       │         │    Raspberry Pi 5      │            │
-│  │ catchup-feed-frontend │←───────→│ catchup-feed-backend   │            │
-│  │      (Frontend)       │   API   │   (Go API + Claude)    │            │
-│  └───────────────────────┘         └───────────────────────┘            │
-│                                                                          │
-└─────────────────────────────────────────────────────────────────────────┘
-```
-
-### 技術的なポイント
-
-| 項目 | 内容 |
-|------|------|
-| **フロントエンド** | Vercel Edge Network によるグローバル CDN 配信 |
-| **バックエンド** | Cloudflare Tunnel による Raspberry Pi 5 のセキュアな公開 |
-| **CI/CD** | GitHub Actions + Vercel による自動デプロイ |
-| **SSL/TLS** | 自動証明書管理（Vercel / Cloudflare） |
-
-### サブドメイン命名について
-
-`pulse.catchup-feed.com` という名前は、「情報の鼓動（Pulse）」をコンセプトに選定しました。RSS フィードから収集される最新情報のリアルタイムな流れを表現しています。
-
----
-
-## 関連プロジェクト
-
-- **[Catchup Feed Backend](https://github.com/Tsuchiya2/catchup-feed-backend)** - フィード収集と AI 要約のための Go バックエンド API
-
----
-
-## ドキュメント
-
-| ドキュメント | 説明 |
-|--------------|------|
-| [開発ガイドライン](./docs/development-guidelines.md) | コーディング規約とベストプラクティス |
-| [レガシー文書](./docs/legacy/README.md) | 旧 catchup-feed 期のアーカイブ(参照非推奨) |
-
-設計・要件の正は親リポジトリの `docs/pulse-phase1-design.md` と `docs/decisions.md`。旧 catchup-feed 期の製品要件・機能設計・アーキテクチャ等の文書は [docs/legacy/](./docs/legacy/README.md) へアーカイブ済み。
-
----
-
-## ライセンス
-
-MIT License - 詳細は [LICENSE](./LICENSE) を参照してください。
+- **[catchup-feed-backend](https://github.com/Tsuchiya2/catchup-feed-backend)** — 音声番組の生成・フィード配信・トークン認証を担う Go バックエンド
+- 設計・要件の正は親リポジトリの `docs/pulse-phase1-design.md` / `docs/decisions.md`
+- 旧 catchup-feed 期の文書は [docs/legacy/](./docs/legacy/README.md) にアーカイブ済み(参照非推奨)
 
 ---
 
 <p align="center">
-  Next.js、TypeScript、Tailwind CSS で構築
+  Next.js・TypeScript・Tailwind CSS で構築 — 単一ユーザー右サイズ / ゼロ円運用
 </p>

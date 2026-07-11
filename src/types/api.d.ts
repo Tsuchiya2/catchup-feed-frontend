@@ -45,27 +45,14 @@ type Nullable<T, K extends keyof T> = Omit<Required<T>, K> & {
 export type LoginRequest = Full<Schemas['internal_handler_http_auth.loginRequest']>;
 
 /**
- * Login response with JWT token
- * Note: Backend returns only token, refresh_token is a frontend extension
+ * Login response with JWT token.
+ *
+ * After H-1 (D-22) authentication is carried by an HttpOnly cookie the backend
+ * sets at login; this body `token` is retained only because the login
+ * endpoint returns it, but the frontend never persists it.
  */
 export interface LoginResponse {
   token: string;
-  refresh_token?: string;
-}
-
-/**
- * Token refresh request payload (frontend-internal)
- */
-export interface RefreshTokenRequest {
-  refresh_token: string;
-}
-
-/**
- * Token refresh response (frontend-internal)
- */
-export interface RefreshTokenResponse {
-  token: string;
-  refresh_token: string;
 }
 
 /**

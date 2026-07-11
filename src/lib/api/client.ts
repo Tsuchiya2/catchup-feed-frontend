@@ -2,18 +2,16 @@
  * API Client
  *
  * Type-safe HTTP client for the Catchup Feed backend API.
- * Automatically injects JWT tokens and handles authentication errors.
- * Supports automatic token refresh before requests.
+ *
+ * Authentication is carried by an HttpOnly `catchup_feed_auth_token` cookie
+ * that the backend issues at login (D-22 / H-1). The cookie is invisible to
+ * JS, so this client never reads or attaches a JWT itself — it only sends
+ * `credentials: 'include'` so the browser attaches the cookie automatically
+ * (same-site cross-origin in prod, same-host in dev). CSRF is still carried
+ * explicitly via the X-CSRF-Token header (double-submit).
  */
 
-import {
-  getAuthToken,
-  clearAllTokens,
-  isTokenExpiringSoon,
-  getRefreshToken,
-} from '@/lib/auth/TokenManager';
 import { ApiError, NetworkError, TimeoutError } from '@/lib/api/errors';
-import { appConfig } from '@/config/app.config';
 import { logger } from '@/lib/logger';
 import {
   addCsrfTokenToHeaders,
@@ -64,84 +62,9 @@ const DEFAULT_RETRY_CONFIG: Required<RetryConfig> = {
 class ApiClient {
   private readonly baseUrl: string;
   private readonly defaultTimeout: number = 30000; // 30 seconds
-  private refreshPromise: Promise<void> | null = null;
 
   constructor() {
     this.baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
-  }
-
-  /**
-   * Ensure token is valid before making a request
-   * Automatically refreshes token if expiring soon
-   *
-   * @param requiresAuth - Whether the request requires authentication
-   */
-  private async ensureValidToken(requiresAuth: boolean): Promise<void> {
-    // Skip if authentication is not required
-    if (!requiresAuth) {
-      return;
-    }
-
-    // Skip if token refresh feature is disabled
-    if (!appConfig.features.tokenRefresh) {
-      return;
-    }
-
-    // Check if token exists and is expiring soon
-    const token = getAuthToken();
-    if (!token) {
-      // No token, cannot refresh
-      return;
-    }
-
-    if (!isTokenExpiringSoon()) {
-      // Token is still valid
-      return;
-    }
-
-    // Check if refresh token exists
-    const refreshToken = getRefreshToken();
-    if (!refreshToken) {
-      logger.warn('Token is expiring but no refresh token available');
-      return;
-    }
-
-    // Prevent concurrent refresh requests
-    if (this.refreshPromise) {
-      logger.debug('Token refresh already in progress, waiting...');
-      await this.refreshPromise;
-      return;
-    }
-
-    // Start token refresh
-    logger.info('Token is expiring soon, refreshing...');
-
-    this.refreshPromise = this.performTokenRefresh();
-
-    try {
-      await this.refreshPromise;
-    } finally {
-      this.refreshPromise = null;
-    }
-  }
-
-  /**
-   * Perform token refresh
-   * This is separated to avoid circular dependency with auth endpoints
-   */
-  private async performTokenRefresh(): Promise<void> {
-    try {
-      // Dynamic import to avoid circular dependency
-      const { refreshToken } = await import('@/lib/api/endpoints/auth');
-      await refreshToken();
-      logger.info('Token refreshed successfully');
-    } catch (error) {
-      logger.error('Token refresh failed', error as Error);
-      // Clear tokens on refresh failure
-      clearAllTokens();
-      // Don't throw error here, let the request proceed and fail with 401
-      // which will trigger the redirect to login
-    }
   }
 
   /**
@@ -341,16 +264,7 @@ class ApiClient {
     endpoint: string,
     options: Omit<RequestOptions, 'retry'>
   ): Promise<T> {
-    const {
-      method = 'GET',
-      body,
-      headers = {},
-      requiresAuth = true,
-      timeout = this.defaultTimeout,
-    } = options;
-
-    // Ensure token is valid before making request
-    await this.ensureValidToken(requiresAuth);
+    const { method = 'GET', body, headers = {}, timeout = this.defaultTimeout } = options;
 
     // Construct full URL
     const url = `${this.baseUrl}${endpoint}`;
@@ -361,23 +275,23 @@ class ApiClient {
       ...headers,
     };
 
-    // Add Authorization header if authentication is required
-    if (requiresAuth) {
-      const token = getAuthToken();
-      if (token) {
-        requestHeaders['Authorization'] = `Bearer ${token}`;
-      }
-    }
+    // Authentication travels via the HttpOnly cookie sent by the browser
+    // (credentials: 'include' below). We never attach a JWT header — the
+    // token is not JS-readable by design (H-1).
 
     // Add CSRF token to headers for state-changing requests
     if (method === 'POST' || method === 'PUT' || method === 'PATCH' || method === 'DELETE') {
       requestHeaders = addCsrfTokenToHeaders(requestHeaders);
     }
 
-    // Prepare request init
+    // Prepare request init.
+    // `credentials: 'include'` makes the browser attach the HttpOnly auth
+    // cookie (and CSRF cookie) on cross-origin (same-site) requests to the
+    // backend, which is how authentication is carried after H-1.
     const init: RequestInit = {
       method,
       headers: requestHeaders,
+      credentials: 'include',
     };
 
     // Add body for non-GET requests
@@ -401,9 +315,13 @@ class ApiClient {
       // Extract and store CSRF token from response (if present)
       setCsrfTokenFromResponse(response);
 
-      // Handle authentication errors
+      // Handle authentication errors.
+      // The JWT lives in an HttpOnly cookie that JS cannot clear; the backend
+      // treats an expired/absent cookie as unauthenticated. We just clear the
+      // client-side CSRF token and bounce to /login (the proxy will also gate
+      // protected routes on the missing cookie).
       if (response.status === 401) {
-        clearAllTokens();
+        clearCsrfToken();
 
         // Redirect to login page on client-side
         if (typeof window !== 'undefined') {

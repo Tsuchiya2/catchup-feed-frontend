@@ -521,6 +521,47 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/auth/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * ログアウト(cookie 失効)
+         * @description HttpOnly の認証 cookie(catchup_feed_auth_token)を Max-Age=0 で失効させます。
+         *     HttpOnly cookie は JS から削除できないため backend で失効させます(D-22)。
+         *     認証不要・冪等。
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description ログアウト成功(cookie 失効) */
+                204: {
+                    headers: {
+                        /** @description catchup_feed_auth_token=; Max-Age=0; HttpOnly; Secure; SameSite=Strict; Path=/ */
+                        "Set-Cookie"?: string;
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/auth/token": {
         parameters: {
             query?: never;
@@ -532,7 +573,10 @@ export interface paths {
         put?: never;
         /**
          * JWT トークン取得
-         * @description 管理者のユーザー名とパスワードで認証し、JWT トークンを発行します
+         * @description 管理者のユーザー名とパスワードで認証し、JWT トークンを発行します。
+         *     JSON body の token(dev の Bearer フォールバック用に後方互換で維持)に加え、
+         *     同じ JWT を HttpOnly / Secure / SameSite=Strict の cookie
+         *     (catchup_feed_auth_token)で Set-Cookie します(D-22)。
          */
         post: {
             parameters: {
@@ -548,9 +592,11 @@ export interface paths {
                 };
             };
             responses: {
-                /** @description JWT トークン */
+                /** @description JWT トークン(併せて Set-Cookie: catchup_feed_auth_token を返す) */
                 200: {
                     headers: {
+                        /** @description catchup_feed_auth_token=<jwt>; HttpOnly; Secure; SameSite=Strict; Path=/ */
+                        "Set-Cookie"?: string;
                         [name: string]: unknown;
                     };
                     content: {

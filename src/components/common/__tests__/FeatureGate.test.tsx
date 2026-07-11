@@ -167,11 +167,11 @@ describe('FeatureGate', () => {
     });
 
     it('should render null fallback explicitly', () => {
-      appConfig.features.tokenRefresh = false;
+      appConfig.features.aiSummary = false;
 
       const { container } = render(
-        <FeatureGate feature="tokenRefresh" fallback={null}>
-          <div>Token Refresh Content</div>
+        <FeatureGate feature="aiSummary" fallback={null}>
+          <div>AI Summary Content</div>
         </FeatureGate>
       );
 
@@ -214,18 +214,6 @@ describe('FeatureGate', () => {
       );
 
       expect(screen.getByText('AI Summary Card')).toBeInTheDocument();
-    });
-
-    it('should handle tokenRefresh feature', () => {
-      appConfig.features.tokenRefresh = true;
-
-      render(
-        <FeatureGate feature="tokenRefresh">
-          <div>Token Refresh Logic</div>
-        </FeatureGate>
-      );
-
-      expect(screen.getByText('Token Refresh Logic')).toBeInTheDocument();
     });
   });
 

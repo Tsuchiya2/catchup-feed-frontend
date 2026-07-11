@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.9.1](https://github.com/Tsuchiya2/catchup-feed-frontend/compare/catchup-feed-frontend-v1.9.0...catchup-feed-frontend-v1.9.1) (2026-07-11)
+
+
+### Bug Fixes
+
+* **security:** validate external hrefs, harden CSP, exclude sensitive APIs from SW cache ([2333b4d](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/2333b4d446a2b81d766a945d6f2c7197fc7751d2))
+
+
+### Miscellaneous
+
+* **auth:** remove dead JWT-storage config and refresh types (H-1 P2 cleanup) ([965720e](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/965720e17f16175a47990d51e3204c633626c4eb))
+
 ## [1.9.0](https://github.com/Tsuchiya2/catchup-feed-frontend/compare/catchup-feed-frontend-v1.8.2...catchup-feed-frontend-v1.9.0) (2026-07-10)
 
 

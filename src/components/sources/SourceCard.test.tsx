@@ -179,6 +179,16 @@ describe('SourceCard', () => {
       expect(link).toHaveAttribute('href', 'https://example.com/feed.xml');
     });
 
+    it('should render unsafe-scheme feed URL as plain text, not a link (H-2)', () => {
+      const source = createMockSource({ feed_url: 'javascript:alert(document.cookie)' });
+      render(<SourceCard source={source} />);
+
+      // No anchor is rendered for a javascript: scheme.
+      expect(screen.queryByRole('link', { name: /visit feed:/i })).not.toBeInTheDocument();
+      // The raw value is still shown (as text) so the admin can see/fix it.
+      expect(screen.getByText('javascript:alert(document.cookie)')).toBeInTheDocument();
+    });
+
     it('should open link in new tab', () => {
       const source = createMockSource({ feed_url: 'https://example.com/feed.xml' });
       render(<SourceCard source={source} />);

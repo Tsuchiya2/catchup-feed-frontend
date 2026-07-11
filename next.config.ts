@@ -20,6 +20,10 @@ const nextConfig: NextConfig = {
     // Get API URL from environment variable or use default
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
+    // 'unsafe-eval' is only required by the Next.js dev tooling (HMR/overlay);
+    // strip it from production CSP to reduce the XSS surface.
+    const isProduction = process.env.NODE_ENV === 'production';
+
     return [
       {
         source: '/:path*',
@@ -54,13 +58,27 @@ const nextConfig: NextConfig = {
           },
           {
             key: 'Content-Security-Policy',
+            // Single source of truth for CSP (M-1). The previously unused
+            // src/config/security.config.ts duplicate was removed to avoid drift.
+            //
+            // - 'unsafe-inline' stays: Next.js injects an inline bootstrap script;
+            //   nonce plumbing is overkill for a single-user dashboard.
+            // - 'unsafe-eval' is only needed by the Next.js dev overlay / HMR, so
+            //   it is dropped from production builds to shrink the XSS surface.
+            // - object-src/base-uri/form-action lock down plugin, <base>, and form
+            //   hijacking vectors that default-src does not cover.
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
+              isProduction
+                ? "script-src 'self' 'unsafe-inline'"
+                : "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: https:",
               "font-src 'self' data:",
               `connect-src 'self' ${apiUrl}`,
+              "object-src 'none'",
+              "base-uri 'self'",
+              "form-action 'self'",
               "frame-ancestors 'self'",
             ].join('; '),
           },

@@ -21,6 +21,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { formatRelativeTime } from '@/lib/utils/formatDate';
+import { safeExternalHref } from '@/lib/utils/safeExternalHref';
 import type { Source, SourceKind } from '@/types/api';
 import { StatusBadge } from './StatusBadge';
 import { ActiveToggle } from './ActiveToggle';
@@ -77,6 +78,10 @@ export const SourceCard = React.memo(function SourceCard({
   const createdAt = source.created_at ? formatRelativeTime(source.created_at) : 'Unknown';
   const kindMeta = KIND_META[source.kind ?? 'rss'];
   const KindIcon = kindMeta.Icon;
+
+  // feed_url is externally sourced; only render a clickable link for safe
+  // (http/https) schemes to neutralize javascript:/data: XSS (H-2).
+  const safeFeedHref = safeExternalHref(source.feed_url);
 
   /**
    * Handle toggle callback
@@ -155,16 +160,23 @@ export const SourceCard = React.memo(function SourceCard({
 
         {/* Feed URL */}
         <div className="min-w-0">
-          <a
-            href={source.feed_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block truncate text-xs text-muted-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-            title={source.feed_url}
-            aria-label={`Visit feed: ${source.feed_url}`}
-          >
-            {source.feed_url}
-          </a>
+          {safeFeedHref ? (
+            <a
+              href={safeFeedHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block truncate text-xs text-muted-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              title={source.feed_url}
+              aria-label={`Visit feed: ${source.feed_url}`}
+            >
+              {source.feed_url}
+            </a>
+          ) : (
+            // Unsafe / unparseable scheme: show the raw value without a link.
+            <span className="block truncate text-xs text-muted-foreground" title={source.feed_url}>
+              {source.feed_url}
+            </span>
+          )}
         </div>
 
         {/* Status and Last Crawled */}

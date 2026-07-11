@@ -2,7 +2,7 @@
  * Configuration Module Exports
  *
  * Centralized configuration for the entire application.
- * Import configurations using: import { appConfig, loggingConfig, securityConfig } from '@/config'
+ * Import configurations using: import { appConfig, loggingConfig } from '@/config'
  *
  * @module config
  */
@@ -30,14 +30,9 @@ export {
   type LoggingConfig,
 } from './logging.config';
 
-// Security Configuration
-export {
-  securityConfig,
-  getSecurityHeaders,
-  type SecurityConfig,
-  type SecurityHeader,
-  type CSPDirectives,
-} from './security.config';
+// Security Configuration is defined directly in next.config.ts (see the
+// Content-Security-Policy header). The former security.config.ts duplicate was
+// unused and removed to keep a single source of truth (M-1).
 
 // Source Configuration
 export { SOURCE_CONFIG, type SourceConfig } from './sourceConfig';

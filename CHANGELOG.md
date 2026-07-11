@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.10.0](https://github.com/Tsuchiya2/catchup-feed-frontend/compare/catchup-feed-frontend-v1.9.3...catchup-feed-frontend-v1.10.0) (2026-07-11)
+
+
+### Features
+
+* 書籍 PDF 管理ページ(一覧・アップロード・削除、D-25) ([8b9d20e](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/8b9d20e56b5cdff73891cd66e3fe28cd949b689d))
+* 書籍 PDF 管理ページ(一覧・アップロード・削除、D-25) ([97e72eb](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/97e72eb0a57007963981a7ace21b209bc54e2036))
+
+
+### Bug Fixes
+
+* CI の型チェックと format チェックを修正 ([73c068a](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/73c068ab90d41617456e91a6f9469b8717f5101f))
+* レビュー指摘対応(SW キャッシュ除外・削除の冪等化ほか) ([49db7a8](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/49db7a8d8ab2fd648c64934350d7d54045fb55fe))
+* 削除実行中は DeleteBookDialog を閉じられないようにガード ([bb6d37c](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/bb6d37ce425bf24691feca36840552ae4f0dbfd6))
+
 ## [1.9.3](https://github.com/Tsuchiya2/catchup-feed-frontend/compare/catchup-feed-frontend-v1.9.2...catchup-feed-frontend-v1.9.3) (2026-07-11)
 
 

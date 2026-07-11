@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.9.3](https://github.com/Tsuchiya2/catchup-feed-frontend/compare/catchup-feed-frontend-v1.9.2...catchup-feed-frontend-v1.9.3) (2026-07-11)
+
+
+### Documentation
+
+* README の製品名表記を pulse から catchup-feed へ統一 ([f9dd8ca](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/f9dd8ca7f45c14b7d8b67545cc2c5bfe618c4984))
+* README を pulse の実態に刷新 ([4a43d66](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/4a43d6654ec230186b40e3c3cbc3ff681f00a05c))
+* README を pulse の実態に刷新 ([3312923](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/331292365b2f2364883f7496374c432f6ed81c9a))
+
 ## [1.9.2](https://github.com/Tsuchiya2/catchup-feed-frontend/compare/catchup-feed-frontend-v1.9.1...catchup-feed-frontend-v1.9.2) (2026-07-11)
 
 

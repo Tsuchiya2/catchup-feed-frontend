@@ -264,12 +264,7 @@ class ApiClient {
     endpoint: string,
     options: Omit<RequestOptions, 'retry'>
   ): Promise<T> {
-    const {
-      method = 'GET',
-      body,
-      headers = {},
-      timeout = this.defaultTimeout,
-    } = options;
+    const { method = 'GET', body, headers = {}, timeout = this.defaultTimeout } = options;
 
     // Construct full URL
     const url = `${this.baseUrl}${endpoint}`;

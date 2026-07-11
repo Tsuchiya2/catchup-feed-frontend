@@ -50,6 +50,9 @@ export function DeleteBookDialog({ book, isOpen, onClose, onSuccess }: DeleteBoo
   };
 
   const handleClose = () => {
+    if (isPending) {
+      return; // Don't let Escape / overlay click swallow an in-flight delete.
+    }
     reset();
     onClose();
   };

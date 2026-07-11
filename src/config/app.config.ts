@@ -36,20 +36,6 @@ export interface ApiConfig {
 }
 
 /**
- * Authentication Configuration
- */
-export interface AuthConfig {
-  /** Token refresh threshold in seconds (refresh token when less than this time remains) */
-  tokenRefreshThreshold: number;
-  /** localStorage key for access token */
-  accessTokenKey: string;
-  /** localStorage key for refresh token */
-  refreshTokenKey: string;
-  /** Grace period in seconds after token expiry to attempt refresh */
-  gracePeriod: number;
-}
-
-/**
  * Feature Flags
  */
 export interface FeatureFlags {
@@ -59,8 +45,6 @@ export interface FeatureFlags {
   darkMode: boolean;
   /** Enable AI summary feature */
   aiSummary: boolean;
-  /** Enable automatic token refresh */
-  tokenRefresh: boolean;
 }
 
 /**
@@ -83,7 +67,6 @@ export interface EnvironmentConfig {
 export interface AppConfig {
   app: AppIdentity;
   api: ApiConfig;
-  auth: AuthConfig;
   features: FeatureFlags;
   env: EnvironmentConfig;
 }
@@ -155,18 +138,10 @@ export const appConfig: AppConfig = {
     retryDelay: getEnvNumber('NEXT_PUBLIC_API_RETRY_DELAY', 1000),
   },
 
-  auth: {
-    tokenRefreshThreshold: getEnvNumber('NEXT_PUBLIC_TOKEN_REFRESH_THRESHOLD', 300), // 5 minutes
-    accessTokenKey: 'catchup_feed_auth_token',
-    refreshTokenKey: 'catchup_feed_refresh_token',
-    gracePeriod: getEnvNumber('NEXT_PUBLIC_TOKEN_GRACE_PERIOD', 60), // 60 seconds
-  },
-
   features: {
     pwa: getEnvBool('NEXT_PUBLIC_FEATURE_PWA', false),
     darkMode: getEnvBool('NEXT_PUBLIC_FEATURE_DARK_MODE', true),
     aiSummary: getEnvBool('NEXT_PUBLIC_FEATURE_AI_SUMMARY', false),
-    tokenRefresh: getEnvBool('NEXT_PUBLIC_FEATURE_TOKEN_REFRESH', true),
   },
 
   env: {

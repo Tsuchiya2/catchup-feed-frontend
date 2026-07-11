@@ -59,14 +59,6 @@ describe('Feature Flags', () => {
       expect(isFeatureEnabled('aiSummary')).toBe(false);
     });
 
-    it('should check tokenRefresh feature flag', () => {
-      appConfig.features.tokenRefresh = true;
-      expect(isFeatureEnabled('tokenRefresh')).toBe(true);
-
-      appConfig.features.tokenRefresh = false;
-      expect(isFeatureEnabled('tokenRefresh')).toBe(false);
-    });
-
     it('should reflect changes to feature flags', () => {
       appConfig.features.pwa = false;
       expect(isFeatureEnabled('pwa')).toBe(false);
@@ -83,21 +75,18 @@ describe('Feature Flags', () => {
       expect(flags).toHaveProperty('pwa');
       expect(flags).toHaveProperty('darkMode');
       expect(flags).toHaveProperty('aiSummary');
-      expect(flags).toHaveProperty('tokenRefresh');
     });
 
     it('should return current feature flag values', () => {
       appConfig.features.pwa = true;
       appConfig.features.darkMode = false;
       appConfig.features.aiSummary = true;
-      appConfig.features.tokenRefresh = false;
 
       const flags = getFeatureFlags();
 
       expect(flags.pwa).toBe(true);
       expect(flags.darkMode).toBe(false);
       expect(flags.aiSummary).toBe(true);
-      expect(flags.tokenRefresh).toBe(false);
     });
 
     it('should return object with boolean values', () => {
@@ -106,7 +95,6 @@ describe('Feature Flags', () => {
       expect(typeof flags.pwa).toBe('boolean');
       expect(typeof flags.darkMode).toBe('boolean');
       expect(typeof flags.aiSummary).toBe('boolean');
-      expect(typeof flags.tokenRefresh).toBe('boolean');
     });
 
     it('should reflect changes to feature flags', () => {
@@ -127,7 +115,7 @@ describe('Feature Flags', () => {
 
   describe('feature names type safety', () => {
     it('should accept valid feature names', () => {
-      const validFeatures: FeatureName[] = ['pwa', 'darkMode', 'aiSummary', 'tokenRefresh'];
+      const validFeatures: FeatureName[] = ['pwa', 'darkMode', 'aiSummary'];
 
       validFeatures.forEach((feature) => {
         // Should not throw type error
@@ -157,40 +145,34 @@ describe('Feature Flags', () => {
       appConfig.features.pwa = false;
       appConfig.features.darkMode = false;
       appConfig.features.aiSummary = false;
-      appConfig.features.tokenRefresh = false;
 
       const flags = getFeatureFlags();
 
       expect(flags.pwa).toBe(false);
       expect(flags.darkMode).toBe(false);
       expect(flags.aiSummary).toBe(false);
-      expect(flags.tokenRefresh).toBe(false);
     });
 
     it('should handle all features enabled', () => {
       appConfig.features.pwa = true;
       appConfig.features.darkMode = true;
       appConfig.features.aiSummary = true;
-      appConfig.features.tokenRefresh = true;
 
       const flags = getFeatureFlags();
 
       expect(flags.pwa).toBe(true);
       expect(flags.darkMode).toBe(true);
       expect(flags.aiSummary).toBe(true);
-      expect(flags.tokenRefresh).toBe(true);
     });
 
     it('should handle mixed feature states', () => {
       appConfig.features.pwa = true;
       appConfig.features.darkMode = false;
       appConfig.features.aiSummary = true;
-      appConfig.features.tokenRefresh = false;
 
       expect(isFeatureEnabled('pwa')).toBe(true);
       expect(isFeatureEnabled('darkMode')).toBe(false);
       expect(isFeatureEnabled('aiSummary')).toBe(true);
-      expect(isFeatureEnabled('tokenRefresh')).toBe(false);
     });
   });
 });

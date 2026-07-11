@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.9.0](https://github.com/Tsuchiya2/catchup-feed-frontend/compare/catchup-feed-frontend-v1.8.2...catchup-feed-frontend-v1.9.0) (2026-07-10)
+
+
+### Features
+
+* **learning:** add Phase 3 grading, tracker, and book management screens ([4bc184b](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/4bc184b1c6f70025a13e1a62bb74b94a4f0a6913))
+
+
+### Miscellaneous
+
+* **learning:** regenerate API types from finalized Phase 3 swagger ([507d9e3](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/507d9e3ba4c5f54c859171cbef04124b001c6389))
+
 ## [1.8.2](https://github.com/Tsuchiya2/catchup-feed-frontend/compare/catchup-feed-frontend-v1.8.1...catchup-feed-frontend-v1.8.2) (2026-07-06)
 
 

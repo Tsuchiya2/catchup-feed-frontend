@@ -269,9 +269,13 @@ class ApiClient {
     // Construct full URL
     const url = `${this.baseUrl}${endpoint}`;
 
+    // FormData bodies (file uploads) must NOT get a manual Content-Type:
+    // the browser sets `multipart/form-data` with the boundary itself.
+    const isFormData = typeof FormData !== 'undefined' && body instanceof FormData;
+
     // Prepare headers
     let requestHeaders: Record<string, string> = {
-      'Content-Type': 'application/json',
+      ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
       ...headers,
     };
 
@@ -294,9 +298,9 @@ class ApiClient {
       credentials: 'include',
     };
 
-    // Add body for non-GET requests
+    // Add body for non-GET requests (FormData is passed through untouched)
     if (body && method !== 'GET') {
-      init.body = JSON.stringify(body);
+      init.body = isFormData ? (body as FormData) : JSON.stringify(body);
     }
 
     // Create abort controller for timeout

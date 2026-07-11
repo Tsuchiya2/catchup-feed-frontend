@@ -647,6 +647,210 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/books": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 書籍一覧取得
+         * @description アップロード済み PDF(ディスク)・ingest 済み書籍(books)・book_ingest ジョブを突き合わせた一覧を返します。status は jobs の状態から導出されます(pending=取り込み待ち / processing=Mac worker が処理中 / done=完了 / failed=失敗)。CLI で ingest した書籍(PDF が Pi に無いもの)は size_bytes / uploaded_at が null になります
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 書籍一覧 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["internal_handler_http_book.DTO"][];
+                    };
+                };
+                /** @description Authentication required */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+                /** @description サーバーエラー */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        /**
+         * 書籍 PDF アップロード
+         * @description PDF を BOOKS_DIR に保存し、kind='book_ingest' のジョブを投入します(取り込みは Mac の worker が夜間に実行、C-4)。検証: 拡張子 .pdf + マジックバイト %PDF、上限 100MB(D-25)。同名ファイルの再アップロードは置き換え+ジョブ再投入です(冪等。既存の pending ジョブがあれば重複投入せず、そのジョブの payload タイトルを新しいタイトルに更新します)
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "multipart/form-data": {
+                        /**
+                         * Format: binary
+                         * @description PDF ファイル
+                         */
+                        file: string;
+                        /** @description タイトル(省略時はファイル名から) */
+                        title?: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description 受理された書籍(status=pending) */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["internal_handler_http_book.DTO"];
+                    };
+                };
+                /** @description Bad request - PDF ではない、ファイル名不正、file フィールド欠落 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+                /** @description Authentication required */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+                /** @description Payload too large - 100MB 超過 */
+                413: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+                /** @description サーバーエラー */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/books/{filename}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * 書籍削除
+         * @description 正準ファイル名をキーに書籍を削除します: books 行(book_chunks・学習項目も含めて削除)+ PDF ファイル + 未処理(pending)の book_ingest ジョブ取消。ingest 前(books 行なし)でもファイルとジョブの削除で成功します。対象は Pi にアップロードされた書籍(GET /books の deletable=true)のみで、CLI 取り込み書籍(deletable=false、file_path が Mac パス)はこの API では削除できません(pulse-books CLI 側で管理)
+         */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description 正準ファイル名(例: golang-book.pdf) */
+                    filename: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Bad request - ファイル名不正 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "*/*": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+                /** @description Authentication required */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "*/*": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+                /** @description Not found - ファイルも books 行も pending ジョブも存在しない */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "*/*": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+                /** @description サーバーエラー */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "*/*": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/learning/books": {
         parameters: {
             query?: never;
@@ -2011,6 +2215,54 @@ export interface components {
         "internal_handler_http_auth.tokenResponse": {
             /** @example eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9... */
             token?: string;
+        };
+        "internal_handler_http_book.DTO": {
+            /**
+             * @description BookID is books.id once ingested.
+             * @example 3
+             */
+            book_id?: number;
+            /**
+             * @description ChunkCount is the number of book_chunks once ingested.
+             * @example 412
+             */
+            chunk_count?: number;
+            /**
+             * @description Deletable reports whether DELETE /books/{filename} can reach this
+             *     entry: true for Pi uploads, false for CLI-ingested books (those stay
+             *     managed by the pulse-books CLI).
+             * @example true
+             */
+            deletable?: boolean;
+            /**
+             * @description FilePath is the canonical identity (books.file_path / job payload):
+             *     unique across all entries. Pi uploads live under BOOKS_DIR; CLI
+             *     ingests carry the Mac-resolved source path.
+             * @example /data/books/golang-book.pdf
+             */
+            file_path?: string;
+            /**
+             * @description Filename is the canonical name: the DELETE key (unique only among
+             *     deletable entries — a CLI book may share a basename).
+             * @example golang-book.pdf
+             */
+            filename?: string;
+            /**
+             * @description SizeBytes of the PDF on disk.
+             * @example 1048576
+             */
+            size_bytes?: number;
+            /**
+             * @description Status is the ingest status derived from jobs:
+             *     pending | processing | done | failed.
+             * @example pending
+             * @enum {string}
+             */
+            status?: "pending" | "processing" | "done" | "failed";
+            /** @example 実用 Go 言語 */
+            title?: string;
+            /** @description UploadedAt is the file modification time on disk. */
+            uploaded_at?: string;
         };
         "internal_handler_http_learning.BookDTO": {
             /** @example 7 */

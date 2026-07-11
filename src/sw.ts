@@ -27,12 +27,13 @@ const API_CACHE_NAME = 'api-cache';
 /**
  * Path segments for authenticated, privacy-sensitive management endpoints
  * (M-3). Responses from these must never be written to the Service Worker
- * cache: they contain friend PII, feed tokens, and access logs. They are
- * matched anywhere in the pathname because the backend serves them without an
- * `/api/` prefix (e.g. `/subscribers`, `/tokens/:id`), and may also be reached
- * through an `/api/`-prefixed proxy.
+ * cache: they contain friend PII, feed tokens, access logs, learning data,
+ * and the private book library (C-22). They are matched anywhere in the
+ * pathname because the backend serves them without an `/api/` prefix
+ * (e.g. `/subscribers`, `/tokens/:id`), and may also be reached through an
+ * `/api/`-prefixed proxy.
  */
-const SENSITIVE_API_SEGMENTS = ['/subscribers', '/tokens', '/access-logs', '/learning'];
+const SENSITIVE_API_SEGMENTS = ['/subscribers', '/tokens', '/access-logs', '/learning', '/books'];
 
 /**
  * True when the request targets a sensitive management endpoint that must not

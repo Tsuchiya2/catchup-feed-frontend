@@ -155,6 +155,17 @@ export function useAuth(): UseAuthReturn {
       document.cookie = 'catchup_feed_auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
     }
 
+    // Purge any API responses the Service Worker cached while authenticated
+    // (M-3). Sensitive endpoints are never cached, but this empties the whole
+    // api-cache on sign-out as defense in depth. Best-effort and non-blocking.
+    if (
+      typeof navigator !== 'undefined' &&
+      'serviceWorker' in navigator &&
+      navigator.serviceWorker.controller
+    ) {
+      navigator.serviceWorker.controller.postMessage({ type: 'CLEAR_API_CACHE' });
+    }
+
     // Redirect to login page
     router.push('/login');
   };

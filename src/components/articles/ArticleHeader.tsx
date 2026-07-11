@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { ExternalLink } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatRelativeTime } from '@/lib/utils/formatDate';
+import { safeExternalHref } from '@/lib/utils/safeExternalHref';
 import { normalizeSourceName } from '@/utils/article';
 import type { Article } from '@/types/api';
 
@@ -29,7 +30,9 @@ interface ArticleHeaderProps {
 export function ArticleHeader({ article, sourceName, className }: ArticleHeaderProps) {
   // Safe field access with fallbacks
   const title = article.title?.trim() || 'Untitled Article';
-  const url = article.url || '#';
+  // article.url is externally sourced; only allow http/https to prevent
+  // javascript:/data: scheme XSS (H-2). Unsafe/missing → no link rendered.
+  const safeUrl = safeExternalHref(article.url);
   const publishedDate = article.published_at;
 
   // Normalize source name with fallback to article.source_name
@@ -64,21 +67,23 @@ export function ArticleHeader({ article, sourceName, className }: ArticleHeaderP
         )}
       </div>
 
-      {/* Read Original Article Button */}
-      <div>
-        <Button
-          asChild
-          variant="default"
-          size="lg"
-          className="w-full sm:w-auto"
-          aria-label={`Read original article${displaySourceName && displaySourceName !== 'Unknown Source' ? ` on ${displaySourceName}` : ''}`}
-        >
-          <a href={url} target="_blank" rel="noopener noreferrer">
-            <ExternalLink className="h-4 w-4" />
-            Read Original Article
-          </a>
-        </Button>
-      </div>
+      {/* Read Original Article Button (only when a safe http/https URL exists) */}
+      {safeUrl && (
+        <div>
+          <Button
+            asChild
+            variant="default"
+            size="lg"
+            className="w-full sm:w-auto"
+            aria-label={`Read original article${displaySourceName && displaySourceName !== 'Unknown Source' ? ` on ${displaySourceName}` : ''}`}
+          >
+            <a href={safeUrl} target="_blank" rel="noopener noreferrer">
+              <ExternalLink className="h-4 w-4" />
+              Read Original Article
+            </a>
+          </Button>
+        </div>
+      )}
     </header>
   );
 }

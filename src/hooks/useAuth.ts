@@ -1,36 +1,35 @@
 /**
  * useAuth Hook
  *
- * Custom React hook for authentication state management using React Query.
- * Provides login, logout, and authentication status.
+ * Custom React hook for the login/logout actions using React Query.
+ *
+ * After H-1 (D-22) the JWT is stored only in an HttpOnly cookie, so this hook
+ * no longer tracks or exposes client-visible auth state — route protection is
+ * handled by the proxy and unauthenticated API calls fail with 401.
  */
 
 'use client';
 
 import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
-import { login as loginApi } from '@/lib/api/endpoints/auth';
-import {
-  getAuthToken,
-  setAuthToken,
-  setRefreshToken,
-  clearAllTokens,
-  isTokenExpired,
-} from '@/lib/auth/TokenManager';
+import { login as loginApi, logout as logoutApi } from '@/lib/api/endpoints/auth';
+import { clearCsrfToken } from '@/lib/security/CsrfTokenManager';
+import { logger } from '@/lib/logger';
 
 /**
  * Authentication hook return type
+ *
+ * Note: after H-1 (D-22) the JWT lives in an HttpOnly cookie that JS cannot
+ * read. This hook therefore no longer exposes the token or a client-side
+ * `isAuthenticated` flag derived from it — session state is enforced by the
+ * proxy (route protection) and by 401s on protected API calls. The hook only
+ * drives the login/logout actions.
  */
 interface UseAuthReturn {
-  /** Whether the user is authenticated with a valid token */
-  isAuthenticated: boolean;
-  /** The JWT token string, or null if not authenticated */
-  token: string | null;
   /** Function to log in with email and password */
   login: (email: string, password: string) => Promise<void>;
-  /** Function to log out (clears token and redirects) */
-  logout: () => void;
+  /** Function to log out (invalidates the auth cookie and redirects) */
+  logout: () => Promise<void>;
   /** Whether a login request is in progress */
   isLoading: boolean;
   /** Error from the last login attempt, or null */
@@ -69,64 +68,20 @@ interface UseAuthReturn {
  */
 export function useAuth(): UseAuthReturn {
   const router = useRouter();
-  const [token, setToken] = useState<string | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // Initialize auth state on mount
-  useEffect(() => {
-    const currentToken = getAuthToken();
-    if (currentToken && !isTokenExpired()) {
-      setToken(currentToken);
-      setIsAuthenticated(true);
-      // Set cookie for middleware
-      if (typeof document !== 'undefined') {
-        document.cookie = `catchup_feed_auth_token=${currentToken}; path=/; max-age=86400; SameSite=Strict`;
-      }
-    } else {
-      setToken(null);
-      setIsAuthenticated(false);
-      // Clear cookie
-      if (typeof document !== 'undefined') {
-        document.cookie = 'catchup_feed_auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
-      }
-    }
-  }, []);
-
-  // Login mutation
+  // Login mutation. On success the backend has already set the HttpOnly auth
+  // cookie via Set-Cookie; we deliberately do NOT persist the body `token`
+  // anywhere (localStorage / JS-readable cookie) — that is the H-1 fix.
   const loginMutation = useMutation({
     mutationFn: async ({ email, password }: { email: string; password: string }) => {
       const response = await loginApi(email, password);
       return response;
     },
-    onSuccess: (response) => {
-      // Store access token in TokenManager
-      setAuthToken(response.token);
-      setToken(response.token);
-      setIsAuthenticated(true);
-
-      // Store refresh token if provided
-      if (response.refresh_token) {
-        setRefreshToken(response.refresh_token);
-      }
-
-      // Set cookie for middleware (expires in 24 hours)
-      if (typeof document !== 'undefined') {
-        document.cookie = `catchup_feed_auth_token=${response.token}; path=/; max-age=86400; SameSite=Strict`;
-      }
-
-      // Redirect to dashboard
+    onSuccess: () => {
+      // Auth is now carried by the HttpOnly cookie the backend just set.
+      // Navigate to the dashboard; the proxy will read that cookie server-side.
       router.push('/dashboard');
-    },
-    onError: () => {
-      // Clear all tokens on login failure
-      clearAllTokens();
-      setToken(null);
-      setIsAuthenticated(false);
-
-      // Clear cookie
-      if (typeof document !== 'undefined') {
-        document.cookie = 'catchup_feed_auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
-      }
+      router.refresh();
     },
   });
 
@@ -142,18 +97,23 @@ export function useAuth(): UseAuthReturn {
   };
 
   /**
-   * Logout (clear all tokens and redirect to login page)
+   * Logout — invalidate the HttpOnly auth cookie and clear client state.
+   *
+   * The JWT is in an HttpOnly cookie that JS cannot delete, so we must ask the
+   * backend to expire it (POST /auth/logout). This is best-effort: even if the
+   * request fails (offline, server error) we still purge client-side state and
+   * bounce to /login so the UI never appears "stuck" signed in (縮退許容).
    */
-  const logout = (): void => {
-    // Clear all tokens from TokenManager
-    clearAllTokens();
-    setToken(null);
-    setIsAuthenticated(false);
-
-    // Clear cookie
-    if (typeof document !== 'undefined') {
-      document.cookie = 'catchup_feed_auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+  const logout = async (): Promise<void> => {
+    try {
+      await logoutApi();
+    } catch (error) {
+      // Best-effort: proceed with client-side cleanup regardless.
+      logger.warn('Logout request failed; clearing client state anyway', { error });
     }
+
+    // Clear the client-side CSRF token (the JWT cookie is cleared server-side).
+    clearCsrfToken();
 
     // Purge any API responses the Service Worker cached while authenticated
     // (M-3). Sensitive endpoints are never cached, but this empties the whole
@@ -166,13 +126,12 @@ export function useAuth(): UseAuthReturn {
       navigator.serviceWorker.controller.postMessage({ type: 'CLEAR_API_CACHE' });
     }
 
-    // Redirect to login page
+    // Redirect to login page.
     router.push('/login');
+    router.refresh();
   };
 
   return {
-    isAuthenticated,
-    token,
     login,
     logout,
     isLoading: loginMutation.isPending,

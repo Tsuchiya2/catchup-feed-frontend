@@ -170,7 +170,7 @@ describe('Sources API Endpoints', () => {
       expect(error.status).toBe(500);
     });
 
-    it('should include Authorization header via apiClient', async () => {
+    it('should route the request through apiClient (cookie auth)', async () => {
       // Arrange
       vi.mocked(apiClient.put).mockResolvedValue(undefined);
 
@@ -178,9 +178,9 @@ describe('Sources API Endpoints', () => {
       await updateSourceActive(1, false);
 
       // Assert
-      // The apiClient.put method should be called (which includes auth header)
+      // The apiClient.put method should be called (auth is carried by the
+      // HttpOnly cookie via credentials:'include', not a header).
       expect(apiClient.put).toHaveBeenCalledTimes(1);
-      // Note: Authorization header is automatically added by apiClient
     });
 
     it('should handle multiple sequential updates', async () => {
@@ -337,7 +337,7 @@ describe('Sources API Endpoints', () => {
       expect(apiClient.delete).toHaveBeenCalledWith('/sources/2');
     });
 
-    it('should include Authorization header via apiClient', async () => {
+    it('should route the request through apiClient (cookie auth)', async () => {
       // Arrange
       vi.mocked(apiClient.delete).mockResolvedValue(undefined);
 
@@ -345,9 +345,9 @@ describe('Sources API Endpoints', () => {
       await deleteSource(1);
 
       // Assert
-      // The apiClient.delete method should be called (which includes auth header)
+      // The apiClient.delete method should be called (auth is carried by the
+      // HttpOnly cookie via credentials:'include', not a header).
       expect(apiClient.delete).toHaveBeenCalledTimes(1);
-      // Note: Authorization header is automatically added by apiClient
     });
 
     it('should propagate network errors', async () => {

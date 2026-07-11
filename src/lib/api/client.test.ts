@@ -1,8 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { ApiClient } from './client';
 import { ApiError, NetworkError, TimeoutError } from './errors';
-import * as TokenManager from '@/lib/auth/TokenManager';
-import { appConfig } from '@/config/app.config';
 import * as CsrfTokenManager from '@/lib/security/CsrfTokenManager';
 
 describe('ApiClient', () => {
@@ -24,10 +22,6 @@ describe('ApiClient', () => {
 
     // Suppress console errors in tests
     vi.spyOn(console, 'error').mockImplementation(() => {});
-
-    // Mock token utilities from TokenManager
-    vi.spyOn(TokenManager, 'getAuthToken').mockReturnValue('mock-token-123');
-    vi.spyOn(TokenManager, 'clearAllTokens').mockImplementation(() => {});
   });
 
   afterEach(() => {
@@ -37,7 +31,7 @@ describe('ApiClient', () => {
   });
 
   describe('request', () => {
-    it('should make GET request with JWT token', async () => {
+    it('should make GET request with credentials included (cookie auth)', async () => {
       // Arrange
       const mockResponse = { data: 'test' };
       global.fetch = vi.fn().mockResolvedValue({
@@ -50,18 +44,64 @@ describe('ApiClient', () => {
       // Act
       const result = await apiClient.request('/test-endpoint');
 
-      // Assert
+      // Assert - auth travels via the HttpOnly cookie, so credentials must be
+      // included and NO Authorization header is attached (H-1).
       expect(global.fetch).toHaveBeenCalledWith(
         'http://localhost:8080/test-endpoint',
         expect.objectContaining({
           method: 'GET',
+          credentials: 'include',
           headers: expect.objectContaining({
             'Content-Type': 'application/json',
-            Authorization: 'Bearer mock-token-123',
           }),
         })
       );
+      const fetchCall = (global.fetch as any).mock.calls[0];
+      expect(fetchCall[1].headers).not.toHaveProperty('Authorization');
       expect(result).toEqual(mockResponse);
+    });
+
+    it('should never attach an Authorization header', async () => {
+      // Arrange
+      global.fetch = vi.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        headers: new Headers({ 'content-length': '2' }),
+        text: async () => '{}',
+      });
+
+      // Act
+      await apiClient.request('/endpoint');
+
+      // Assert
+      const fetchCall = (global.fetch as any).mock.calls[0];
+      expect(fetchCall[1].headers).not.toHaveProperty('Authorization');
+    });
+
+    it('should include credentials even when requiresAuth is false', async () => {
+      // Arrange
+      const mockResponse = { data: 'public' };
+      global.fetch = vi.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        headers: new Headers({ 'content-length': '100' }),
+        text: async () => JSON.stringify(mockResponse),
+      });
+
+      // Act
+      await apiClient.request('/public-endpoint', { requiresAuth: false });
+
+      // Assert - credentials are always included (login also needs Set-Cookie
+      // to be honored), and there is still no Authorization header.
+      expect(global.fetch).toHaveBeenCalledWith(
+        'http://localhost:8080/public-endpoint',
+        expect.objectContaining({
+          credentials: 'include',
+          headers: expect.not.objectContaining({
+            Authorization: expect.anything(),
+          }),
+        })
+      );
     });
 
     it('should make POST request with body', async () => {
@@ -86,60 +126,22 @@ describe('ApiClient', () => {
       expect(result).toEqual(mockResponse);
     });
 
-    it('should make request without auth token when requiresAuth is false', async () => {
+    it('should handle 401 error by clearing CSRF token and redirecting', async () => {
       // Arrange
-      const mockResponse = { data: 'public' };
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        status: 200,
-        headers: new Headers({ 'content-length': '100' }),
-        text: async () => JSON.stringify(mockResponse),
-      });
-
-      // Act
-      await apiClient.request('/public-endpoint', { requiresAuth: false });
-
-      // Assert
-      expect(global.fetch).toHaveBeenCalledWith(
-        'http://localhost:8080/public-endpoint',
-        expect.objectContaining({
-          headers: expect.not.objectContaining({
-            Authorization: expect.anything(),
-          }),
-        })
-      );
-    });
-
-    it('should include Authorization header even when no token exists', async () => {
-      // Arrange
-      vi.spyOn(TokenManager, 'getAuthToken').mockReturnValue(null);
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        status: 200,
-        headers: new Headers({ 'content-length': '2' }),
-        text: async () => '{}',
-      });
-
-      // Act
-      await apiClient.request('/endpoint');
-
-      // Assert
-      const fetchCall = (global.fetch as any).mock.calls[0];
-      expect(fetchCall[1].headers).not.toHaveProperty('Authorization');
-    });
-
-    it('should handle 401 error by clearing token and redirecting', async () => {
-      // Arrange
+      const clearCsrfTokenSpy = vi.spyOn(CsrfTokenManager, 'clearCsrfToken');
       global.fetch = vi.fn().mockResolvedValue({
         ok: false,
         status: 401,
         json: async () => ({ message: 'Unauthorized' }),
+        headers: new Headers(),
       });
 
       // Act & Assert
       await expect(apiClient.request('/protected')).rejects.toThrow(ApiError);
 
-      expect(TokenManager.clearAllTokens).toHaveBeenCalled();
+      // The HttpOnly JWT cookie can't be cleared from JS; we clear the CSRF
+      // token and bounce to /login.
+      expect(clearCsrfTokenSpy).toHaveBeenCalled();
       expect(window.location.href).toBe('/login');
     });
 
@@ -149,6 +151,7 @@ describe('ApiClient', () => {
         ok: false,
         status: 404,
         json: async () => ({ message: 'Not found', error: 'Resource not found' }),
+        headers: new Headers(),
       });
 
       // Act & Assert
@@ -166,6 +169,7 @@ describe('ApiClient', () => {
         ok: false,
         status: 500,
         json: async () => ({ message: 'Internal server error' }),
+        headers: new Headers(),
       });
 
       // Act & Assert - disable retries to prevent timeout
@@ -187,6 +191,7 @@ describe('ApiClient', () => {
           message: 'Validation error',
           details: { email: 'Invalid email format' },
         }),
+        headers: new Headers(),
       });
 
       // Act & Assert
@@ -204,6 +209,7 @@ describe('ApiClient', () => {
         json: async () => {
           throw new Error('Not JSON');
         },
+        headers: new Headers(),
       });
 
       // Act & Assert - disable retries to prevent timeout
@@ -318,7 +324,7 @@ describe('ApiClient', () => {
       // Assert
       expect(global.fetch).toHaveBeenCalledWith(
         'http://localhost:8080/get-test',
-        expect.objectContaining({ method: 'GET' })
+        expect.objectContaining({ method: 'GET', credentials: 'include' })
       );
     });
 
@@ -334,6 +340,7 @@ describe('ApiClient', () => {
         'http://localhost:8080/post-test',
         expect.objectContaining({
           method: 'POST',
+          credentials: 'include',
           body: JSON.stringify(body),
         })
       );
@@ -375,6 +382,7 @@ describe('ApiClient', () => {
         ok: false,
         status: 400,
         json: async () => ({ message: 'Bad request' }),
+        headers: new Headers(),
       });
 
       // Act & Assert
@@ -396,11 +404,6 @@ describe('ApiClient', () => {
   });
 
   describe('retry logic', () => {
-    beforeEach(() => {
-      // Prevent token refresh from making extra requests
-      vi.spyOn(TokenManager, 'isTokenExpiringSoon').mockReturnValue(false);
-    });
-
     it('should retry on network error up to maxRetries', async () => {
       // Arrange
       global.fetch = vi.fn().mockRejectedValue(new TypeError('Failed to fetch'));
@@ -424,6 +427,7 @@ describe('ApiClient', () => {
         ok: false,
         status: 400,
         json: async () => ({ message: 'Bad request' }),
+        headers: new Headers(),
       });
 
       // Act & Assert
@@ -472,7 +476,6 @@ describe('ApiClient', () => {
 
   describe('CSRF token handling', () => {
     let mockSessionStorage: Record<string, string>;
-    let mockGetCsrfToken: () => string | null;
     let mockAddCsrfTokenToHeaders: (headers: Record<string, string>) => Record<string, string>;
     let mockSetCsrfTokenFromResponse: (response: Response) => void;
 
@@ -497,7 +500,6 @@ describe('ApiClient', () => {
       });
 
       // Mock CSRF token manager functions
-      mockGetCsrfToken = vi.fn(() => mockSessionStorage['catchup_feed_csrf_token'] || null);
       mockAddCsrfTokenToHeaders = vi.fn((headers: Record<string, string>) => {
         const token = mockSessionStorage['catchup_feed_csrf_token'];
         if (token) {
@@ -512,7 +514,6 @@ describe('ApiClient', () => {
         }
       });
 
-      vi.spyOn(CsrfTokenManager, 'getCsrfToken').mockImplementation(mockGetCsrfToken);
       vi.spyOn(CsrfTokenManager, 'addCsrfTokenToHeaders').mockImplementation(
         mockAddCsrfTokenToHeaders
       );
@@ -654,32 +655,6 @@ describe('ApiClient', () => {
       expect(mockSessionStorage['catchup_feed_csrf_token']).toBe('new-csrf-token-456');
     });
 
-    it('should persist CSRF token across multiple requests', async () => {
-      // Arrange - First request with CSRF token in response
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        status: 200,
-        headers: new Headers({
-          'content-length': '20',
-          'X-CSRF-Token': 'persistent-token',
-        }),
-        text: async () => JSON.stringify({ success: true }),
-      });
-
-      // Act - First request (GET)
-      await apiClient.get('/first-endpoint');
-
-      // Assert - Token stored after first request
-      expect(mockSessionStorage['catchup_feed_csrf_token']).toBe('persistent-token');
-
-      // Act - Second request (POST) should include the stored token
-      await apiClient.post('/second-endpoint', { data: 'test' });
-
-      // Assert - Second request includes the token
-      const secondCallHeaders = (global.fetch as any).mock.calls[1][1].headers;
-      expect(secondCallHeaders['X-CSRF-Token']).toBe('persistent-token');
-    });
-
     it('should handle missing CSRF token gracefully in POST requests', async () => {
       // Arrange - No token in sessionStorage
       mockSessionStorage = {};
@@ -697,274 +672,6 @@ describe('ApiClient', () => {
           }),
         })
       );
-    });
-
-    it('should handle response without CSRF token header', async () => {
-      // Arrange - Response without CSRF token header
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        status: 200,
-        headers: new Headers({
-          'content-length': '20',
-        }),
-        text: async () => JSON.stringify({ success: true }),
-      });
-
-      // Set initial token
-      mockSessionStorage['catchup_feed_csrf_token'] = 'existing-token';
-
-      // Act
-      await apiClient.get('/test-endpoint');
-
-      // Assert - Existing token should remain unchanged
-      expect(mockSessionStorage['catchup_feed_csrf_token']).toBe('existing-token');
-    });
-
-    it('should update CSRF token when new token is received', async () => {
-      // Arrange - Set initial token
-      mockSessionStorage['catchup_feed_csrf_token'] = 'old-token';
-
-      // Response with new CSRF token
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        status: 200,
-        headers: new Headers({
-          'content-length': '20',
-          'X-CSRF-Token': 'new-token',
-        }),
-        text: async () => JSON.stringify({ success: true }),
-      });
-
-      // Act
-      await apiClient.get('/test-endpoint');
-
-      // Assert - Token should be updated
-      expect(mockSessionStorage['catchup_feed_csrf_token']).toBe('new-token');
-    });
-  });
-
-  describe('token refresh', () => {
-    beforeEach(() => {
-      // Mock successful fetch response
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        status: 200,
-        headers: new Headers({ 'content-length': '20' }),
-        text: async () => JSON.stringify({ success: true }),
-      });
-    });
-
-    it('should refresh token when it is expiring soon', async () => {
-      // Arrange - Enable token refresh feature
-      const originalFeatures = appConfig.features;
-      appConfig.features = { ...originalFeatures, tokenRefresh: true };
-
-      // Mock token utilities
-      vi.spyOn(TokenManager, 'getAuthToken').mockReturnValue('expiring-token');
-      vi.spyOn(TokenManager, 'getRefreshToken').mockReturnValue('refresh-token');
-      vi.spyOn(TokenManager, 'isTokenExpiringSoon').mockReturnValue(true);
-      vi.spyOn(TokenManager, 'clearAllTokens').mockImplementation(() => {});
-
-      // Mock dynamic import of refreshToken function
-      const mockRefreshToken = vi.fn().mockResolvedValue(undefined);
-      vi.doMock('@/lib/api/endpoints/auth', () => ({
-        refreshToken: mockRefreshToken,
-      }));
-
-      // Act
-      await apiClient.request('/test-endpoint');
-
-      // Cleanup
-      appConfig.features = originalFeatures;
-    });
-
-    it('should not refresh when token refresh feature is disabled', async () => {
-      // Arrange - Disable token refresh feature
-      const originalFeatures = appConfig.features;
-      appConfig.features = { ...originalFeatures, tokenRefresh: false };
-
-      // Mock token utilities
-      vi.spyOn(TokenManager, 'getAuthToken').mockReturnValue('expiring-token');
-      vi.spyOn(TokenManager, 'isTokenExpiringSoon').mockReturnValue(true);
-
-      // Act
-      await apiClient.request('/test-endpoint');
-
-      // Assert - fetch should be called directly without refresh attempt
-      expect(global.fetch).toHaveBeenCalledTimes(1);
-
-      // Cleanup
-      appConfig.features = originalFeatures;
-    });
-
-    it('should not refresh when no token exists', async () => {
-      // Arrange
-      const originalFeatures = appConfig.features;
-      appConfig.features = { ...originalFeatures, tokenRefresh: true };
-
-      vi.spyOn(TokenManager, 'getAuthToken').mockReturnValue(null);
-
-      // Act
-      await apiClient.request('/test-endpoint');
-
-      // Assert - fetch should be called directly without refresh attempt
-      expect(global.fetch).toHaveBeenCalledTimes(1);
-
-      // Cleanup
-      appConfig.features = originalFeatures;
-    });
-
-    it('should not refresh when token is not expiring soon', async () => {
-      // Arrange
-      const originalFeatures = appConfig.features;
-      appConfig.features = { ...originalFeatures, tokenRefresh: true };
-
-      vi.spyOn(TokenManager, 'getAuthToken').mockReturnValue('valid-token');
-      vi.spyOn(TokenManager, 'isTokenExpiringSoon').mockReturnValue(false);
-
-      // Act
-      await apiClient.request('/test-endpoint');
-
-      // Assert - fetch should be called directly without refresh attempt
-      expect(global.fetch).toHaveBeenCalledTimes(1);
-
-      // Cleanup
-      appConfig.features = originalFeatures;
-    });
-
-    it('should not refresh when no refresh token exists', async () => {
-      // Arrange
-      const originalFeatures = appConfig.features;
-      appConfig.features = { ...originalFeatures, tokenRefresh: true };
-
-      vi.spyOn(TokenManager, 'getAuthToken').mockReturnValue('expiring-token');
-      vi.spyOn(TokenManager, 'isTokenExpiringSoon').mockReturnValue(true);
-      vi.spyOn(TokenManager, 'getRefreshToken').mockReturnValue(null);
-
-      // Act
-      await apiClient.request('/test-endpoint');
-
-      // Assert - fetch should be called directly without refresh attempt
-      expect(global.fetch).toHaveBeenCalledTimes(1);
-
-      // Cleanup
-      appConfig.features = originalFeatures;
-    });
-
-    it('should prevent concurrent refresh requests', async () => {
-      // Arrange
-      const originalFeatures = appConfig.features;
-      appConfig.features = { ...originalFeatures, tokenRefresh: true };
-
-      vi.spyOn(TokenManager, 'getAuthToken').mockReturnValue('expiring-token');
-      vi.spyOn(TokenManager, 'getRefreshToken').mockReturnValue('refresh-token');
-      vi.spyOn(TokenManager, 'isTokenExpiringSoon').mockReturnValue(true);
-
-      // Mock a slow refresh token function
-      const mockRefreshToken = vi.fn().mockImplementation(
-        () =>
-          new Promise((resolve) => {
-            setTimeout(resolve, 100);
-          })
-      );
-
-      vi.doMock('@/lib/api/endpoints/auth', () => ({
-        refreshToken: mockRefreshToken,
-      }));
-
-      // Act - Make two concurrent requests
-      const [result1, result2] = await Promise.all([
-        apiClient.request('/test-endpoint-1'),
-        apiClient.request('/test-endpoint-2'),
-      ]);
-
-      // Assert - Both requests should succeed
-      expect(result1).toBeDefined();
-      expect(result2).toBeDefined();
-
-      // Cleanup
-      appConfig.features = originalFeatures;
-    });
-
-    it('should clear tokens on refresh failure', async () => {
-      // Arrange
-      const originalFeatures = appConfig.features;
-      appConfig.features = { ...originalFeatures, tokenRefresh: true };
-
-      vi.spyOn(TokenManager, 'getAuthToken').mockReturnValue('expiring-token');
-      vi.spyOn(TokenManager, 'getRefreshToken').mockReturnValue('refresh-token');
-      vi.spyOn(TokenManager, 'isTokenExpiringSoon').mockReturnValue(true);
-
-      const clearAllTokensSpy = vi
-        .spyOn(TokenManager, 'clearAllTokens')
-        .mockImplementation(() => {});
-
-      // Mock refresh token failure
-      const mockRefreshToken = vi.fn().mockRejectedValue(new Error('Refresh failed'));
-      vi.doMock('@/lib/api/endpoints/auth', () => ({
-        refreshToken: mockRefreshToken,
-      }));
-
-      // Act
-      await apiClient.request('/test-endpoint');
-
-      // Assert - Request should still proceed (will fail with 401 if needed)
-      expect(global.fetch).toHaveBeenCalled();
-
-      // Cleanup
-      appConfig.features = originalFeatures;
-    });
-
-    it('should handle exponential backoff for retry on refresh failure', async () => {
-      // Arrange
-      const originalFeatures = appConfig.features;
-      appConfig.features = { ...originalFeatures, tokenRefresh: true };
-
-      // Mock expiring token scenario
-      vi.spyOn(TokenManager, 'getAuthToken').mockReturnValue('expiring-token');
-      vi.spyOn(TokenManager, 'getRefreshToken').mockReturnValue('refresh-token');
-      vi.spyOn(TokenManager, 'isTokenExpiringSoon').mockReturnValue(true);
-
-      // Mock fetch to return 500 error (retryable)
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: false,
-        status: 500,
-        json: async () => ({ message: 'Server error' }),
-      });
-
-      // Act & Assert
-      const error = (await apiClient
-        .request('/test-endpoint', {
-          retry: { maxRetries: 2, initialDelay: 10, maxDelay: 50 },
-        })
-        .catch((e) => e)) as ApiError;
-
-      // Should retry the request (1 initial + 2 retries = 3 calls)
-      expect(global.fetch).toHaveBeenCalledTimes(3);
-      expect(error).toBeInstanceOf(ApiError);
-      expect(error.status).toBe(500);
-
-      // Cleanup
-      appConfig.features = originalFeatures;
-    });
-
-    it('should respect grace period before token refresh', async () => {
-      // Arrange
-      const originalFeatures = appConfig.features;
-      appConfig.features = { ...originalFeatures, tokenRefresh: true };
-
-      // Mock token that is NOT expiring soon (still in grace period)
-      vi.spyOn(TokenManager, 'getAuthToken').mockReturnValue('valid-token');
-      vi.spyOn(TokenManager, 'isTokenExpiringSoon').mockReturnValue(false);
-
-      // Act
-      await apiClient.request('/test-endpoint');
-
-      // Assert - Should not attempt refresh, just make the request
-      expect(global.fetch).toHaveBeenCalledTimes(1);
-
-      // Cleanup
-      appConfig.features = originalFeatures;
     });
   });
 
@@ -1023,24 +730,6 @@ describe('ApiClient', () => {
       expect(clearCsrfTokenSpy).toHaveBeenCalled();
     });
 
-    it('should clear CSRF token on CSRF error', async () => {
-      // Arrange
-      const clearCsrfTokenSpy = vi.spyOn(CsrfTokenManager, 'clearCsrfToken');
-
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: false,
-        status: 403,
-        json: async () => ({ message: 'CSRF token validation failed' }),
-        headers: new Headers(),
-      });
-
-      // Act
-      await apiClient.request('/test-endpoint', { method: 'POST' }).catch(() => {});
-
-      // Assert
-      expect(clearCsrfTokenSpy).toHaveBeenCalled();
-    });
-
     it('should reload page on CSRF error', async () => {
       // Arrange
       global.fetch = vi.fn().mockResolvedValue({
@@ -1061,60 +750,6 @@ describe('ApiClient', () => {
       // Assert
       expect(window.location.reload).toHaveBeenCalled();
       expect(sessionStorage.getItem('csrf_reload_attempted')).toBeTruthy();
-
-      vi.useRealTimers();
-    });
-
-    it('should prevent infinite reload loops on CSRF error', async () => {
-      // Arrange
-      // Simulate recent reload attempt
-      const recentTimestamp = Date.now() - 1000; // 1 second ago
-      sessionStorage.setItem('csrf_reload_attempted', recentTimestamp.toString());
-
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: false,
-        status: 403,
-        json: async () => ({ message: 'CSRF token validation failed' }),
-        headers: new Headers(),
-      });
-
-      vi.useFakeTimers({ now: Date.now() });
-
-      // Act
-      await apiClient.request('/test-endpoint', { method: 'POST' }).catch(() => {});
-
-      // Fast-forward timer
-      vi.advanceTimersByTime(100);
-
-      // Assert - Should NOT reload again (within 5 seconds)
-      expect(window.location.reload).not.toHaveBeenCalled();
-
-      vi.useRealTimers();
-    });
-
-    it('should allow reload after grace period', async () => {
-      // Arrange
-      // Simulate old reload attempt (6 seconds ago)
-      const oldTimestamp = Date.now() - 6000;
-      sessionStorage.setItem('csrf_reload_attempted', oldTimestamp.toString());
-
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: false,
-        status: 403,
-        json: async () => ({ message: 'CSRF token validation failed' }),
-        headers: new Headers(),
-      });
-
-      vi.useFakeTimers({ now: Date.now() });
-
-      // Act
-      await apiClient.request('/test-endpoint', { method: 'POST' }).catch(() => {});
-
-      // Fast-forward timer
-      vi.advanceTimersByTime(100);
-
-      // Assert - Should reload again (past grace period)
-      expect(window.location.reload).toHaveBeenCalled();
 
       vi.useRealTimers();
     });

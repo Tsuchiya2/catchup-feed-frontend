@@ -525,7 +525,7 @@ describe('Articles API Endpoints', () => {
       }
     });
 
-    it('should include Authorization header via apiClient', async () => {
+    it('should route the request through apiClient (cookie auth)', async () => {
       // Arrange
       const mockResponse: PaginatedArticlesResponse = {
         data: [mockArticle1],
@@ -543,9 +543,9 @@ describe('Articles API Endpoints', () => {
       await searchArticles({ keyword: 'test' });
 
       // Assert
-      // The apiClient.get method should be called (which includes auth header)
+      // The apiClient.get method should be called (auth is carried by the
+      // HttpOnly cookie via credentials:'include', not a header).
       expect(apiClient.get).toHaveBeenCalledTimes(1);
-      // Note: Authorization header is automatically added by apiClient
     });
   });
 });

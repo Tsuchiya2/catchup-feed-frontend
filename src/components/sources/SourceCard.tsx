@@ -173,10 +173,7 @@ export const SourceCard = React.memo(function SourceCard({
             </a>
           ) : (
             // Unsafe / unparseable scheme: show the raw value without a link.
-            <span
-              className="block truncate text-xs text-muted-foreground"
-              title={source.feed_url}
-            >
+            <span className="block truncate text-xs text-muted-foreground" title={source.feed_url}>
               {source.feed_url}
             </span>
           )}

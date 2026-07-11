@@ -47,8 +47,9 @@ export function CategoryFilter({
   const debouncedValue = useDebounce(inputValue, debounceMs);
 
   // Keep local state in sync when the value is changed externally
-  // (e.g. "Clear All Filters")
+  // (e.g. "Clear All Filters"). Intentional external-value sync.
   React.useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setInputValue(value ?? '');
   }, [value]);
 

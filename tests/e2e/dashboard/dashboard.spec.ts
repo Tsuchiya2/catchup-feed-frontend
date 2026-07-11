@@ -1,4 +1,5 @@
 import { test, expect } from '../support/test';
+import { fulfillJsonError } from '../support/api-mock';
 import { ARTICLE_COUNT } from '../support/mock-data';
 
 test.describe('Dashboard', () => {
@@ -38,14 +39,7 @@ test.describe('Dashboard', () => {
 
   test('should show an error message when the stats API fails', async ({ page }) => {
     // Page-level route overrides the context-level ApiMock route
-    await page.route(/\/articles\?/, (route) =>
-      route.fulfill({
-        status: 400,
-        contentType: 'application/json',
-        headers: { 'access-control-allow-origin': '*' },
-        body: JSON.stringify({ error: 'bad request' }),
-      })
-    );
+    await page.route(/\/articles\?/, (route) => fulfillJsonError(route, 400, { error: 'bad request' }));
 
     await page.goto('/dashboard');
     await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();

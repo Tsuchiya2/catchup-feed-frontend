@@ -105,7 +105,7 @@ export interface PaginatedResponse<T> {
 /**
  * Paginated articles response
  */
-export interface PaginatedArticlesResponse extends PaginatedResponse<Article> {}
+export type PaginatedArticlesResponse = PaginatedResponse<Article>;
 
 /**
  * Articles list response

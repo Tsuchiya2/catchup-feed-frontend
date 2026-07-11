@@ -401,7 +401,7 @@ describe('Proxy Function - CSRF Protection Integration Tests', () => {
       });
 
       // Act
-      const response = proxy(request);
+      proxy(request);
 
       // Assert
       expect(csrfUtils.setCsrfToken).toHaveBeenCalledWith(expect.any(NextResponse));
@@ -415,7 +415,7 @@ describe('Proxy Function - CSRF Protection Integration Tests', () => {
 
       // No auth token (user not logged in)
       // Act
-      const response = proxy(request);
+      proxy(request);
 
       // Assert
       expect(csrfUtils.setCsrfToken).toHaveBeenCalledWith(expect.any(NextResponse));
@@ -429,7 +429,7 @@ describe('Proxy Function - CSRF Protection Integration Tests', () => {
 
       // No auth token
       // Act
-      const response = proxy(request);
+      proxy(request);
 
       // Assert
       expect(csrfUtils.setCsrfToken).not.toHaveBeenCalled();
@@ -454,7 +454,7 @@ describe('Proxy Function - CSRF Protection Integration Tests', () => {
       vi.mocked(csrfUtils.validateCsrfToken).mockReturnValue(true);
 
       // Act
-      const response = proxy(request);
+      proxy(request);
 
       // Assert
       expect(csrfUtils.setCsrfToken).toHaveBeenCalledWith(expect.any(NextResponse));
@@ -513,7 +513,7 @@ describe('Proxy Function - CSRF Protection Integration Tests', () => {
         method: 'GET',
       });
 
-      const loginResponse = proxy(loginRequest);
+      proxy(loginRequest);
 
       // Assert: CSRF token should be set on login page
       expect(csrfUtils.setCsrfToken).toHaveBeenCalled();

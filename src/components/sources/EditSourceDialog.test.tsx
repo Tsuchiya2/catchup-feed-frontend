@@ -367,7 +367,6 @@ describe('EditSourceDialog', () => {
 
   describe('API Error Tests', () => {
     it('displays error message when API returns 500 error', async () => {
-      const user = userEvent.setup();
       const apiError = new Error('Internal Server Error');
 
       vi.mocked(useUpdateSourceModule.useUpdateSource).mockReturnValue({

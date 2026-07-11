@@ -337,7 +337,6 @@ describe('PWAInstallPrompt', () => {
 
   describe('error handling', () => {
     it('should handle missing deferred prompt gracefully', async () => {
-      const user = userEvent.setup();
       render(<PWAInstallPrompt />);
 
       // Show prompt but don't trigger beforeinstallprompt event

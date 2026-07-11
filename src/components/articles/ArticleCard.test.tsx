@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { ArticleCard } from './ArticleCard';
-import type { Article } from '@/types/api';
 import { createMockArticle } from '@/__test__/factories/articleFactory';
 
 // Mock Next.js Link component

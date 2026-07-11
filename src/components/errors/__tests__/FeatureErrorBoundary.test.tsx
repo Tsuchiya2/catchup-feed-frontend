@@ -29,11 +29,9 @@ const ThrowError = ({ shouldThrow = true }: { shouldThrow?: boolean }) => {
 };
 
 describe('FeatureErrorBoundary', () => {
-  let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
-
   beforeEach(() => {
     // Suppress console.error in tests
-    consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    vi.spyOn(console, 'error').mockImplementation(() => {});
     vi.clearAllMocks();
   });
 

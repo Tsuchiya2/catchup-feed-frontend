@@ -39,7 +39,7 @@ async function checkBackendConnectivity(): Promise<{ ready: boolean; message?: s
     }
 
     return { ready: false, message: `Backend returned ${response.status}` };
-  } catch (error) {
+  } catch {
     return { ready: false, message: 'Backend unreachable' };
   }
 }

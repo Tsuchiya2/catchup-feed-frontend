@@ -441,7 +441,7 @@ describe('ActiveToggle', () => {
       const mockOnToggle1 = vi.fn().mockResolvedValue(undefined);
       const mockOnToggle2 = vi.fn().mockResolvedValue(undefined);
 
-      const { container } = render(
+      render(
         <>
           <ActiveToggle
             sourceId={1}

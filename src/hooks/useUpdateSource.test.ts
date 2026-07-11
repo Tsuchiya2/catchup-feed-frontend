@@ -158,8 +158,6 @@ describe('useUpdateSource', () => {
       });
       mockUpdateSource.mockReturnValueOnce(pendingPromise);
 
-      const wrapper = createWrapper();
-      const Wrapper = wrapper as React.ComponentType<{ children: React.ReactNode }>;
       const queryClient = new QueryClient({
         defaultOptions: {
           queries: { retry: false },

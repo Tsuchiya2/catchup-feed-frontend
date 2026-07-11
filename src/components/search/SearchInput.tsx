@@ -63,9 +63,10 @@ export function SearchInput({
   // Filters"), which used to instantly restore the cleared keyword.
   const lastSyncedValue = React.useRef(value);
 
-  // Sync with external value changes
+  // Sync with external value changes. Intentional external-value sync.
   React.useEffect(() => {
     lastSyncedValue.current = value;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setInputValue(value);
   }, [value]);
 

@@ -13,7 +13,7 @@
  */
 import type { BrowserContext, Route } from '@playwright/test';
 import { MOCK_API_URL } from './constants';
-import { makeMockJwt, TEST_CREDENTIALS } from './auth';
+import { AUTH_TOKEN_KEY, makeMockJwt, TEST_CREDENTIALS } from './auth';
 import {
   ISSUED_FEED_URL,
   ISSUED_PLAINTEXT_TOKEN,
@@ -34,11 +34,47 @@ import {
 
 export { MOCK_API_URL };
 
-const CORS_HEADERS: Record<string, string> = {
-  'access-control-allow-origin': '*',
-  'access-control-allow-methods': 'GET,POST,PUT,PATCH,DELETE,OPTIONS',
-  'access-control-allow-headers': 'authorization, content-type, x-csrf-token',
-};
+/**
+ * CORS headers for the intercepted responses.
+ *
+ * The app client sends `credentials: 'include'` (src/lib/api/client.ts), so
+ * the browser applies the credentialed-CORS rules: `Access-Control-Allow-Origin`
+ * must echo the exact request origin (a wildcard `*` is rejected) and
+ * `Access-Control-Allow-Credentials: true` must be present. Modern Chromium
+ * (bundled with the current Playwright) enforces this strictly, so the origin
+ * is echoed from the request rather than hard-coded to `*`.
+ */
+export function corsHeaders(route: Route): Record<string, string> {
+  const origin = route.request().headers()['origin'] || '*';
+  return {
+    'access-control-allow-origin': origin,
+    'access-control-allow-credentials': 'true',
+    'access-control-allow-methods': 'GET,POST,PUT,PATCH,DELETE,OPTIONS',
+    'access-control-allow-headers': 'authorization, content-type, x-csrf-token',
+  };
+}
+
+/**
+ * Fulfill a per-spec error override with credential-compatible CORS headers.
+ *
+ * Specs register `page.route(...)` to force an endpoint to fail; those
+ * responses must carry the same credentialed-CORS headers as the main mock,
+ * otherwise the browser blocks the (credentialed) response as a network error
+ * and the app never sees the intended status/body. Use this instead of a bare
+ * `route.fulfill({ headers: { 'access-control-allow-origin': '*' } })`.
+ */
+export function fulfillJsonError(
+  route: Route,
+  status: number,
+  body: unknown
+): Promise<void> {
+  return route.fulfill({
+    status,
+    contentType: 'application/json',
+    headers: corsHeaders(route),
+    body: JSON.stringify(body),
+  });
+}
 
 /** Mutable per-test backend state. */
 export class ApiMock {
@@ -51,7 +87,19 @@ export class ApiMock {
 
   private nextId = 9000;
 
-  async install(context: BrowserContext): Promise<void> {
+  /**
+   * The app runs on a different origin than the mocked API, so a `Set-Cookie`
+   * on an intercepted (cross-origin) response never lands on the app origin.
+   * The real backend is same-origin and sets the HttpOnly auth cookie via
+   * `Set-Cookie` on login; here we emulate that by planting/removing the
+   * cookie on the app origin through the browser context.
+   */
+  private context!: BrowserContext;
+  private appOrigin!: string;
+
+  async install(context: BrowserContext, baseURL: string): Promise<void> {
+    this.context = context;
+    this.appOrigin = baseURL;
     await context.route(`${MOCK_API_URL}/**`, (route) => this.handle(route));
   }
 
@@ -61,7 +109,7 @@ export class ApiMock {
     return route.fulfill({
       status,
       contentType: 'application/json',
-      headers: CORS_HEADERS,
+      headers: corsHeaders(route),
       body: JSON.stringify(body),
     });
   }
@@ -81,7 +129,7 @@ export class ApiMock {
     return route.fulfill({
       status,
       contentType: 'text/plain; charset=utf-8',
-      headers: CORS_HEADERS,
+      headers: corsHeaders(route),
       body: `${message}\n`,
     });
   }
@@ -96,7 +144,7 @@ export class ApiMock {
 
     // CORS preflight (the app origin differs from the API origin)
     if (method === 'OPTIONS') {
-      await route.fulfill({ status: 204, headers: CORS_HEADERS });
+      await route.fulfill({ status: 204, headers: corsHeaders(route) });
       return;
     }
 
@@ -106,11 +154,24 @@ export class ApiMock {
     if (method === 'POST' && path === '/auth/token') {
       const body = request.postDataJSON() as { email?: string; password?: string };
       if (body.email === TEST_CREDENTIALS.email && body.password === TEST_CREDENTIALS.password) {
+        // The real backend authenticates by setting the HttpOnly
+        // `catchup_feed_auth_token` cookie (H-1 / D-22). Emulate that on the
+        // app origin so the route-protection proxy sees the session.
+        await this.context.addCookies([
+          { name: AUTH_TOKEN_KEY, value: makeMockJwt(), url: this.appOrigin },
+        ]);
         await this.fulfillJson(route, { token: makeMockJwt() });
       } else {
         // The real handler rejects credentials via http.Error → plain text.
         await this.fulfillPlainTextError(route, 401, 'unauthorized');
       }
+      return;
+    }
+    if (method === 'POST' && path === '/auth/logout') {
+      // The real backend clears the auth cookie on logout; mirror that by
+      // removing it from the app origin. Respond 204 like the real handler.
+      await this.context.clearCookies({ name: AUTH_TOKEN_KEY });
+      await route.fulfill({ status: 204, headers: corsHeaders(route) });
       return;
     }
 
@@ -328,7 +389,7 @@ export class ApiMock {
       }
       if (method === 'DELETE') {
         this.sources.splice(index, 1);
-        await route.fulfill({ status: 204, headers: CORS_HEADERS });
+        await route.fulfill({ status: 204, headers: corsHeaders(route) });
         return;
       }
     }

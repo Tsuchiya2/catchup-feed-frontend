@@ -15,7 +15,7 @@
  * always render management controls, so there is no role branching here.
  */
 import * as React from 'react';
-import { Rss, Youtube, Podcast, Pencil, Trash2, type LucideIcon } from 'lucide-react';
+import { Rss, Tv, Podcast, Pencil, Trash2, type LucideIcon } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -33,7 +33,7 @@ import { SOURCE_TEST_IDS, SOURCE_ARIA_LABELS } from '@/constants/source';
  */
 const KIND_META: Record<SourceKind, { label: string; Icon: LucideIcon }> = {
   rss: { label: 'RSS', Icon: Rss },
-  youtube: { label: 'YouTube', Icon: Youtube },
+  youtube: { label: 'YouTube', Icon: Tv },
   podcast: { label: 'Podcast', Icon: Podcast },
 };
 

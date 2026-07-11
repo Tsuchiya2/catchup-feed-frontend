@@ -183,7 +183,7 @@ describe('LoginForm Integration Tests', () => {
         .mockRejectedValueOnce(new Error('Invalid credentials'))
         .mockResolvedValueOnce(undefined);
 
-      const { rerender } = render(<LoginForm onLogin={mockOnLogin} />);
+      render(<LoginForm onLogin={mockOnLogin} />);
 
       // Act - First attempt (fail)
       const emailInput = screen.getByLabelText(/email/i);

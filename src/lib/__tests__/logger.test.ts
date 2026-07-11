@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { logger, type LogContext } from '../logger';
-import { loggingConfig, logLevels } from '@/config/logging.config';
+import { loggingConfig } from '@/config/logging.config';
 
 describe('Logger', () => {
   let consoleLogSpy: ReturnType<typeof vi.spyOn>;

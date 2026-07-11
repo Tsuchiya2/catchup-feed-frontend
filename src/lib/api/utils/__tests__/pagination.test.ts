@@ -7,7 +7,7 @@ import {
   validatePaginatedResponse,
 } from '../pagination';
 import { PAGINATION_CONFIG } from '@/lib/constants/pagination';
-import type { PaginatedResponse, PaginationMetadata } from '@/types/api';
+import type { PaginatedResponse } from '@/types/api';
 
 describe('pagination utils', () => {
   describe('buildPaginationQuery', () => {

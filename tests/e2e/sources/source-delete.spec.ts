@@ -6,6 +6,7 @@
  * principle), so only the functional behaviour is verified.
  */
 import { test, expect } from '../support/test';
+import { fulfillJsonError } from '../support/api-mock';
 
 test.describe('Source Delete', () => {
   test.beforeEach(async ({ page, authenticated: _auth }) => {
@@ -39,14 +40,7 @@ test.describe('Source Delete', () => {
   });
 
   test('should surface an error when deletion fails', async ({ page }) => {
-    await page.route(/\/sources\/1$/, (route) =>
-      route.fulfill({
-        status: 400,
-        contentType: 'application/json',
-        headers: { 'access-control-allow-origin': '*' },
-        body: JSON.stringify({ error: 'delete failed' }),
-      })
-    );
+    await page.route(/\/sources\/1$/, (route) => fulfillJsonError(route, 400, { error: 'delete failed' }));
 
     await page.getByRole('button', { name: 'Delete source: Go Blog' }).click();
     await page.getByTestId('source-delete-confirm-button').click();

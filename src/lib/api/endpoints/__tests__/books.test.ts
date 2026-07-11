@@ -59,7 +59,11 @@ describe('Books API Endpoints', () => {
         expect.any(FormData),
         expect.objectContaining({ retry: false })
       );
-      const formData = vi.mocked(apiClient.post).mock.calls[0][1] as FormData;
+      const call = vi.mocked(apiClient.post).mock.lastCall;
+      if (!call) {
+        throw new Error('apiClient.post was not called');
+      }
+      const formData = call[1] as FormData;
       expect(formData.get('file')).toBe(file);
       expect(formData.get('title')).toBe('実用 Go 言語');
       expect(result).toEqual(mockBook);
@@ -71,7 +75,11 @@ describe('Books API Endpoints', () => {
       const file = new File(['%PDF-1.7'], 'golang-book.pdf', { type: 'application/pdf' });
       await uploadBook({ file });
 
-      const formData = vi.mocked(apiClient.post).mock.calls[0][1] as FormData;
+      const call = vi.mocked(apiClient.post).mock.lastCall;
+      if (!call) {
+        throw new Error('apiClient.post was not called');
+      }
+      const formData = call[1] as FormData;
       expect(formData.get('title')).toBeNull();
     });
 

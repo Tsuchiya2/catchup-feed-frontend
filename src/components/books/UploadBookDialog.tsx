@@ -129,7 +129,8 @@ export function UploadBookDialog({ isOpen, onClose, onSuccess }: UploadBookDialo
         <DialogHeader>
           <DialogTitle>書籍 PDF をアップロード</DialogTitle>
           <DialogDescription>
-            取り込みは Mac の夜間バッチ(03:00)で実行されます。アップロード直後は「待機」のまま翌朝を待ってください。同名ファイルの再アップロードは置き換え(再取り込み)になります。
+            取り込みは Mac
+            の夜間バッチ(03:00)で実行されます。アップロード直後は「待機」のまま翌朝を待ってください。同名ファイルの再アップロードは置き換え(再取り込み)になります。
           </DialogDescription>
         </DialogHeader>
 

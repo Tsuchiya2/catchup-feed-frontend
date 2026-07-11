@@ -28,13 +28,15 @@ interface BookCardProps {
   onDelete: (book: PdfBook) => void;
 }
 
-const STATUS_VARIANT: Record<BookIngestStatus, 'secondary' | 'default' | 'success' | 'destructive'> =
-  {
-    pending: 'secondary',
-    processing: 'default',
-    done: 'success',
-    failed: 'destructive',
-  };
+const STATUS_VARIANT: Record<
+  BookIngestStatus,
+  'secondary' | 'default' | 'success' | 'destructive'
+> = {
+  pending: 'secondary',
+  processing: 'default',
+  done: 'success',
+  failed: 'destructive',
+};
 
 /**
  * BookCard — title, file metadata, ingest status, and delete (when allowed).

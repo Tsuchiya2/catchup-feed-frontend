@@ -345,6 +345,43 @@ export type BookReviewStatus = NonNullable<
 export type LearningBook = Full<Schemas['internal_handler_http_learning.BookDTO']>;
 
 // ============================================================================
+// Book PDF Management Types (D-25)
+// ============================================================================
+
+/**
+ * Ingest status of a managed book, derived from jobs on the backend:
+ * `pending` = 取り込み待ち(Mac の夜間バッチ待ち), `processing` = Mac worker
+ * が処理中, `done` = 取り込み完了, `failed` = 失敗.
+ */
+export type BookIngestStatus = NonNullable<Schemas['internal_handler_http_book.DTO']['status']>;
+
+/**
+ * A managed book PDF (GET /books).
+ *
+ * `file_path` is the canonical identity and is unique across all entries
+ * (use it as the React key). `filename` is the DELETE key, unique only
+ * among deletable entries. `deletable: false` = CLI-ingested book, which
+ * cannot be removed from the dashboard; for those, `size_bytes` and
+ * `uploaded_at` are null (the PDF lives on the Mac, not on the Pi).
+ * `book_id` / `chunk_count` are null until ingest completes.
+ */
+export type PdfBook = Nullable<
+  Schemas['internal_handler_http_book.DTO'],
+  'size_bytes' | 'uploaded_at' | 'book_id' | 'chunk_count'
+>;
+
+/**
+ * Input for POST /books (multipart upload). Same-name re-upload replaces
+ * the stored PDF and re-queues the ingest job (idempotent).
+ */
+export interface UploadBookInput {
+  /** PDF file (max 100MB, validated client-side before sending) */
+  file: File;
+  /** Optional display title (backend derives one from the filename if omitted) */
+  title?: string;
+}
+
+// ============================================================================
 // Error Types
 // ============================================================================
 

@@ -126,6 +126,28 @@ describe('ApiClient', () => {
       expect(result).toEqual(mockResponse);
     });
 
+    it('should pass FormData through without JSON content-type (multipart upload)', async () => {
+      // Arrange
+      const formData = new FormData();
+      formData.append('title', 'test book');
+      global.fetch = vi.fn().mockResolvedValue({
+        ok: true,
+        status: 201,
+        headers: new Headers({ 'content-length': '2' }),
+        text: async () => '{}',
+      });
+
+      // Act
+      await apiClient.request('/books', { method: 'POST', body: formData });
+
+      // Assert - the body must be the FormData itself (not JSON.stringify'd)
+      // and Content-Type must be left to the browser so it can set the
+      // multipart boundary.
+      const fetchCall = (global.fetch as any).mock.calls[0];
+      expect(fetchCall[1].body).toBe(formData);
+      expect(fetchCall[1].headers).not.toHaveProperty('Content-Type');
+    });
+
     it('should handle 401 error by clearing CSRF token and redirecting', async () => {
       // Arrange
       const clearCsrfTokenSpy = vi.spyOn(CsrfTokenManager, 'clearCsrfToken');

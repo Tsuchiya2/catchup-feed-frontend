@@ -34,7 +34,14 @@ const CSRF_EXEMPT_ROUTES = ['/api/health', '/api/webhooks', '/api/metrics', '/ap
  * Protected route patterns
  * These routes require authentication
  */
-const PROTECTED_ROUTES = ['/dashboard', '/articles', '/sources', '/subscribers', '/access-logs'];
+const PROTECTED_ROUTES = [
+  '/dashboard',
+  '/articles',
+  '/sources',
+  '/subscribers',
+  '/access-logs',
+  '/books',
+];
 
 /**
  * Check if a path matches any of the protected routes

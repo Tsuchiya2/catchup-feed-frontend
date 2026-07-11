@@ -19,6 +19,7 @@ const mainNavigation = [
   { name: 'Dashboard', href: '/dashboard' },
   { name: 'Articles', href: '/articles' },
   { name: 'Sources', href: '/sources' },
+  { name: 'Books', href: '/books' },
   { name: 'Friends', href: '/subscribers' },
   { name: 'Access Logs', href: '/access-logs' },
   { name: 'Review', href: '/learning' },

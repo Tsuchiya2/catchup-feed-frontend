@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.9.2](https://github.com/Tsuchiya2/catchup-feed-frontend/compare/catchup-feed-frontend-v1.9.1...catchup-feed-frontend-v1.9.2) (2026-07-11)
+
+
+### Miscellaneous
+
+* **deps:** bump Node 24, Next 16.2, ESLint 9 (flat config) and all deps to latest ([2f9cef5](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/2f9cef5db54ea4dc75a29602fefd71116e23b8cf))
+* **deps:** Node 24 + Next 16.2 + ESLint 9(flat config)+ 依存一括最新化 ([8e7cb14](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/8e7cb14cd871ac0bc2fd52ad16b28a927e608b6c))
+
 ## [1.9.1](https://github.com/Tsuchiya2/catchup-feed-frontend/compare/catchup-feed-frontend-v1.9.0...catchup-feed-frontend-v1.9.1) (2026-07-11)
 
 

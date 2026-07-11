@@ -1,4 +1,5 @@
 import { test, expect } from '../support/test';
+import { fulfillJsonError } from '../support/api-mock';
 
 test.describe('Source List', () => {
   test.beforeEach(async ({ authenticated: _auth }) => {});
@@ -22,14 +23,7 @@ test.describe('Source List', () => {
   });
 
   test('should show an error message when the API fails', async ({ page }) => {
-    await page.route(/\/sources$/, (route) =>
-      route.fulfill({
-        status: 400,
-        contentType: 'application/json',
-        headers: { 'access-control-allow-origin': '*' },
-        body: JSON.stringify({ error: 'boom' }),
-      })
-    );
+    await page.route(/\/sources$/, (route) => fulfillJsonError(route, 400, { error: 'boom' }));
     await page.goto('/sources');
 
     await expect(page.getByText(/error|failed|boom/i).first()).toBeVisible();

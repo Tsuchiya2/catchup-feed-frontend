@@ -37,23 +37,10 @@ const CSRF_EXEMPT_ROUTES = ['/api/health', '/api/webhooks', '/api/metrics', '/ap
 const PROTECTED_ROUTES = ['/dashboard', '/articles', '/sources', '/subscribers', '/access-logs'];
 
 /**
- * Public route patterns
- * These routes are accessible without authentication
- */
-const PUBLIC_ROUTES = ['/', '/login'];
-
-/**
  * Check if a path matches any of the protected routes
  */
 function isProtectedRoute(pathname: string): boolean {
   return PROTECTED_ROUTES.some((route) => pathname.startsWith(route));
-}
-
-/**
- * Check if a path matches any of the public routes
- */
-function isPublicRoute(pathname: string): boolean {
-  return PUBLIC_ROUTES.some((route) => pathname === route);
 }
 
 /**

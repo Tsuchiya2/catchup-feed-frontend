@@ -44,12 +44,12 @@ export const Default: Story = {
  */
 export const SuccessfulLogin: Story = {
   args: {
-    onLogin: fn(async (email: string, password: string) => {
+    onLogin: fn(async (email: string, _password: string) => {
       console.log('Login successful:', email);
       await new Promise((resolve) => setTimeout(resolve, 1000));
     }),
   },
-  play: async ({ canvasElement }) => {
+  play: async ({ canvasElement: _canvasElement }) => {
     // Note: Interactive tests would go here in a real scenario
     // This demonstrates the successful state
   },

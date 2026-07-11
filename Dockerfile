@@ -9,7 +9,7 @@
 # Stage 1: Dependencies
 # -----------------------------------------------------------------------------
 # Install and cache npm dependencies
-FROM node:20-alpine AS deps
+FROM node:24-alpine AS deps
 
 WORKDIR /app
 
@@ -23,7 +23,7 @@ RUN npm ci
 # Stage 2: Development
 # -----------------------------------------------------------------------------
 # Development environment with hot reload support
-FROM node:20-alpine AS dev
+FROM node:24-alpine AS dev
 
 WORKDIR /app
 

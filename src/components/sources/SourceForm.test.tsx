@@ -902,7 +902,6 @@ describe('SourceForm', () => {
     });
 
     it('should handle form with max length input', async () => {
-      const user = userEvent.setup();
       render(
         <SourceForm
           mode="create"

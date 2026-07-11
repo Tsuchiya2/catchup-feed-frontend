@@ -28,8 +28,10 @@ export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
 
-  // Prevent hydration mismatch by only rendering after mount
+  // Prevent hydration mismatch by only rendering after mount.
+  // Intentional mount-guard: setState in effect runs exactly once on mount.
   React.useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 

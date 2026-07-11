@@ -458,7 +458,6 @@ describe('DeleteSourceDialog', () => {
     });
 
     it('displays correct source name for different sources', async () => {
-      const user = userEvent.setup();
       mockMutateAsync.mockResolvedValue(undefined);
 
       const source1: Source = {

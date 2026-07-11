@@ -20,9 +20,9 @@ export const test = base.extend<Fixtures>({
   // Note: Playwright fixture callbacks receive a `use` continuation; it is
   // renamed here to avoid a react-hooks/rules-of-hooks false positive.
   api: [
-    async ({ context }, provide) => {
+    async ({ context, baseURL }, provide) => {
       const api = new ApiMock();
-      await api.install(context);
+      await api.install(context, baseURL!);
       await provide(api);
     },
     { auto: true },

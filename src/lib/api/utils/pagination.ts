@@ -12,7 +12,7 @@ export function buildPaginationQuery(page?: number, limit?: number): string {
 
   const validPage = page && page > 0 ? page : PAGINATION_CONFIG.DEFAULT_PAGE;
   const validLimit =
-    limit && PAGINATION_CONFIG.AVAILABLE_PAGE_SIZES.includes(limit as any)
+    limit && (PAGINATION_CONFIG.AVAILABLE_PAGE_SIZES as readonly number[]).includes(limit)
       ? limit
       : PAGINATION_CONFIG.DEFAULT_LIMIT;
 
@@ -66,7 +66,10 @@ export function validatePaginationParams(params: URLSearchParams): {
 
   if (limitParam) {
     const parsed = parseInt(limitParam, 10);
-    if (!isNaN(parsed) && PAGINATION_CONFIG.AVAILABLE_PAGE_SIZES.includes(parsed as any)) {
+    if (
+      !isNaN(parsed) &&
+      (PAGINATION_CONFIG.AVAILABLE_PAGE_SIZES as readonly number[]).includes(parsed)
+    ) {
       limit = parsed;
     }
   }

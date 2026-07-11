@@ -1,6 +1,6 @@
 'use client';
 
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { Component, ErrorInfo, ReactNode } from 'react';
 import { logger } from '@/lib/logger';
 
 /**
@@ -86,7 +86,7 @@ export class FeatureErrorBoundary extends Component<
   };
 
   override render(): ReactNode {
-    const { hasError, error } = this.state;
+    const { hasError } = this.state;
     const { children, fallback } = this.props;
 
     if (hasError) {

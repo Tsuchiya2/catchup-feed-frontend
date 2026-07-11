@@ -670,8 +670,6 @@ describe('CsrfTokenManager', () => {
     });
 
     it('should handle Unicode characters in token', () => {
-      const manager = CsrfTokenManager.getInstance();
-
       // Note: HTTP headers must be ASCII (ISO-8859-1) compatible
       // Unicode characters in headers would cause errors in real scenarios
       // This test documents that limitation

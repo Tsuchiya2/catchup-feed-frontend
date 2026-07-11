@@ -47,12 +47,11 @@ export function makeMockJwt(expiresInSeconds = 60 * 60): string {
  */
 export async function authenticate(context: BrowserContext, baseURL: string): Promise<string> {
   const token = makeMockJwt();
+  // Auth is carried solely by the HttpOnly cookie (H-1 / D-22). The app never
+  // reads a JWT from localStorage, so we deliberately do NOT plant one: a
+  // persistent addInitScript would re-inject it on every navigation (including
+  // the post-logout redirect to /login), which would defeat the logout spec's
+  // "no lingering session" assertion.
   await context.addCookies([{ name: AUTH_TOKEN_KEY, value: token, url: baseURL }]);
-  await context.addInitScript(
-    ([key, value]) => {
-      window.localStorage.setItem(key, value);
-    },
-    [AUTH_TOKEN_KEY, token] as const
-  );
   return token;
 }

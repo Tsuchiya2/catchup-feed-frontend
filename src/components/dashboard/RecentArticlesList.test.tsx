@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { RecentArticlesList } from './RecentArticlesList';
 import type { Article } from '@/types/api';
-import { createMockArticle, createMockArticles } from '@/__test__/factories/articleFactory';
+import { createMockArticle } from '@/__test__/factories/articleFactory';
 
 // Mock Next.js Link component
 vi.mock('next/link', () => ({
@@ -81,7 +81,7 @@ describe('RecentArticlesList', () => {
 
     it('should not render empty summaries', () => {
       // Act
-      const { container } = render(<RecentArticlesList articles={mockArticles} />);
+      render(<RecentArticlesList articles={mockArticles} />);
 
       // Assert
       const thirdArticle = screen.getByText('Third Article Without Summary').closest('a');

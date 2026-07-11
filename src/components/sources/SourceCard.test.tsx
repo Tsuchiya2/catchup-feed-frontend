@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { SourceCard } from './SourceCard';
 import type { Source } from '@/types/api';
 
@@ -484,7 +483,7 @@ describe('SourceCard', () => {
 
       it('should render Pencil icon for visual indication', () => {
         const source = createMockSource();
-        const { container } = render(<SourceCard source={source} onEdit={mockOnEdit} />);
+        render(<SourceCard source={source} onEdit={mockOnEdit} />);
 
         const editButton = screen.getByTestId('source-edit-button');
         const icon = editButton.querySelector('svg');

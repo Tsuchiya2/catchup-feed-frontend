@@ -8,8 +8,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { render, screen } from '@testing-library/react';
 import { PWAUpdateNotification } from '../PWAUpdateNotification';
 
 // Mock workbox-window
@@ -23,9 +22,6 @@ vi.mock('workbox-window', () => ({
 }));
 
 describe('PWAUpdateNotification', () => {
-  let mockServiceWorker: {
-    postMessage: ReturnType<typeof vi.fn>;
-  };
   let mockRegistration: {
     waiting: ServiceWorker | null;
   };
@@ -33,11 +29,6 @@ describe('PWAUpdateNotification', () => {
   beforeEach(() => {
     // Mock NODE_ENV as production
     vi.stubEnv('NODE_ENV', 'production');
-
-    // Mock service worker
-    mockServiceWorker = {
-      postMessage: vi.fn(),
-    };
 
     mockRegistration = {
       waiting: null,

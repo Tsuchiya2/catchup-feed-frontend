@@ -33,6 +33,9 @@ export function makeMockJwt(expiresInSeconds = 60 * 60): string {
   const payload = {
     sub: 'admin',
     email: TEST_CREDENTIALS.email,
+    // Role claim (D-27): the proxy routes viewer-role tokens to /sources
+    // only, so the admin e2e session must carry an explicit admin role.
+    role: 'admin',
     exp: Math.floor(Date.now() / 1000) + expiresInSeconds,
   };
   return `${base64url(header)}.${base64url(payload)}.e2e-mock-signature`;

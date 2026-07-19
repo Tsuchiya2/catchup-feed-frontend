@@ -167,6 +167,12 @@ export class ApiMock {
       }
       return;
     }
+    if (method === 'GET' && path === '/auth/me') {
+      // e2e sessions are always the admin (D-27): the sources page and the
+      // header derive their role-scoped UI from this endpoint.
+      await this.fulfillJson(route, { sub: TEST_CREDENTIALS.email, role: 'admin' });
+      return;
+    }
     if (method === 'POST' && path === '/auth/logout') {
       // The real backend clears the auth cookie on logout; mirror that by
       // removing it from the app origin. Respond 204 like the real handler.

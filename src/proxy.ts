@@ -42,7 +42,15 @@ const PROTECTED_ROUTES = [
   '/access-logs',
   '/books',
   '/learning',
+  '/viewers',
 ];
+
+/**
+ * The only protected route a `viewer` role may reach (D-27 (3)).
+ * Everything else redirects to it; the backend independently returns 403
+ * on every other API, so this is UX, not the security boundary.
+ */
+const VIEWER_HOME = '/sources';
 
 /**
  * Check if a path matches any of the protected routes
@@ -95,6 +103,26 @@ function isTokenValid(token: string): boolean {
 }
 
 /**
+ * Read the `role` claim from the JWT (D-27): 'admin' | 'viewer'.
+ *
+ * Like isTokenValid, this only decodes — no signature check. A forged role
+ * can at most change which pages the proxy serves; every API call is
+ * re-authorized by the backend. Tokens without a role claim (pre-D-27) are
+ * treated as before (admin-shaped routing; the backend still decides).
+ *
+ * @param token - JWT token string
+ * @returns the role claim, or null when absent/unreadable
+ */
+function getTokenRole(token: string): string | null {
+  try {
+    const { role } = decodeJwt(token);
+    return typeof role === 'string' ? role : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Next.js 16 Proxy Function
  *
  * Handles authentication, CSRF protection, and route access control.
@@ -142,8 +170,23 @@ export function proxy(request: NextRequest) {
       return response;
     }
 
-    // Login page: redirect to /dashboard if already authenticated with valid token
+    // Viewer role (D-27 (3)): the only protected route a viewer may open is
+    // /sources. Redirect everything else there server-side — hiding links in
+    // the UI alone is not an acceptable guarantee. The match is
+    // boundary-aware (exact or a `/`-separated child) so future sibling
+    // routes like `/sources-admin` do not slip through.
+    const isViewer = hasValidToken && token ? getTokenRole(token) === 'viewer' : false;
+    const isViewerAllowedPath = pathname === VIEWER_HOME || pathname.startsWith(`${VIEWER_HOME}/`);
+    if (isViewer && isProtectedRoute(pathname) && !isViewerAllowedPath) {
+      return NextResponse.redirect(new URL(VIEWER_HOME, request.url));
+    }
+
+    // Login page: redirect to /dashboard (viewers: /sources) if already
+    // authenticated with valid token
     if (pathname === '/login' && hasValidToken) {
+      if (isViewer) {
+        return NextResponse.redirect(new URL(VIEWER_HOME, request.url));
+      }
       // Check if there's a redirect parameter
       const redirectParam = request.nextUrl.searchParams.get('redirect');
       const dashboardUrl = new URL(redirectParam || '/dashboard', request.url);

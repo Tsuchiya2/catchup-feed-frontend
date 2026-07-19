@@ -10,7 +10,7 @@
  */
 
 import { apiClient } from '@/lib/api/client';
-import type { LoginRequest, LoginResponse } from '@/types/api';
+import type { LoginRequest, LoginResponse, Me } from '@/types/api';
 
 /**
  * Login with email and password
@@ -54,4 +54,21 @@ export async function logout(): Promise<void> {
     requiresAuth: false, // Logout endpoint is idempotent and auth-optional
     retry: false,
   });
+}
+
+/**
+ * Fetch the authenticated user's identity and role (GET /auth/me).
+ *
+ * The JWT is in an HttpOnly cookie that JS cannot read (D-22), so this
+ * endpoint is the ONLY sanctioned way for the frontend to learn its role
+ * (`admin` / `viewer`, D-27 (5)). The role is never persisted client-side;
+ * display gating always re-derives it from this call (the backend enforces
+ * authorization regardless, so a spoofed role only breaks the spoofer's UI).
+ *
+ * @returns Promise resolving to `{ sub, role }`
+ * @throws {ApiError} 401 when unauthenticated, 403 for tokens without a
+ *   valid role or deactivated viewers
+ */
+export async function getMe(): Promise<Me> {
+  return apiClient.get<Me>('/auth/me');
 }

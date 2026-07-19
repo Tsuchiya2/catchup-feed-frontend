@@ -16,6 +16,7 @@ import { EditSourceDialog } from '@/components/sources/EditSourceDialog';
 import { DeleteSourceDialog } from '@/components/sources/DeleteSourceDialog';
 import { useSources } from '@/hooks/useSources';
 import { useSourceSearch } from '@/hooks/useSourceSearch';
+import { useMe } from '@/hooks/useAuth';
 import { updateSourceActive } from '@/lib/api/endpoints/sources';
 import {
   SourceSearch,
@@ -33,6 +34,13 @@ import type { Source } from '@/types/api';
 function SourcesPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
+
+  // Role gating (D-27): viewers get a read-only list of active sources
+  // (the backend force-filters GET /sources and 403s search/mutations).
+  // Until the role is known we render the read-only variant so admin-only
+  // controls never flash for a viewer.
+  const { role } = useMe();
+  const isAdmin = role === 'admin';
 
   // Add Source Dialog state
   const [isAddDialogOpen, setIsAddDialogOpen] = React.useState(false);
@@ -58,8 +66,9 @@ function SourcesPageContent() {
     active,
   });
 
-  // Determine if we're in search mode
-  const isSearchMode = hasActiveFilters(searchState);
+  // Determine if we're in search mode (admin only — GET /sources/search is
+  // 403 for viewers, so a viewer never issues search requests)
+  const isSearchMode = isAdmin && hasActiveFilters(searchState);
 
   // Fetch sources - conditionally enable based on mode to prevent duplicate API calls
   const listResult = useSources({ enabled: !isSearchMode });
@@ -181,22 +190,26 @@ function SourcesPageContent() {
 
   return (
     <div className="container py-8">
-      {/* Page Header with Add Button */}
+      {/* Page Header with Add Button (admin only) */}
       <div className="mb-6 flex items-start justify-between gap-4">
         <PageHeader title="Sources" description="RSS/Atom feeds being tracked" />
 
-        <Button onClick={() => setIsAddDialogOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Source
-        </Button>
+        {isAdmin && (
+          <Button onClick={() => setIsAddDialogOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            Add Source
+          </Button>
+        )}
       </div>
 
-      {/* Search and Filter Panel */}
-      <SourceSearch
-        searchState={searchState}
-        onSearchChange={setSearchState}
-        isLoading={isLoading}
-      />
+      {/* Search and Filter Panel (admin only — search is 403 for viewers) */}
+      {isAdmin && (
+        <SourceSearch
+          searchState={searchState}
+          onSearchChange={setSearchState}
+          isLoading={isLoading}
+        />
+      )}
 
       {/* Error State */}
       {error && (
@@ -243,15 +256,21 @@ function SourcesPageContent() {
       {!isLoading && !error && sources.length > 0 && (
         <>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {sources.map((source) => (
-              <SourceCard
-                key={source.id}
-                source={source}
-                onUpdateActive={handleUpdateActive}
-                onEdit={handleEditSource}
-                onDelete={handleDeleteSource}
-              />
-            ))}
+            {sources.map((source) =>
+              isAdmin ? (
+                <SourceCard
+                  key={source.id}
+                  source={source}
+                  onUpdateActive={handleUpdateActive}
+                  onEdit={handleEditSource}
+                  onDelete={handleDeleteSource}
+                />
+              ) : (
+                // Viewer (D-27): no handlers → SourceCard renders its
+                // read-only variant (StatusBadge, no edit/delete/toggle)
+                <SourceCard key={source.id} source={source} />
+              )
+            )}
           </div>
 
           {/* Total Count */}
@@ -263,13 +282,13 @@ function SourcesPageContent() {
 
       {/* Add Source Dialog */}
       <AddSourceDialog
-        isOpen={isAddDialogOpen}
+        isOpen={isAdmin && isAddDialogOpen}
         onClose={() => setIsAddDialogOpen(false)}
         onSuccess={() => setIsAddDialogOpen(false)}
       />
 
       {/* Edit Source Dialog */}
-      {selectedSource && (
+      {isAdmin && selectedSource && (
         <EditSourceDialog
           isOpen={editDialogOpen}
           onClose={handleEditDialogClose}
@@ -278,7 +297,7 @@ function SourcesPageContent() {
       )}
 
       {/* Delete Source Dialog */}
-      {sourceToDelete && (
+      {isAdmin && sourceToDelete && (
         <DeleteSourceDialog
           isOpen={deleteDialogOpen}
           onClose={handleDeleteDialogClose}
@@ -294,8 +313,10 @@ function SourcesPageContent() {
  * Sources List Page
  *
  * Protected page that displays a grid of RSS/Atom feed sources.
- * The system has a single administrator (C-7/C-20): any authenticated
- * user is the admin, so management controls are always shown here.
+ * The admin (C-7) gets full management controls; `viewer` accounts (D-27)
+ * get a read-only list of active sources — the backend force-filters
+ * GET /sources and rejects search/mutations with 403, so the UI gating
+ * here is presentation only.
  * Requires authentication - unauthenticated users will be redirected by the proxy.
  *
  * Wrapped in Suspense boundary for useSearchParams compatibility with Next.js 15.

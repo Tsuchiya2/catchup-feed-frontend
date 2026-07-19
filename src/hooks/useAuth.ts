@@ -10,11 +10,45 @@
 
 'use client';
 
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import { login as loginApi, logout as logoutApi } from '@/lib/api/endpoints/auth';
+import { login as loginApi, logout as logoutApi, getMe } from '@/lib/api/endpoints/auth';
 import { clearCsrfToken } from '@/lib/security/CsrfTokenManager';
 import { logger } from '@/lib/logger';
+import type { Me, UserRole } from '@/types/api';
+
+/** React Query key for the GET /auth/me identity/role lookup. */
+const ME_QUERY_KEY = ['auth', 'me'] as const;
+
+/**
+ * Fetch the authenticated user's `{ sub, role }` via GET /auth/me (D-27 (5)).
+ *
+ * The role is intentionally NOT persisted anywhere (no localStorage): the
+ * server response is the single source of truth, and the backend enforces
+ * authorization on every call anyway. `role` is `undefined` while loading or
+ * when the request fails (callers should render the restrictive/read-only
+ * variant in that case).
+ */
+export function useMe(): {
+  me: Me | null;
+  role: UserRole | undefined;
+  isLoading: boolean;
+  error: Error | null;
+} {
+  const query = useQuery({
+    queryKey: ME_QUERY_KEY,
+    queryFn: getMe,
+    staleTime: 60000,
+    retry: false, // 401/403 will not heal on retry
+  });
+
+  return {
+    me: query.data ?? null,
+    role: query.data?.role,
+    isLoading: query.isLoading,
+    error: query.error as Error | null,
+  };
+}
 
 /**
  * Authentication hook return type
@@ -68,19 +102,34 @@ interface UseAuthReturn {
  */
 export function useAuth(): UseAuthReturn {
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   // Login mutation. On success the backend has already set the HttpOnly auth
   // cookie via Set-Cookie; we deliberately do NOT persist the body `token`
   // anywhere (localStorage / JS-readable cookie) — that is the H-1 fix.
   const loginMutation = useMutation({
     mutationFn: async ({ email, password }: { email: string; password: string }) => {
-      const response = await loginApi(email, password);
-      return response;
+      await loginApi(email, password);
+
+      // Ask the backend who we are (the cookie is HttpOnly, so GET /auth/me
+      // is the only way to learn the role — D-27 (5)). Best-effort: if it
+      // fails we fall back to the admin route and let the proxy sort a
+      // viewer out server-side.
+      let role: UserRole | undefined;
+      try {
+        const me = await getMe();
+        queryClient.setQueryData(ME_QUERY_KEY, me);
+        role = me.role;
+      } catch (error) {
+        logger.warn('GET /auth/me failed after login; defaulting to admin route', { error });
+      }
+      return role;
     },
-    onSuccess: () => {
+    onSuccess: (role) => {
       // Auth is now carried by the HttpOnly cookie the backend just set.
-      // Navigate to the dashboard; the proxy will read that cookie server-side.
-      router.push('/dashboard');
+      // Viewers only have access to /sources (D-27 (3)); admins keep the
+      // dashboard. The proxy re-enforces this server-side on every request.
+      router.push(role === 'viewer' ? '/sources' : '/dashboard');
       router.refresh();
     },
   });
@@ -114,6 +163,9 @@ export function useAuth(): UseAuthReturn {
 
     // Clear the client-side CSRF token (the JWT cookie is cleared server-side).
     clearCsrfToken();
+
+    // Drop the cached identity/role so the next session re-fetches it.
+    queryClient.removeQueries({ queryKey: ME_QUERY_KEY });
 
     // Purge any API responses the Service Worker cached while authenticated
     // (M-3). Sensitive endpoints are never cached, but this empties the whole

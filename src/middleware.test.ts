@@ -722,6 +722,112 @@ describe('Proxy Function - CSRF Protection Integration Tests', () => {
     });
   });
 
+  describe('Viewer Role Routing (D-27)', () => {
+    const futureExp = () => Math.floor(Date.now() / 1000) + 3600;
+
+    it('redirects a viewer from /dashboard to /sources', async () => {
+      const request = new NextRequest('http://localhost:3000/dashboard', { method: 'GET' });
+      request.cookies.set('catchup_feed_auth_token', mockValidToken);
+
+      const { decodeJwt } = await import('jose');
+      vi.mocked(decodeJwt).mockReturnValue({ exp: futureExp(), role: 'viewer' });
+
+      const response = proxy(request);
+
+      expect(response.status).toBe(307);
+      expect(response.headers.get('location')).toContain('/sources');
+    });
+
+    it.each(['/articles', '/subscribers', '/viewers', '/access-logs', '/books', '/learning'])(
+      'redirects a viewer from %s to /sources',
+      async (path) => {
+        const request = new NextRequest(`http://localhost:3000${path}`, { method: 'GET' });
+        request.cookies.set('catchup_feed_auth_token', mockValidToken);
+
+        const { decodeJwt } = await import('jose');
+        vi.mocked(decodeJwt).mockReturnValue({ exp: futureExp(), role: 'viewer' });
+
+        const response = proxy(request);
+
+        expect(response.status).toBe(307);
+        expect(new URL(response.headers.get('location')!).pathname).toBe('/sources');
+      }
+    );
+
+    it('allows a viewer to access /sources', async () => {
+      const request = new NextRequest('http://localhost:3000/sources', { method: 'GET' });
+      request.cookies.set('catchup_feed_auth_token', mockValidToken);
+
+      const { decodeJwt } = await import('jose');
+      vi.mocked(decodeJwt).mockReturnValue({ exp: futureExp(), role: 'viewer' });
+
+      const response = proxy(request);
+
+      expect(response.status).not.toBe(307);
+      expect(csrfUtils.setCsrfToken).toHaveBeenCalled();
+    });
+
+    it('does NOT let a viewer through on sibling paths like /sources-admin (boundary match)', async () => {
+      const request = new NextRequest('http://localhost:3000/sources-admin', { method: 'GET' });
+      request.cookies.set('catchup_feed_auth_token', mockValidToken);
+
+      const { decodeJwt } = await import('jose');
+      vi.mocked(decodeJwt).mockReturnValue({ exp: futureExp(), role: 'viewer' });
+
+      const response = proxy(request);
+
+      expect(response.status).toBe(307);
+      expect(new URL(response.headers.get('location')!).pathname).toBe('/sources');
+    });
+
+    it('redirects an authenticated viewer from /login to /sources (not /dashboard)', async () => {
+      const request = new NextRequest('http://localhost:3000/login', { method: 'GET' });
+      request.cookies.set('catchup_feed_auth_token', mockValidToken);
+
+      const { decodeJwt } = await import('jose');
+      vi.mocked(decodeJwt).mockReturnValue({ exp: futureExp(), role: 'viewer' });
+
+      const response = proxy(request);
+
+      expect(response.status).toBe(307);
+      expect(new URL(response.headers.get('location')!).pathname).toBe('/sources');
+    });
+
+    it('does not restrict admin-role tokens', async () => {
+      const request = new NextRequest('http://localhost:3000/viewers', { method: 'GET' });
+      request.cookies.set('catchup_feed_auth_token', mockValidToken);
+
+      const { decodeJwt } = await import('jose');
+      vi.mocked(decodeJwt).mockReturnValue({ exp: futureExp(), role: 'admin' });
+
+      const response = proxy(request);
+
+      expect(response.status).not.toBe(307);
+    });
+
+    it('treats tokens WITHOUT a role claim as before (no viewer restriction)', async () => {
+      const request = new NextRequest('http://localhost:3000/dashboard', { method: 'GET' });
+      request.cookies.set('catchup_feed_auth_token', mockValidToken);
+
+      const { decodeJwt } = await import('jose');
+      vi.mocked(decodeJwt).mockReturnValue({ exp: futureExp() });
+
+      const response = proxy(request);
+
+      expect(response.status).not.toBe(307);
+    });
+
+    it('requires authentication for /viewers (redirects to login without a token)', () => {
+      const request = new NextRequest('http://localhost:3000/viewers', { method: 'GET' });
+
+      const response = proxy(request);
+
+      expect(response.status).toBe(307);
+      expect(response.headers.get('location')).toContain('/login');
+      expect(response.headers.get('location')).toContain('redirect=%2Fviewers');
+    });
+  });
+
   describe('Edge Cases', () => {
     it('should handle POST request to public route (requires CSRF)', () => {
       // Arrange - POST to homepage (public route)

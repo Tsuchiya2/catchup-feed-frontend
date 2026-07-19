@@ -9,30 +9,46 @@ import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/common/ThemeToggle';
 import { cn } from '@/lib/utils';
+import type { UserRole } from '@/types/api';
 
 interface HeaderProps {
   onLogout?: () => void;
   showAuthLinks?: boolean;
+  /**
+   * Authenticated role from GET /auth/me (D-27). Viewers only see the
+   * Sources link; undefined (still loading / unknown) hides the main nav
+   * so admin-only links never flash for a viewer. Logout stays visible
+   * regardless (POST /auth/logout is a public endpoint).
+   */
+  role?: UserRole;
 }
 
-const mainNavigation = [
+const adminNavigation = [
   { name: 'Dashboard', href: '/dashboard' },
   { name: 'Articles', href: '/articles' },
   { name: 'Sources', href: '/sources' },
   { name: 'Books', href: '/books' },
   { name: 'Friends', href: '/subscribers' },
+  { name: 'Viewers', href: '/viewers' },
   { name: 'Access Logs', href: '/access-logs' },
   { name: 'Review', href: '/learning' },
 ];
+
+const viewerNavigation = [{ name: 'Sources', href: '/sources' }];
 
 const legalNavigation = [
   { name: 'Terms', href: '/terms' },
   { name: 'Privacy', href: '/privacy' },
 ];
 
-export function Header({ onLogout, showAuthLinks = true }: HeaderProps) {
+export function Header({ onLogout, showAuthLinks = true, role }: HeaderProps) {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+
+  // Role-scoped main navigation (D-27): admin sees everything, viewer only
+  // Sources, unknown role (loading) shows nothing yet.
+  const mainNavigation =
+    role === 'admin' ? adminNavigation : role === 'viewer' ? viewerNavigation : [];
 
   const handleLogout = () => {
     if (onLogout) {
@@ -56,7 +72,7 @@ export function Header({ onLogout, showAuthLinks = true }: HeaderProps) {
         {/* Logo */}
         <div className="flex items-center">
           <Link
-            href="/dashboard"
+            href={role === 'viewer' ? '/sources' : '/dashboard'}
             data-testid="header-logo"
             className="group flex items-center space-x-2 transition-all duration-200"
           >
@@ -101,7 +117,9 @@ export function Header({ onLogout, showAuthLinks = true }: HeaderProps) {
             })}
 
           {/* Divider */}
-          {showAuthLinks && <div className="mx-2 h-6 w-px bg-border/50" />}
+          {showAuthLinks && mainNavigation.length > 0 && (
+            <div className="mx-2 h-6 w-px bg-border/50" />
+          )}
 
           {/* Legal navigation (public pages) */}
           {legalNavigation.map((item) => {
@@ -180,7 +198,9 @@ export function Header({ onLogout, showAuthLinks = true }: HeaderProps) {
               })}
 
             {/* Legal navigation */}
-            {showAuthLinks && <div className="my-2 border-t border-border/30 pt-2" />}
+            {showAuthLinks && mainNavigation.length > 0 && (
+              <div className="my-2 border-t border-border/30 pt-2" />
+            )}
             {legalNavigation.map((item) => {
               const isActive = pathname === item.href;
               return (

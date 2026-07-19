@@ -64,6 +64,19 @@ export interface TokenValidationResponse {
   email?: string;
 }
 
+/**
+ * Role carried by the JWT `role` claim (D-27): `admin` (single administrator,
+ * env credentials) or `viewer` (read-only friend account).
+ */
+export type UserRole = NonNullable<Schemas['internal_handler_http_auth.MeResponse']['role']>;
+
+/**
+ * Response of GET /auth/me. The JWT lives in an HttpOnly cookie (D-22), so
+ * this endpoint is the only way for client code to learn its own role
+ * (D-27 (5)).
+ */
+export type Me = Full<Schemas['internal_handler_http_auth.MeResponse']>;
+
 // ============================================================================
 // Article Types
 // ============================================================================
@@ -248,6 +261,33 @@ export type IssuedFeedToken = Nullable<
  * Response of DELETE /tokens/:id (revocation is irreversible).
  */
 export type RevokedFeedToken = Full<Schemas['internal_handler_http_subscriber.RevokedTokenDTO']>;
+
+// ============================================================================
+// Viewer (read-only account) Types — D-27
+// ============================================================================
+
+/**
+ * Viewer (read-only friend account) entity.
+ * `deactivated_at` set = logically deactivated (reversible via
+ * PUT /viewers/:id/active). Deletion, unlike subscribers, is PHYSICAL.
+ */
+export type Viewer = Nullable<Schemas['internal_handler_http_viewer.DTO'], 'deactivated_at'>;
+
+/**
+ * Body of POST /viewers. All three fields are required; the admin sets the
+ * initial password (8–72 bytes, bcrypt'd server-side).
+ */
+export type ViewerCreateInput = Full<Schemas['internal_handler_http_viewer.CreateRequest']>;
+
+/**
+ * Body of PUT /viewers/:id. name / email are required; password is optional
+ * and only resets the password when present (omit the key to keep the
+ * current password).
+ */
+export type ViewerUpdateInput = Full<
+  Omit<Schemas['internal_handler_http_viewer.UpdateRequest'], 'password'>
+> &
+  Pick<Schemas['internal_handler_http_viewer.UpdateRequest'], 'password'>;
 
 // ============================================================================
 // Access Log Types

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { login, logout } from '../auth';
+import { login, logout, getMe } from '../auth';
 import { apiClient } from '@/lib/api/client';
 
 // Mock the API client
@@ -78,6 +78,23 @@ describe('Auth API Endpoints', () => {
       vi.mocked(apiClient.post).mockRejectedValue(new Error('network down'));
 
       await expect(logout()).rejects.toThrow('network down');
+    });
+  });
+
+  describe('getMe', () => {
+    it('calls GET /auth/me and returns sub + role (D-27)', async () => {
+      vi.mocked(apiClient.get).mockResolvedValue({ sub: 'friend@example.com', role: 'viewer' });
+
+      const result = await getMe();
+
+      expect(apiClient.get).toHaveBeenCalledWith('/auth/me');
+      expect(result).toEqual({ sub: 'friend@example.com', role: 'viewer' });
+    });
+
+    it('propagates errors (401 unauthenticated / 403 deactivated viewer)', async () => {
+      vi.mocked(apiClient.get).mockRejectedValue(new Error('Forbidden'));
+
+      await expect(getMe()).rejects.toThrow('Forbidden');
     });
   });
 });

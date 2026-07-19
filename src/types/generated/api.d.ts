@@ -562,6 +562,65 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/auth/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 認証情報取得
+         * @description 認証済みユーザーの識別子(sub)とロール(admin / viewer)を返します。
+         *     JWT は HttpOnly cookie のため JS から読めず、frontend が自分のロールを
+         *     知る唯一の手段です(D-27 (5)、D-22)。admin / viewer の両ロールが呼べます。
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 認証済みユーザーの sub と role */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["internal_handler_http_auth.MeResponse"];
+                    };
+                };
+                /** @description Authentication required */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+                /** @description Forbidden - role クレームなし・未知 role・無効化済み viewer */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/auth/token": {
         parameters: {
             query?: never;
@@ -573,7 +632,10 @@ export interface paths {
         put?: never;
         /**
          * JWT トークン取得
-         * @description 管理者のユーザー名とパスワードで認証し、JWT トークンを発行します。
+         * @description メールアドレスとパスワードで認証し、JWT トークンを発行します。
+         *     まず管理者(環境変数+bcrypt)と照合し、不一致なら viewers テーブルの
+         *     アクティブな閲覧専用アカウントと照合します(D-27。無効化済み viewer は拒否)。
+         *     発行する JWT には role クレーム(admin / viewer)が入ります。
          *     JSON body の token(dev の Bearer フォールバック用に後方互換で維持)に加え、
          *     同じ JWT を HttpOnly / Secure / SameSite=Strict の cookie
          *     (catchup_feed_auth_token)で Set-Cookie します(D-22)。
@@ -1333,7 +1395,8 @@ export interface paths {
         };
         /**
          * ソース一覧取得
-         * @description 登録されているすべてのソースを取得します
+         * @description 登録されているソースを取得します。admin はアクティブ・非アクティブ含む全件、
+         *     viewer はアクティブなソースのみ返ります(サーバー側で強制フィルタ、D-27)
          */
         get: {
             parameters: {
@@ -1434,7 +1497,7 @@ export interface paths {
         };
         /**
          * ソース検索
-         * @description マルチキーワードでソースを検索します（AND論理）
+         * @description マルチキーワードでソースを検索します（AND論理）。admin 専用(viewer は 403、D-27)
          */
         get: {
             parameters: {
@@ -1472,6 +1535,15 @@ export interface paths {
                 };
                 /** @description Authentication required */
                 401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+                /** @description Forbidden - viewer ロールは検索不可(D-27) */
+                403: {
                     headers: {
                         [name: string]: unknown;
                     };
@@ -2111,6 +2183,378 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/viewers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * viewer 一覧取得
+         * @description 閲覧専用アカウント(viewer, D-27)をアクティブ・非アクティブ含めてすべて取得します。
+         *     active / deactivated_at で有効・無効を判別できます。admin 専用
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description viewer 一覧 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["internal_handler_http_viewer.DTO"][];
+                    };
+                };
+                /** @description Authentication required */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+                /** @description Forbidden - admin 専用 */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+                /** @description サーバーエラー */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        /**
+         * viewer 登録
+         * @description 閲覧専用アカウントを作成します。パスワードは admin が設定し(D-27 (2))、
+         *     サーバー側で bcrypt ハッシュのみ保存されます。admin 専用
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            /** @description viewer 情報(name / email / password すべて必須) */
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["internal_handler_http_viewer.CreateRequest"];
+                };
+            };
+            responses: {
+                /** @description 作成された viewer */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["internal_handler_http_viewer.DTO"];
+                    };
+                };
+                /** @description Bad request - name/email/password が不正 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+                /** @description Authentication required */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+                /** @description Forbidden - admin 専用 */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+                /** @description Conflict - email が既に登録済み */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/viewers/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * viewer 更新
+         * @description viewer の name / email を更新します。password は任意で、指定した場合のみ
+         *     再設定されます(省略時は現在のパスワードを維持)。admin 専用
+         */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description viewer ID */
+                    id: number;
+                };
+                cookie?: never;
+            };
+            /** @description 更新する viewer 情報 */
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["internal_handler_http_viewer.UpdateRequest"];
+                };
+            };
+            responses: {
+                /** @description 更新後の viewer */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["internal_handler_http_viewer.DTO"];
+                    };
+                };
+                /** @description Bad request - 入力が不正 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+                /** @description Authentication required */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+                /** @description Forbidden - admin 専用 */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+                /** @description Not found - viewer が存在しない */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+                /** @description Conflict - email が既に登録済み */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        /**
+         * viewer 削除(物理削除)
+         * @description viewer を物理削除します(subscribers と異なり集計のために行を残す理由が
+         *     ないため、D-27 (4))。削除後、その viewer の既存 JWT はリクエスト時の
+         *     DB 再検証で即座に 403 になります。admin 専用
+         */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description viewer ID */
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Bad request - invalid ID */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "*/*": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+                /** @description Authentication required */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "*/*": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+                /** @description Forbidden - admin 専用 */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "*/*": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+                /** @description Not found - viewer が存在しない */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "*/*": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/viewers/{id}/active": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * viewer 有効/無効切替
+         * @description viewer の有効/無効を切り替えます(論理無効化 = deactivated_at の set/clear)。
+         *     無効化はリクエスト時の DB 再検証により即時反映され、発行済み JWT の失効を
+         *     待ちません(D-27 (4))。冪等。admin 専用
+         */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description viewer ID */
+                    id: number;
+                };
+                cookie?: never;
+            };
+            /** @description {active: true|false} */
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["internal_handler_http_viewer.ActiveRequest"];
+                };
+            };
+            responses: {
+                /** @description 切替後の viewer */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["internal_handler_http_viewer.DTO"];
+                    };
+                };
+                /** @description Bad request - 入力が不正 */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+                /** @description Authentication required */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+                /** @description Forbidden - admin 専用 */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+                /** @description Not found - viewer が存在しない */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -2205,6 +2649,15 @@ export interface components {
             title?: string;
             /** @example https://example.com/article/1 */
             url?: string;
+        };
+        "internal_handler_http_auth.MeResponse": {
+            /**
+             * @example viewer
+             * @enum {string}
+             */
+            role?: "admin" | "viewer";
+            /** @example friend@example.com */
+            sub?: string;
         };
         "internal_handler_http_auth.loginRequest": {
             /** @example admin@example.com */
@@ -2441,6 +2894,35 @@ export interface components {
             id?: number;
             revoked_at?: string;
             subscriber_id?: number;
+        };
+        "internal_handler_http_viewer.ActiveRequest": {
+            /** @example false */
+            active?: boolean;
+        };
+        "internal_handler_http_viewer.CreateRequest": {
+            /** @example alice@example.com */
+            email?: string;
+            /** @example Alice */
+            name?: string;
+            /** @example correct-horse-battery */
+            password?: string;
+        };
+        "internal_handler_http_viewer.DTO": {
+            active?: boolean;
+            created_at?: string;
+            deactivated_at?: string;
+            email?: string;
+            id?: number;
+            name?: string;
+            updated_at?: string;
+        };
+        "internal_handler_http_viewer.UpdateRequest": {
+            /** @example alice@example.com */
+            email?: string;
+            /** @example Alice */
+            name?: string;
+            /** @example new-password-123 */
+            password?: string;
         };
     };
     responses: never;

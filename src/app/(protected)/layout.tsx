@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { Header } from '@/components/layout/Header';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth, useMe } from '@/hooks/useAuth';
 
 /**
  * Protected Layout
@@ -17,6 +17,9 @@ export default function ProtectedLayout({
   children: React.ReactNode;
 }>) {
   const { logout } = useAuth();
+  // Role from GET /auth/me (D-27): scopes the header navigation. The proxy
+  // and backend enforce access regardless of what the client renders.
+  const { role } = useMe();
 
   return (
     <div className="relative min-h-screen bg-background">
@@ -26,7 +29,7 @@ export default function ProtectedLayout({
 
       {/* Content */}
       <div className="relative">
-        <Header onLogout={logout} />
+        <Header onLogout={logout} role={role} />
         <main className="px-4 pb-8 sm:px-6 lg:px-8">{children}</main>
       </div>
     </div>

@@ -6,6 +6,7 @@ import SourcesPage from '../page';
 import * as sourcesApi from '@/lib/api/endpoints/sources';
 import * as useSources from '@/hooks/useSources';
 import * as useSourceSearch from '@/hooks/useSourceSearch';
+import * as useAuth from '@/hooks/useAuth';
 import { ApiError } from '@/lib/api/errors';
 import type { Source } from '@/types/api';
 
@@ -13,6 +14,7 @@ import type { Source } from '@/types/api';
 vi.mock('@/lib/api/endpoints/sources');
 vi.mock('@/hooks/useSources');
 vi.mock('@/hooks/useSourceSearch');
+vi.mock('@/hooks/useAuth');
 
 // Mock next/navigation
 vi.mock('next/navigation', () => ({
@@ -93,6 +95,15 @@ describe('SourcesPage', () => {
 
     // Backend responds 204 No Content
     vi.mocked(sourcesApi.updateSourceActive).mockResolvedValue(undefined);
+
+    // Default to the admin role (D-27): management UI is admin-only.
+    // Viewer-specific tests override this per-test.
+    vi.mocked(useAuth.useMe).mockReturnValue({
+      me: { sub: 'admin@example.com', role: 'admin' },
+      role: 'admin',
+      isLoading: false,
+      error: null,
+    });
   });
 
   afterEach(() => {
@@ -108,7 +119,7 @@ describe('SourcesPage', () => {
       // Act
       renderWithClient(<SourcesPage />);
 
-      // Assert - single-admin system: authenticated users always see management UI
+      // Assert - the admin role always sees the management UI
       expect(screen.getByRole('button', { name: /add source/i })).toBeInTheDocument();
     });
 
@@ -152,6 +163,54 @@ describe('SourcesPage', () => {
 
         // Third source is active
         expect(toggles[2]).toBeChecked();
+      });
+    });
+  });
+
+  describe('Viewer role (read-only, D-27)', () => {
+    beforeEach(() => {
+      vi.mocked(useAuth.useMe).mockReturnValue({
+        me: { sub: 'friend@example.com', role: 'viewer' },
+        role: 'viewer',
+        isLoading: false,
+        error: null,
+      });
+    });
+
+    it('should NOT display the Add Source button', () => {
+      renderWithClient(<SourcesPage />);
+
+      expect(screen.queryByRole('button', { name: /add source/i })).not.toBeInTheDocument();
+    });
+
+    it('should NOT display the search panel (search is 403 for viewers)', () => {
+      renderWithClient(<SourcesPage />);
+
+      expect(screen.queryByPlaceholderText(/search/i)).not.toBeInTheDocument();
+    });
+
+    it('should render read-only cards: StatusBadge instead of toggles, no edit/delete', async () => {
+      renderWithClient(<SourcesPage />);
+
+      await waitFor(() => {
+        // No ActiveToggle switches
+        expect(screen.queryAllByRole('switch')).toHaveLength(0);
+        // StatusBadge text appears instead (server returns active only in
+        // production; the mocked list has 2 active + 1 inactive here)
+        expect(screen.getAllByText('Active').length).toBeGreaterThan(0);
+      });
+
+      expect(screen.queryByRole('button', { name: /edit source/i })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /delete source/i })).not.toBeInTheDocument();
+    });
+
+    it('should still list the sources themselves', async () => {
+      renderWithClient(<SourcesPage />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Tech Blog')).toBeInTheDocument();
+        expect(screen.getByText('News Site')).toBeInTheDocument();
+        expect(screen.getByText('Developer Feed')).toBeInTheDocument();
       });
     });
   });

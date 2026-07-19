@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.11.0](https://github.com/Tsuchiya2/catchup-feed-frontend/compare/catchup-feed-frontend-v1.10.0...catchup-feed-frontend-v1.11.0) (2026-07-19)
+
+
+### Features
+
+* add read-only viewer accounts (D-27) ([bac85fb](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/bac85fb72b590dcb5a35bec19c2f517ca3da45de))
+* add read-only viewer accounts (D-27) ([23f5584](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/23f55844bbcc5ddafa1bcbd014d6c459bb5bfddc))
+
 ## [1.10.0](https://github.com/Tsuchiya2/catchup-feed-frontend/compare/catchup-feed-frontend-v1.9.3...catchup-feed-frontend-v1.10.0) (2026-07-11)
 
 

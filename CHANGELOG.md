@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.11.1](https://github.com/Tsuchiya2/catchup-feed-frontend/compare/catchup-feed-frontend-v1.11.0...catchup-feed-frontend-v1.11.1) (2026-08-04)
+
+
+### Bug Fixes
+
+* keep header navigation on legal pages and link them from public screens ([9794fce](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/9794fcebff9e0fa9e473316cc9773a03842d5335))
+* keep header navigation on legal pages and link them from public screens ([ea938cf](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/ea938cf74f9f9c0de6a26d798512d645bf6adfa6))
+
+
+### Documentation
+
+* align README overview with backend wording ([ec1bba2](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/ec1bba2940b0a85b025eba95f71050da9952783f))
+
 ## [1.11.0](https://github.com/Tsuchiya2/catchup-feed-frontend/compare/catchup-feed-frontend-v1.10.0...catchup-feed-frontend-v1.11.0) (2026-07-19)
 
 

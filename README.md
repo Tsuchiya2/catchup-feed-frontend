@@ -94,7 +94,7 @@
 ### ローカル(Node で直接起動)
 
 ```bash
-git clone https://github.com/Tsuchiya2/catchup-feed-front.git
+git clone https://github.com/Tsuchiya2/catchup-feed-frontend.git
 cd catchup-feed-front
 
 cp .env.example .env   # 環境変数を用意

@@ -57,6 +57,22 @@ export default function LoginPage() {
             Back to Home
           </Link>
         </div>
+
+        {/* Legal Links */}
+        <div className="flex justify-center gap-6">
+          <Link
+            href="/terms"
+            className="text-xs text-muted-foreground transition-colors hover:text-primary"
+          >
+            Terms of Service
+          </Link>
+          <Link
+            href="/privacy"
+            className="text-xs text-muted-foreground transition-colors hover:text-primary"
+          >
+            Privacy Policy
+          </Link>
+        </div>
       </div>
     </div>
   );

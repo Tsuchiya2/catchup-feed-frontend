@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
+import { Footer } from '@/components/layout/Footer';
 import { FileText, Rss, Zap } from 'lucide-react';
 
 /**
@@ -89,12 +90,8 @@ export default function Home() {
       {/* Decorative cyber line */}
       <div className="absolute bottom-24 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
 
-      {/* Footer */}
-      <footer className="relative border-t border-border/50 py-6">
-        <div className="container mx-auto text-center text-sm text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} Catchup Feed. All rights reserved.</p>
-        </div>
-      </footer>
+      {/* Footer (shared component; includes Terms/Privacy links) */}
+      <Footer />
     </main>
   );
 }

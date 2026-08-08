@@ -25,7 +25,7 @@ export interface SourceFormData {
   /** Content language (optional, e.g. "ja", "en") */
   lang: string;
   /**
-   * Source kind (rss / youtube / podcast; defaults to 'rss').
+   * Source kind (rss / youtube / podcast / newsletter; defaults to 'rss').
    * Constrained by a select, so it needs no validation.
    */
   kind: SourceKind;

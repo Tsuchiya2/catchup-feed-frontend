@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.12.0](https://github.com/Tsuchiya2/catchup-feed-frontend/compare/catchup-feed-frontend-v1.11.1...catchup-feed-frontend-v1.12.0) (2026-08-08)
+
+
+### Features
+
+* ソース種別に newsletter を追加 ([0e7aab6](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/0e7aab6dcb5662bbdd381d8357cb53fcb9c2f946))
+* ソース種別に newsletter を追加 ([2e809c3](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/2e809c3dabf153cc540f25fe51279a314da05686))
+
 ## [1.11.1](https://github.com/Tsuchiya2/catchup-feed-frontend/compare/catchup-feed-frontend-v1.11.0...catchup-feed-frontend-v1.11.1) (2026-08-04)
 
 

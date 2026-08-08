@@ -32,6 +32,7 @@ const KIND_OPTIONS: ReadonlyArray<{ value: SourceKind; label: string }> = [
   { value: 'rss', label: 'RSS' },
   { value: 'youtube', label: 'YouTube' },
   { value: 'podcast', label: 'Podcast' },
+  { value: 'newsletter', label: 'Newsletter' },
 ];
 
 /**

@@ -1647,7 +1647,7 @@ export interface paths {
         post?: never;
         /**
          * ソース削除
-         * @description ソースを削除します
+         * @description ソースを削除します(論理削除。記事は保持されます)
          */
         delete: {
             parameters: {
@@ -1679,6 +1679,15 @@ export interface paths {
                 };
                 /** @description Authentication required - missing or invalid JWT token */
                 401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "*/*": components["schemas"]["catchup-feed_internal_handler_http_respond.ErrorResponse"];
+                    };
+                };
+                /** @description Not found - source not found */
+                404: {
                     headers: {
                         [name: string]: unknown;
                     };
@@ -2813,7 +2822,7 @@ export interface components {
              * @example rss
              * @enum {string}
              */
-            kind?: "rss" | "youtube" | "podcast";
+            kind?: "rss" | "youtube" | "podcast" | "newsletter";
             /** @example en */
             lang?: string;
             /** @example Go Blog */
@@ -2829,7 +2838,7 @@ export interface components {
              * @example rss
              * @enum {string}
              */
-            kind?: "rss" | "youtube" | "podcast";
+            kind?: "rss" | "youtube" | "podcast" | "newsletter";
             lang?: string;
             name?: string;
             /** @description Mapped from FeedURL for frontend compatibility */
@@ -2846,7 +2855,7 @@ export interface components {
              * @example rss
              * @enum {string}
              */
-            kind?: "rss" | "youtube" | "podcast";
+            kind?: "rss" | "youtube" | "podcast" | "newsletter";
             /** @example en */
             lang?: string;
             /** @example Go Blog */

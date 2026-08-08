@@ -409,6 +409,35 @@ describe('SourceForm', () => {
       });
     });
 
+    it('should submit the newsletter kind when selected', async () => {
+      const user = userEvent.setup();
+      render(
+        <SourceForm
+          mode="create"
+          onSubmit={mockOnSubmit}
+          isLoading={false}
+          error={null}
+          onCancel={mockOnCancel}
+        />
+      );
+
+      await user.type(screen.getByLabelText('Source name'), 'Weekly Links');
+      await user.type(screen.getByLabelText('Feed URL'), 'https://newsletter.example.com/rss');
+      await user.type(screen.getByLabelText('Category'), 'tech');
+      await user.selectOptions(screen.getByLabelText('Source type'), 'newsletter');
+      await user.click(screen.getByRole('button', { name: /add source/i }));
+
+      await waitFor(() => {
+        expect(mockOnSubmit).toHaveBeenCalledWith({
+          kind: 'newsletter',
+          name: 'Weekly Links',
+          feedURL: 'https://newsletter.example.com/rss',
+          category: 'tech',
+          lang: '',
+        });
+      });
+    });
+
     it('should pre-select the kind from initialData in edit mode', () => {
       render(
         <SourceForm

@@ -74,6 +74,12 @@ describe('SourceCard', () => {
       expect(screen.getByTestId('source-kind-badge')).toHaveTextContent('RSS');
     });
 
+    it('should render the Newsletter kind badge for newsletter sources', () => {
+      const source = createMockSource({ kind: 'newsletter' });
+      render(<SourceCard source={source} />);
+      expect(screen.getByTestId('source-kind-badge')).toHaveTextContent('Newsletter');
+    });
+
     it('should not render language badge when lang is empty', () => {
       const source = createMockSource({ lang: '' });
       render(<SourceCard source={source} />);

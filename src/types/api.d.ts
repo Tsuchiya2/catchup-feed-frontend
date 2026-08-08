@@ -136,7 +136,8 @@ export type ArticleResponse = Article;
 
 /**
  * Source kind: how the source is ingested (Phase 2 multi-modal).
- * 'rss' = regular RSS/Atom feed, 'youtube' / 'podcast' = transcription path.
+ * 'rss' = regular RSS/Atom feed, 'youtube' / 'podcast' = transcription path,
+ * 'newsletter' = link-roundup newsletter (issue links expanded into articles).
  */
 export type SourceKind = NonNullable<Schemas['internal_handler_http_source.DTO']['kind']>;
 
@@ -194,7 +195,7 @@ export interface SourceFormData {
   category: string;
   /** Content language (optional) */
   lang: string;
-  /** Source kind (rss / youtube / podcast; defaults to 'rss') */
+  /** Source kind (rss / youtube / podcast / newsletter; defaults to 'rss') */
   kind: SourceKind;
 }
 

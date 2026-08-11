@@ -4,9 +4,9 @@ import { AUTH_TOKEN_KEY } from '../support/auth';
 test.describe('Logout Flow', () => {
   test('should logout and clear session data', async ({ page, authenticated: _auth }) => {
     await page.goto('/dashboard');
-    await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: '今朝の構成' })).toBeVisible();
 
-    await page.getByTestId('header-logout-button').click();
+    await page.getByRole('button', { name: 'ログアウト' }).first().click();
 
     await expect(page).toHaveURL(/\/login/);
 
@@ -23,7 +23,7 @@ test.describe('Logout Flow', () => {
     authenticated: _auth,
   }) => {
     await page.goto('/dashboard');
-    await page.getByTestId('header-logout-button').click();
+    await page.getByRole('button', { name: 'ログアウト' }).first().click();
     await expect(page).toHaveURL(/\/login/);
 
     await page.goto('/subscribers');

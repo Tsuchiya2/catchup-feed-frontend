@@ -120,7 +120,7 @@ describe('SourcesPage', () => {
       renderWithClient(<SourcesPage />);
 
       // Assert - the admin role always sees the management UI
-      expect(screen.getByRole('button', { name: /add source/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'ソースを追加' })).toBeInTheDocument();
     });
 
     it('should display ActiveToggle on all source cards', async () => {
@@ -140,10 +140,10 @@ describe('SourcesPage', () => {
 
       // Assert
       await waitFor(() => {
-        // StatusBadge shows "Active" or "Inactive" text
+        // StatusBadge shows 有効 / 無効 text
         // With ActiveToggle, these texts should not appear
-        expect(screen.queryByText('Active')).not.toBeInTheDocument();
-        expect(screen.queryByText('Inactive')).not.toBeInTheDocument();
+        expect(screen.queryByText('有効')).not.toBeInTheDocument();
+        expect(screen.queryByText('無効')).not.toBeInTheDocument();
       });
     });
 
@@ -180,7 +180,7 @@ describe('SourcesPage', () => {
     it('should NOT display the Add Source button', () => {
       renderWithClient(<SourcesPage />);
 
-      expect(screen.queryByRole('button', { name: /add source/i })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'ソースを追加' })).not.toBeInTheDocument();
     });
 
     it('should NOT display the search panel (search is 403 for viewers)', () => {
@@ -197,7 +197,7 @@ describe('SourcesPage', () => {
         expect(screen.queryAllByRole('switch')).toHaveLength(0);
         // StatusBadge text appears instead (server returns active only in
         // production; the mocked list has 2 active + 1 inactive here)
-        expect(screen.getAllByText('Active').length).toBeGreaterThan(0);
+        expect(screen.getAllByText('有効').length).toBeGreaterThan(0);
       });
 
       expect(screen.queryByRole('button', { name: /edit source/i })).not.toBeInTheDocument();
@@ -346,7 +346,9 @@ describe('SourcesPage', () => {
       // Assert
       await waitFor(() => {
         expect(screen.getByRole('alert')).toBeInTheDocument();
-        expect(screen.getByText('Server error. Please try again later.')).toBeInTheDocument();
+        expect(
+          screen.getByText('サーバーエラーです。しばらくしてからやり直してください。')
+        ).toBeInTheDocument();
       });
     });
 
@@ -391,9 +393,7 @@ describe('SourcesPage', () => {
 
       // Assert
       await waitFor(() => {
-        expect(
-          screen.getByText("You don't have permission to perform this action.")
-        ).toBeInTheDocument();
+        expect(screen.getByText('この操作を行う権限がありません。')).toBeInTheDocument();
       });
     });
 
@@ -413,7 +413,9 @@ describe('SourcesPage', () => {
 
       // Assert
       await waitFor(() => {
-        expect(screen.getByText('Source not found. Please refresh the page.')).toBeInTheDocument();
+        expect(
+          screen.getByText('ソースが見つかりません。ページを再読み込みしてください。')
+        ).toBeInTheDocument();
       });
     });
   });
@@ -432,9 +434,9 @@ describe('SourcesPage', () => {
       const { container } = renderWithClient(<SourcesPage />);
 
       // Assert
-      // Should show skeleton loaders (animate-pulse class)
-      const skeletons = container.querySelectorAll('.animate-pulse');
-      expect(skeletons.length).toBeGreaterThan(0);
+      // Loading rows are hairline frames with empty contents (no pulse)
+      const frames = container.querySelectorAll('[aria-hidden]');
+      expect(frames.length).toBeGreaterThan(0);
     });
 
     it('should not show source cards while loading', () => {
@@ -487,7 +489,7 @@ describe('SourcesPage', () => {
       renderWithClient(<SourcesPage />);
 
       // Assert
-      const retryButton = screen.getByRole('button', { name: /retry/i });
+      const retryButton = screen.getByRole('button', { name: '再試行' });
       expect(retryButton).toBeInTheDocument();
     });
   });
@@ -506,8 +508,8 @@ describe('SourcesPage', () => {
       renderWithClient(<SourcesPage />);
 
       // Assert
-      expect(screen.getByText('No sources configured')).toBeInTheDocument();
-      expect(screen.getByText(/Feed sources will appear here/i)).toBeInTheDocument();
+      expect(screen.getByText('ソースはまだありません')).toBeInTheDocument();
+      expect(screen.getByText(/管理者がソースを追加すると/)).toBeInTheDocument();
     });
 
     it('should show RSS icon in empty state', () => {
@@ -544,7 +546,7 @@ describe('SourcesPage', () => {
       renderWithClient(<SourcesPage />);
 
       // Assert
-      expect(screen.getByText('Total: 3 sources')).toBeInTheDocument();
+      expect(screen.getByText('全 3 件')).toBeInTheDocument();
     });
 
     it('should handle singular vs plural for source count', () => {
@@ -560,7 +562,7 @@ describe('SourcesPage', () => {
       renderWithClient(<SourcesPage />);
 
       // Assert
-      expect(screen.getByText('Total: 1 source')).toBeInTheDocument();
+      expect(screen.getByText('全 1 件')).toBeInTheDocument();
     });
   });
 
@@ -570,7 +572,7 @@ describe('SourcesPage', () => {
       renderWithClient(<SourcesPage />);
 
       // Assert
-      expect(screen.getByText('Sources')).toBeInTheDocument();
+      expect(screen.getByText('ソース')).toBeInTheDocument();
     });
 
     it('should display page description', () => {
@@ -578,7 +580,7 @@ describe('SourcesPage', () => {
       renderWithClient(<SourcesPage />);
 
       // Assert
-      expect(screen.getByText('RSS/Atom feeds being tracked')).toBeInTheDocument();
+      expect(screen.getByText('全 3 件')).toBeInTheDocument();
     });
   });
 
@@ -597,9 +599,9 @@ describe('SourcesPage', () => {
       renderWithClient(<SourcesPage />);
 
       // Assert
-      expect(screen.getByLabelText('Source: Tech Blog')).toBeInTheDocument();
-      expect(screen.getByLabelText('Source: News Site')).toBeInTheDocument();
-      expect(screen.getByLabelText('Source: Developer Feed')).toBeInTheDocument();
+      expect(screen.getByLabelText('ソース: Tech Blog')).toBeInTheDocument();
+      expect(screen.getByLabelText('ソース: News Site')).toBeInTheDocument();
+      expect(screen.getByLabelText('ソース: Developer Feed')).toBeInTheDocument();
     });
 
     it('should have accessible time elements', () => {

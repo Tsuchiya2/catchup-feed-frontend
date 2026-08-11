@@ -20,7 +20,7 @@ function summary(overrides: Partial<AccessLogSummary> = {}): AccessLogSummary {
 describe('AccessLogSummaryTable', () => {
   it('renders an empty message when there are no friends', () => {
     render(<AccessLogSummaryTable summaries={[]} />);
-    expect(screen.getByText(/No friends registered yet/)).toBeInTheDocument();
+    expect(screen.getByText(/友人はまだ登録されていません/)).toBeInTheDocument();
   });
 
   it('renders one row per friend with counts', () => {
@@ -45,13 +45,13 @@ describe('AccessLogSummaryTable', () => {
       />
     );
 
-    expect(screen.getByText('Never accessed')).toBeInTheDocument();
+    expect(screen.getByText('未アクセス')).toBeInTheDocument();
   });
 
   it('flags friends silent for 3+ weeks', () => {
     render(<AccessLogSummaryTable summaries={[summary({ days_since_last_access: 25 })]} />);
 
-    expect(screen.getByText('25d silent')).toBeInTheDocument();
+    expect(screen.getByText('25日 放置')).toBeInTheDocument();
   });
 
   it('sorts friends needing attention to the top', () => {

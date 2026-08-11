@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { IBM_Plex_Mono, Noto_Sans_JP } from 'next/font/google';
 import './globals.css';
 import { QueryProvider } from '@/providers/QueryProvider';
 import { ThemeProvider } from '@/providers/ThemeProvider';
@@ -7,7 +7,19 @@ import { PWAInstallPrompt } from '@/components/common/PWAInstallPrompt';
 import { PWAUpdateNotification } from '@/components/common/PWAUpdateNotification';
 import { FeatureGate } from '@/components/common/FeatureGate';
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
+const notoSansJp = Noto_Sans_JP({
+  subsets: ['latin'],
+  weight: ['400', '500', '700'],
+  variable: '--font-noto-sans-jp',
+  display: 'swap',
+});
+
+const ibmPlexMono = IBM_Plex_Mono({
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
+  variable: '--font-ibm-plex-mono',
+  display: 'swap',
+});
 
 /**
  * Get the base URL for metadata
@@ -25,8 +37,8 @@ function getMetadataBase(): URL {
 
 export const metadata: Metadata = {
   metadataBase: getMetadataBase(),
-  title: 'Catchup Feed - Stay Updated',
-  description: 'Your personalized news aggregator with AI-powered insights',
+  title: 'Catchup Feed',
+  description: '早朝に技術情報を10分間の音声でお届け。',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
@@ -37,8 +49,8 @@ export const metadata: Metadata = {
     telephone: false,
   },
   openGraph: {
-    title: 'Catchup Feed - Stay Updated',
-    description: 'Your personalized news aggregator with AI-powered insights',
+    title: 'Catchup Feed',
+    description: '早朝に技術情報を10分間の音声でお届け。',
     url: 'https://pulse.catchup-feed.com',
     siteName: 'Catchup Feed',
     images: [
@@ -46,16 +58,16 @@ export const metadata: Metadata = {
         url: '/og-image.webp',
         width: 1200,
         height: 630,
-        alt: 'Catchup Feed - Your personalized news aggregator',
+        alt: 'Catchup Feed',
       },
     ],
-    locale: 'en_US',
+    locale: 'ja_JP',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Catchup Feed - Stay Updated',
-    description: 'Your personalized news aggregator with AI-powered insights',
+    title: 'Catchup Feed',
+    description: '早朝に技術情報を10分間の音声でお届け。',
     images: ['/og-image.webp'],
   },
 };
@@ -66,8 +78,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={inter.variable}>
+    <html lang="ja" suppressHydrationWarning>
+      <body className={`${notoSansJp.variable} ${ibmPlexMono.variable}`}>
         <ThemeProvider>
           <QueryProvider>
             {children}

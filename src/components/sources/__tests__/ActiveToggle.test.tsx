@@ -42,7 +42,7 @@ describe('ActiveToggle', () => {
     it('should have proper aria-label for accessibility', () => {
       render(<ActiveToggle {...defaultProps} sourceName="Tech Blog" />);
 
-      const toggle = screen.getByLabelText('Toggle Tech Blog active status');
+      const toggle = screen.getByLabelText('Tech Blog の有効状態を切り替え');
       expect(toggle).toBeInTheDocument();
     });
 
@@ -229,7 +229,9 @@ describe('ActiveToggle', () => {
       await waitFor(() => {
         const error = screen.getByRole('alert');
         expect(error).toBeInTheDocument();
-        expect(error).toHaveTextContent('Failed to update source status. Please try again.');
+        expect(error).toHaveTextContent(
+          'ソースの状態を更新できませんでした。もう一度お試しください。'
+        );
       });
     });
 
@@ -264,9 +266,7 @@ describe('ActiveToggle', () => {
       await user.click(screen.getByRole('switch'));
 
       await waitFor(() => {
-        expect(
-          screen.getByText("You don't have permission to perform this action.")
-        ).toBeInTheDocument();
+        expect(screen.getByText('この操作を行う権限がありません。')).toBeInTheDocument();
       });
     });
 
@@ -279,7 +279,9 @@ describe('ActiveToggle', () => {
       await user.click(screen.getByRole('switch'));
 
       await waitFor(() => {
-        expect(screen.getByText('Source not found. Please refresh the page.')).toBeInTheDocument();
+        expect(
+          screen.getByText('ソースが見つかりません。ページを再読み込みしてください。')
+        ).toBeInTheDocument();
       });
     });
 
@@ -292,7 +294,9 @@ describe('ActiveToggle', () => {
       await user.click(screen.getByRole('switch'));
 
       await waitFor(() => {
-        expect(screen.getByText('Server error. Please try again later.')).toBeInTheDocument();
+        expect(
+          screen.getByText('サーバーエラーです。しばらくしてからやり直してください。')
+        ).toBeInTheDocument();
       });
     });
 
@@ -306,7 +310,7 @@ describe('ActiveToggle', () => {
 
       await waitFor(() => {
         expect(
-          screen.getByText('Network error. Please check your connection.')
+          screen.getByText('ネットワークエラーです。接続を確認してください。')
         ).toBeInTheDocument();
       });
     });
@@ -321,7 +325,7 @@ describe('ActiveToggle', () => {
 
       await waitFor(() => {
         expect(
-          screen.getByText('Failed to update source status. Please try again.')
+          screen.getByText('ソースの状態を更新できませんでした。もう一度お試しください。')
         ).toBeInTheDocument();
       });
     });

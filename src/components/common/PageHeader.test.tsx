@@ -42,26 +42,20 @@ describe('PageHeader', () => {
     it('should have default flex layout', () => {
       const { container } = render(<PageHeader title="Test Title" />);
       expect(container.firstChild).toHaveClass('flex');
-      expect(container.firstChild).toHaveClass('flex-col');
+      expect(container.firstChild).toHaveClass('items-end');
     });
 
-    it('should have responsive styling', () => {
-      const { container } = render(<PageHeader title="Test Title" />);
-      expect(container.firstChild).toHaveClass('sm:flex-row');
-      expect(container.firstChild).toHaveClass('sm:items-start');
-    });
-
-    it('should apply text styles to title', () => {
+    it('should apply console mono styles to title', () => {
       render(<PageHeader title="Test Title" />);
       const heading = screen.getByRole('heading', { level: 1 });
-      expect(heading).toHaveClass('text-3xl');
-      expect(heading).toHaveClass('font-bold');
+      expect(heading).toHaveClass('font-mono');
+      expect(heading).toHaveClass('text-console-ink-weak');
     });
 
-    it('should apply muted foreground to description', () => {
+    it('should apply faint mono style to description', () => {
       render(<PageHeader title="Test Title" description="Test description" />);
       const description = screen.getByText('Test description');
-      expect(description).toHaveClass('text-muted-foreground');
+      expect(description).toHaveClass('text-console-ink-faint');
     });
   });
 
@@ -106,7 +100,7 @@ describe('PageHeader', () => {
     it('should have proper text contrast class', () => {
       render(<PageHeader title="Title" />);
       const heading = screen.getByRole('heading', { level: 1 });
-      expect(heading).toHaveClass('text-foreground');
+      expect(heading).toHaveClass('text-console-ink-weak');
     });
   });
 

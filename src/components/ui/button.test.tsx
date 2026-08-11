@@ -30,7 +30,7 @@ describe('Button', () => {
   it('should apply default variant styles', () => {
     render(<Button>Default</Button>);
     const button = screen.getByRole('button', { name: /default/i });
-    expect(button).toHaveClass('bg-primary');
+    expect(button).toHaveClass('bg-console-sel-bg');
   });
 
   it('should apply destructive variant styles', () => {
@@ -59,7 +59,7 @@ describe('Button', () => {
     render(<Button className="custom-class">Custom</Button>);
     const button = screen.getByRole('button', { name: /custom/i });
     expect(button).toHaveClass('custom-class');
-    expect(button).toHaveClass('bg-primary'); // Still has default styles
+    expect(button).toHaveClass('bg-console-sel-bg'); // Still has default styles
   });
 
   it('should forward ref correctly', () => {

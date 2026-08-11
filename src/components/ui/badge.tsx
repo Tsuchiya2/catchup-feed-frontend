@@ -3,19 +3,21 @@ import { cva, type VariantProps } from 'class-variance-authority';
 
 import { cn } from '@/lib/utils';
 
+/**
+ * Console status label (放送卓改訂版): state is shown with a mono label and
+ * a 1px border — never a fill (design handoff 未着手の画面 guidance).
+ */
 const badgeVariants = cva(
-  'inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+  'inline-flex items-center border px-2 py-0.5 font-mono text-[10.5px] tracking-[.12em]',
   {
     variants: {
       variant: {
-        default:
-          'border-primary/50 bg-primary/20 text-primary hover:bg-primary/30 hover:shadow-glow-sm',
-        secondary: 'border-gray-600/50 bg-gray-600/20 text-gray-400 hover:bg-gray-600/30',
-        success:
-          'border-[#00ffff]/50 bg-[#a0ffff]/20 text-[#a0ffff] shadow-[0_0_8px_#00ffff40] hover:bg-[#a0ffff]/30 hover:shadow-[0_0_12px_#00ffff60]',
-        destructive:
-          'border-destructive/50 bg-destructive/20 text-destructive hover:bg-destructive/30',
-        outline: 'border-primary/30 text-foreground hover:border-primary/50',
+        default: 'border-console-line-3 text-console-ink-sub',
+        secondary: 'border-console-line-2 text-console-ink-faint',
+        success: 'border-console-cyan text-console-cyan',
+        warn: 'border-console-warn text-console-warn',
+        destructive: 'border-destructive text-destructive',
+        outline: 'border-console-line-3 text-console-ink-weak',
       },
     },
     defaultVariants: {

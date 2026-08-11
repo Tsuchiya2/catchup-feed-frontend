@@ -1,11 +1,10 @@
 'use client';
 
 import * as React from 'react';
-import { BookOpen, Info, Upload } from 'lucide-react';
+import { BookOpen, Upload } from 'lucide-react';
 import { PageHeader } from '@/components/common/PageHeader';
 import { ErrorMessage } from '@/components/common/ErrorMessage';
 import { EmptyState } from '@/components/common/EmptyState';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { BookCard } from '@/components/books/BookCard';
 import { UploadBookDialog } from '@/components/books/UploadBookDialog';
@@ -14,7 +13,7 @@ import { useBooks } from '@/hooks/useBooks';
 import type { PdfBook } from '@/types/api';
 
 /**
- * Book PDF management page (D-25)
+ * Book PDF management page (D-25) — 放送卓(改訂版)
  *
  * Upload / list / delete for the book PDFs feeding the book RAG. The
  * ingest itself is asynchronous — the Mac's nightly batch (03:00) picks up
@@ -31,27 +30,27 @@ export default function BooksPage() {
   const pendingCount = books.filter((b) => b.status === 'pending').length;
 
   return (
-    <div className="container py-8">
-      <div className="mb-6 flex items-start justify-between gap-4">
-        <PageHeader
-          title="Books"
-          description={
-            books.length > 0
-              ? `${books.length} 冊${pendingCount > 0 ? `(取り込み待ち ${pendingCount} 冊)` : ''}`
+    <div className="flex flex-1 flex-col gap-5 max-sm:p-5 sm:max-desk:p-7 desk:px-8 desk:py-7">
+      <PageHeader
+        title="書籍"
+        description={
+          isLoading
+            ? '— 冊'
+            : books.length > 0
+              ? `${books.length} 冊${pendingCount > 0 ? ` ／ 取り込み待ち ${pendingCount} 冊` : ''}`
               : '書籍 PDF のアップロードと取り込み管理'
-          }
-          className="mb-0"
-        />
-        <Button onClick={() => setIsUploadOpen(true)}>
-          <Upload className="mr-2 h-4 w-4" />
-          アップロード
-        </Button>
-      </div>
+        }
+        action={
+          <Button variant="outline" size="sm" onClick={() => setIsUploadOpen(true)}>
+            <Upload className="mr-1 h-4 w-4" />
+            アップロード
+          </Button>
+        }
+      />
 
       {/* How ingest works — async nightly batch + idempotent replace */}
-      <div className="mb-6 flex items-start gap-2 rounded-md border border-border/50 bg-muted/50 p-3 text-sm text-muted-foreground">
-        <Info className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
-        <p>
+      <div className="border border-console-line-2 bg-console-panel px-[18px] py-3">
+        <p className="text-[12px] leading-[1.9] text-console-ink-weak [text-wrap:pretty]">
           取り込みは Mac の夜間バッチ(03:00)で実行される非同期処理です。アップロード直後は
           「待機」のまま翌朝まで待ってください(Mac が不在の夜は翌晩に持ち越し)。
           同名ファイルを再アップロードすると置き換えて再取り込みされます(失敗時の再試行もこの方法で)。
@@ -59,17 +58,18 @@ export default function BooksPage() {
       </div>
 
       {/* Error State */}
-      {error && (
-        <div className="mb-6">
-          <ErrorMessage error={error} onRetry={refetch} />
-        </div>
-      )}
+      {error && <ErrorMessage error={error} onRetry={refetch} />}
 
       {/* Loading State */}
       {isLoading && (
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="border border-console-line-2 bg-console-panel" aria-hidden>
           {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-44 w-full rounded-lg" />
+            <div
+              key={i}
+              className="flex items-center gap-4 border-b border-console-line-1 px-[18px] py-3.5 last:border-b-0"
+            >
+              <span className="min-h-[34px] flex-1" />
+            </div>
           ))}
         </div>
       )}
@@ -79,10 +79,10 @@ export default function BooksPage() {
         <EmptyState
           title="書籍はまだありません"
           description="PDF をアップロードすると、Mac の夜間バッチで取り込まれてラジオの書籍コーナーに使われます。"
-          icon={<BookOpen className="h-12 w-12" />}
+          icon={<BookOpen className="h-10 w-10" />}
           action={
-            <Button onClick={() => setIsUploadOpen(true)}>
-              <Upload className="mr-2 h-4 w-4" />
+            <Button variant="outline" size="sm" onClick={() => setIsUploadOpen(true)}>
+              <Upload className="mr-1 h-4 w-4" />
               PDF をアップロード
             </Button>
           }
@@ -91,7 +91,7 @@ export default function BooksPage() {
 
       {/* Book list */}
       {!isLoading && !error && books.length > 0 && (
-        <div className="grid gap-4 md:grid-cols-2" role="list">
+        <div className="border border-console-line-2 bg-console-panel" role="list">
           {books.map((book) => (
             <BookCard key={book.file_path} book={book} onDelete={setBookToDelete} />
           ))}

@@ -73,10 +73,10 @@ export function EditSubscriberDialog({
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Edit Friend</DialogTitle>
+          <DialogTitle>友人を編集</DialogTitle>
           <DialogDescription>
-            Update {subscriber.name}&apos;s details. All fields are saved as shown — clearing a
-            field removes the stored value.
+            {subscriber.name} の情報を更新します。表示中の内容がそのまま保存されます —
+            空にしたフィールドは保存値も消えます。
           </DialogDescription>
         </DialogHeader>
 

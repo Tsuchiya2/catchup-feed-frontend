@@ -80,7 +80,7 @@ describe('TokenSection', () => {
       .map((m) => m.state.data as IssuedFeedToken | undefined);
     expect(openState.some((data) => data?.token === issued.token)).toBe(true);
 
-    await user.click(screen.getByRole('button', { name: /I saved the URL/i }));
+    await user.click(screen.getByRole('button', { name: /URL を保存した/ }));
 
     await waitFor(() => {
       expect(screen.queryByTestId(SUBSCRIBER_TEST_IDS.ISSUED_TOKEN_DIALOG)).not.toBeInTheDocument();

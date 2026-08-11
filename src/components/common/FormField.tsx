@@ -59,20 +59,23 @@ export function FormField({
 
   return (
     <div className={cn('space-y-2', className)}>
-      <Label htmlFor={htmlFor}>
+      <Label
+        htmlFor={htmlFor}
+        className="font-mono text-[11px] font-normal tracking-[.18em] text-console-ink-weak"
+      >
         {label}
         {required && (
           <>
             <span className="ml-1 text-destructive" aria-hidden="true">
               *
             </span>
-            <span className="sr-only">(required)</span>
+            <span className="sr-only">(必須)</span>
           </>
         )}
       </Label>
       {children}
       {error && (
-        <p id={errorId} className="text-sm text-destructive" role="alert">
+        <p id={errorId} className="font-mono text-[11px] text-destructive" role="alert">
           {error}
         </p>
       )}

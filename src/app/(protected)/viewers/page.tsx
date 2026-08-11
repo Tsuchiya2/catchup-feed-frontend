@@ -6,7 +6,6 @@ import { PageHeader } from '@/components/common/PageHeader';
 import { ErrorMessage } from '@/components/common/ErrorMessage';
 import { ErrorAlert } from '@/components/common/ErrorAlert';
 import { EmptyState } from '@/components/common/EmptyState';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { ViewerCard } from '@/components/viewers/ViewerCard';
 import { AddViewerDialog } from '@/components/viewers/AddViewerDialog';
@@ -56,46 +55,40 @@ export default function ViewersPage() {
   );
 
   return (
-    <div className="container py-8">
+    <div className="flex flex-1 flex-col gap-5 max-sm:p-5 sm:max-desk:p-7 desk:px-8 desk:py-7">
       {/* Page Header with Add button */}
-      <div className="mb-6 flex items-start justify-between gap-4">
-        <PageHeader
-          title="Viewers"
-          description={
-            viewers.length > 0
-              ? `${activeCount} active${inactiveCount > 0 ? `, ${inactiveCount} deactivated` : ''}`
-              : 'Read-only accounts for friends to browse the source list'
-          }
-        />
-        <Button onClick={() => setIsAddOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Viewer
-        </Button>
-      </div>
+      <PageHeader
+        title="視聴者"
+        description={
+          isLoading
+            ? '— 名'
+            : viewers.length > 0
+              ? `有効 ${activeCount} 名${inactiveCount > 0 ? ` ／ 無効化 ${inactiveCount} 名` : ''}`
+              : 'ソース一覧を閲覧できる読み取り専用アカウント'
+        }
+        action={
+          <Button variant="outline" size="sm" onClick={() => setIsAddOpen(true)}>
+            <Plus className="mr-1 h-4 w-4" />
+            視聴者を追加
+          </Button>
+        }
+      />
 
       {/* List fetch error */}
-      {error && (
-        <div className="mb-6">
-          <ErrorMessage error={error} onRetry={refetch} />
-        </div>
-      )}
+      {error && <ErrorMessage error={error} onRetry={refetch} />}
 
       {/* Activate/deactivate toggle error */}
       <ErrorAlert error={toggleActive.error} />
 
       {/* Loading State */}
       {isLoading && (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="border border-console-line-2 bg-console-panel" aria-hidden>
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="rounded-lg border bg-card p-6">
-              <div className="mb-4 flex items-start gap-3">
-                <Skeleton className="h-10 w-10 rounded" />
-                <div className="flex-1">
-                  <Skeleton className="mb-2 h-5 w-3/4" />
-                  <Skeleton className="h-3 w-full" />
-                </div>
-              </div>
-              <Skeleton className="h-8 w-full" />
+            <div
+              key={i}
+              className="flex items-center gap-4 border-b border-console-line-1 px-[18px] py-3.5 last:border-b-0"
+            >
+              <span className="min-h-[34px] flex-1" />
             </div>
           ))}
         </div>
@@ -104,21 +97,21 @@ export default function ViewersPage() {
       {/* Empty State */}
       {!isLoading && !error && viewers.length === 0 && (
         <EmptyState
-          title="No viewers yet"
-          description="Create a read-only account so a friend can browse your source list and tell you what to add or drop."
-          icon={<Eye className="h-12 w-12" />}
+          title="視聴者はまだいません"
+          description="読み取り専用アカウントを作ると、友人がソース一覧を見て「これを足して」「これは要らない」と言えるようになります。"
+          icon={<Eye className="h-10 w-10" />}
           action={
-            <Button onClick={() => setIsAddOpen(true)}>
-              <Plus className="mr-2 h-4 w-4" />
-              Add Viewer
+            <Button variant="outline" size="sm" onClick={() => setIsAddOpen(true)}>
+              <Plus className="mr-1 h-4 w-4" />
+              視聴者を追加
             </Button>
           }
         />
       )}
 
-      {/* Viewers grid */}
+      {/* Viewers list */}
       {!isLoading && !error && viewers.length > 0 && (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3" role="list">
+        <div className="border border-console-line-2 bg-console-panel" role="list">
           {viewers.map((viewer) => (
             <ViewerCard
               key={viewer.id}

@@ -102,18 +102,21 @@ export function SourceFilter({
 
   return (
     <div className={cn('space-y-1.5', className)}>
-      <Label htmlFor="source-filter" className="text-sm font-medium">
-        Source
+      <Label
+        htmlFor="source-filter"
+        className="font-mono text-[11px] tracking-[.18em] text-console-ink-weak"
+      >
+        ソース
       </Label>
       <select
         id="source-filter"
         value={value ?? ''}
         onChange={handleChange}
         disabled={disabled || isLoading}
-        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-        aria-label="Filter by source"
+        className="console-field flex h-10 w-full disabled:cursor-not-allowed"
+        aria-label="ソースで絞り込む"
       >
-        <option value="">All Sources</option>
+        <option value="">すべてのソース</option>
         {filteredSources.map((source) => (
           <option key={source.id} value={source.id}>
             {source.name}

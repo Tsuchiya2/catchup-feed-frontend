@@ -57,25 +57,25 @@ export const SOURCE_TEST_IDS = {
  */
 export const SOURCE_ARIA_LABELS = {
   /** Generate ARIA label for edit button */
-  EDIT_BUTTON: (name: string) => `Edit source: ${name}`,
+  EDIT_BUTTON: (name: string) => `ソースを編集: ${name}`,
   /** ARIA label for name input */
-  NAME_INPUT: 'Source name',
+  NAME_INPUT: 'ソース名',
   /** ARIA label for URL input */
-  URL_INPUT: 'Feed URL',
+  URL_INPUT: 'フィード URL',
   /** ARIA label for category input */
-  CATEGORY_INPUT: 'Category',
+  CATEGORY_INPUT: 'カテゴリ',
   /** ARIA label for lang input */
-  LANG_INPUT: 'Language',
+  LANG_INPUT: '言語',
   /** ARIA label for kind select */
-  KIND_SELECT: 'Source type',
+  KIND_SELECT: 'ソース種別',
   /** ARIA label for save button */
-  SAVE_BUTTON: 'Save changes',
+  SAVE_BUTTON: '変更を保存',
   /** ARIA label for cancel button */
-  CANCEL_BUTTON: 'Cancel editing',
+  CANCEL_BUTTON: '編集をキャンセル',
   /** Generate ARIA label for delete button */
-  DELETE_BUTTON: (name: string) => `Delete source: ${name}`,
+  DELETE_BUTTON: (name: string) => `ソースを削除: ${name}`,
   /** Generate ARIA label for delete confirm button */
-  DELETE_CONFIRM_BUTTON: (name: string) => `Confirm delete ${name}`,
+  DELETE_CONFIRM_BUTTON: (name: string) => `${name} の削除を確定`,
   /** ARIA label for delete cancel button */
-  DELETE_CANCEL_BUTTON: 'Cancel deletion',
+  DELETE_CANCEL_BUTTON: '削除をキャンセル',
 } as const;

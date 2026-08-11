@@ -1,9 +1,9 @@
 /**
- * PageHeader Component
+ * PageHeader Component (放送卓改訂版)
  *
- * A reusable page header component with title, optional description, and optional action.
- * Used at the top of pages to provide consistent styling and layout.
- * Features cyber/tech theme with glow effects.
+ * Console panel heading: a small mono label with letter-spacing, an optional
+ * mono sub line (counts, status), and an optional action on the right.
+ * No glow, no large display type — pages read like console panels.
  */
 import * as React from 'react';
 import { cn } from '@/lib/utils';
@@ -22,29 +22,16 @@ interface PageHeaderProps {
   className?: string;
 }
 
-/**
- * PageHeader displays a page title with optional description and action.
- *
- * @example
- * ```tsx
- * <PageHeader
- *   title="Articles"
- *   description="Browse all articles from your sources"
- *   action={<Button>Add Source</Button>}
- * />
- * ```
- */
 export function PageHeader({ title, description, action, className }: PageHeaderProps) {
   return (
-    <div
-      className={cn(
-        'mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between',
-        className
-      )}
-    >
-      <div className="flex-1">
-        <h1 className="text-glow-sm text-3xl font-bold tracking-tight text-foreground">{title}</h1>
-        {description && <p className="mt-2 text-base text-muted-foreground">{description}</p>}
+    <div className={cn('flex items-end justify-between gap-4', className)}>
+      <div className="min-w-0 flex-1">
+        <h1 className="font-mono text-[11px] tracking-[.2em] text-console-ink-weak">{title}</h1>
+        {description && (
+          <p className="mt-1.5 font-mono text-[11px] leading-[1.8] text-console-ink-faint">
+            {description}
+          </p>
+        )}
       </div>
       {action && <div className="flex-shrink-0">{action}</div>}
     </div>

@@ -49,20 +49,23 @@ export function ActiveFilter({ value, onChange, className, disabled = false }: A
 
   return (
     <div className={cn('space-y-1.5', className)}>
-      <Label htmlFor="active-filter" className="text-sm font-medium">
-        Status
+      <Label
+        htmlFor="active-filter"
+        className="font-mono text-[11px] tracking-[.18em] text-console-ink-weak"
+      >
+        状態
       </Label>
       <select
         id="active-filter"
         value={selectValue}
         onChange={handleChange}
         disabled={disabled}
-        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-        aria-label="Filter by status"
+        className="console-field flex h-10 w-full disabled:cursor-not-allowed"
+        aria-label="状態で絞り込む"
       >
-        <option value="">All</option>
-        <option value="true">Active Only</option>
-        <option value="false">Inactive Only</option>
+        <option value="">すべて</option>
+        <option value="true">有効のみ</option>
+        <option value="false">無効のみ</option>
       </select>
     </div>
   );

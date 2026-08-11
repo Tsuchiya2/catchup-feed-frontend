@@ -66,23 +66,21 @@ describe('DeleteSourceDialog', () => {
 
       expect(screen.getByText(/Tech Blog/)).toBeInTheDocument();
       expect(
-        screen.getByText(
-          /Are you sure you want to delete 'Tech Blog'\? This action cannot be undone\./
-        )
+        screen.getByText(/「Tech Blog」を削除しますか\? この操作は取り消せません。/)
       ).toBeInTheDocument();
     });
 
-    it('renders dialog title "Delete Source"', () => {
+    it('renders dialog title 「ソースを削除」', () => {
       render(<DeleteSourceDialog {...defaultProps} />);
 
-      expect(screen.getByText('Delete Source')).toBeInTheDocument();
+      expect(screen.getByText('ソースを削除')).toBeInTheDocument();
     });
 
     it('renders Cancel and Delete buttons', () => {
       render(<DeleteSourceDialog {...defaultProps} />);
 
-      expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /delete/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: '削除をキャンセル' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /削除を確定/ })).toBeInTheDocument();
     });
   });
 
@@ -93,7 +91,7 @@ describe('DeleteSourceDialog', () => {
 
       render(<DeleteSourceDialog {...defaultProps} onClose={onClose} />);
 
-      await user.click(screen.getByRole('button', { name: /cancel/i }));
+      await user.click(screen.getByRole('button', { name: '削除をキャンセル' }));
 
       expect(onClose).toHaveBeenCalledTimes(1);
     });
@@ -103,7 +101,7 @@ describe('DeleteSourceDialog', () => {
 
       render(<DeleteSourceDialog {...defaultProps} />);
 
-      await user.click(screen.getByRole('button', { name: /cancel/i }));
+      await user.click(screen.getByRole('button', { name: '削除をキャンセル' }));
 
       expect(mockReset).toHaveBeenCalledTimes(1);
     });
@@ -113,7 +111,7 @@ describe('DeleteSourceDialog', () => {
 
       render(<DeleteSourceDialog {...defaultProps} />);
 
-      await user.click(screen.getByRole('button', { name: /cancel/i }));
+      await user.click(screen.getByRole('button', { name: '削除をキャンセル' }));
 
       expect(mockMutateAsync).not.toHaveBeenCalled();
     });
@@ -124,7 +122,7 @@ describe('DeleteSourceDialog', () => {
 
       render(<DeleteSourceDialog {...defaultProps} onSuccess={onSuccess} />);
 
-      await user.click(screen.getByRole('button', { name: /cancel/i }));
+      await user.click(screen.getByRole('button', { name: '削除をキャンセル' }));
 
       expect(onSuccess).not.toHaveBeenCalled();
     });
@@ -137,7 +135,7 @@ describe('DeleteSourceDialog', () => {
 
       render(<DeleteSourceDialog {...defaultProps} />);
 
-      await user.click(screen.getByRole('button', { name: /delete/i }));
+      await user.click(screen.getByRole('button', { name: /削除を確定/ }));
 
       await waitFor(() => {
         expect(mockMutateAsync).toHaveBeenCalledWith({ id: 1 });
@@ -151,7 +149,7 @@ describe('DeleteSourceDialog', () => {
 
       render(<DeleteSourceDialog {...defaultProps} />);
 
-      await user.click(screen.getByRole('button', { name: /delete/i }));
+      await user.click(screen.getByRole('button', { name: /削除を確定/ }));
 
       await waitFor(() => {
         expect(mockReset).toHaveBeenCalled();
@@ -166,7 +164,7 @@ describe('DeleteSourceDialog', () => {
 
       render(<DeleteSourceDialog {...defaultProps} onSuccess={onSuccess} onClose={onClose} />);
 
-      await user.click(screen.getByRole('button', { name: /delete/i }));
+      await user.click(screen.getByRole('button', { name: /削除を確定/ }));
 
       await waitFor(() => {
         expect(onSuccess).toHaveBeenCalledTimes(1);
@@ -182,7 +180,7 @@ describe('DeleteSourceDialog', () => {
 
       // Should not throw when onSuccess is not provided
       await expect(
-        user.click(screen.getByRole('button', { name: /delete/i }))
+        user.click(screen.getByRole('button', { name: /削除を確定/ }))
       ).resolves.not.toThrow();
     });
 
@@ -200,7 +198,7 @@ describe('DeleteSourceDialog', () => {
 
       render(<DeleteSourceDialog {...defaultProps} source={customSource} />);
 
-      await user.click(screen.getByRole('button', { name: /delete/i }));
+      await user.click(screen.getByRole('button', { name: /削除を確定/ }));
 
       await waitFor(() => {
         expect(mockMutateAsync).toHaveBeenCalledWith({ id: 42 });
@@ -234,7 +232,7 @@ describe('DeleteSourceDialog', () => {
 
       render(<DeleteSourceDialog {...defaultProps} onClose={onClose} />);
 
-      await user.click(screen.getByRole('button', { name: /delete/i }));
+      await user.click(screen.getByRole('button', { name: /削除を確定/ }));
 
       // Wait and verify onClose was not called when submission fails
       await waitFor(() => {
@@ -254,7 +252,7 @@ describe('DeleteSourceDialog', () => {
 
       render(<DeleteSourceDialog {...defaultProps} onSuccess={onSuccess} />);
 
-      await user.click(screen.getByRole('button', { name: /delete/i }));
+      await user.click(screen.getByRole('button', { name: /削除を確定/ }));
 
       await waitFor(() => {
         expect(mockMutateAsync).toHaveBeenCalled();
@@ -280,7 +278,9 @@ describe('DeleteSourceDialog', () => {
 
       render(<DeleteSourceDialog {...defaultProps} />);
 
-      expect(screen.getByText('Failed to delete source. Please try again.')).toBeInTheDocument();
+      expect(
+        screen.getByText('ソースを削除できませんでした。もう一度お試しください。')
+      ).toBeInTheDocument();
     });
   });
 
@@ -330,14 +330,14 @@ describe('DeleteSourceDialog', () => {
       render(<DeleteSourceDialog {...defaultProps} />);
 
       const deleteButton = screen.getByTestId('source-delete-confirm-button');
-      expect(deleteButton).toHaveTextContent('Deleting...');
+      expect(deleteButton).toHaveTextContent('削除中…');
     });
 
     it('shows "Delete" text when isPending is false', () => {
       render(<DeleteSourceDialog {...defaultProps} />);
 
       const deleteButton = screen.getByTestId('source-delete-confirm-button');
-      expect(deleteButton).toHaveTextContent('Delete');
+      expect(deleteButton).toHaveTextContent('削除する');
     });
   });
 
@@ -388,11 +388,11 @@ describe('DeleteSourceDialog', () => {
       render(<DeleteSourceDialog {...defaultProps} />);
 
       // Delete button should have descriptive aria-label
-      const deleteButton = screen.getByRole('button', { name: /confirm delete tech blog/i });
+      const deleteButton = screen.getByRole('button', { name: /Tech Blog の削除を確定/ });
       expect(deleteButton).toBeInTheDocument();
 
       // Cancel button should have aria-label
-      const cancelButton = screen.getByRole('button', { name: /cancel deletion/i });
+      const cancelButton = screen.getByRole('button', { name: '削除をキャンセル' });
       expect(cancelButton).toBeInTheDocument();
     });
 
@@ -419,7 +419,7 @@ describe('DeleteSourceDialog', () => {
       render(<DeleteSourceDialog {...defaultProps} />);
 
       // Dialog should have accessible name via DialogTitle
-      expect(screen.getByText('Delete Source')).toBeInTheDocument();
+      expect(screen.getByText('ソースを削除')).toBeInTheDocument();
     });
   });
 
@@ -501,7 +501,7 @@ describe('DeleteSourceDialog', () => {
       expect(screen.getByText(/Tech Blog/)).toBeInTheDocument();
 
       // Click delete
-      await user.click(screen.getByRole('button', { name: /delete/i }));
+      await user.click(screen.getByRole('button', { name: /削除を確定/ }));
 
       // Wait for mutation to complete
       await waitFor(() => {
@@ -520,7 +520,7 @@ describe('DeleteSourceDialog', () => {
       render(<DeleteSourceDialog {...defaultProps} onClose={onClose} />);
 
       // Click delete
-      await user.click(screen.getByRole('button', { name: /delete/i }));
+      await user.click(screen.getByRole('button', { name: /削除を確定/ }));
 
       // Wait for mutation to fail
       await waitFor(() => {
@@ -543,7 +543,7 @@ describe('DeleteSourceDialog', () => {
       const { rerender } = render(<DeleteSourceDialog {...defaultProps} />);
 
       // First attempt - fails
-      await user.click(screen.getByRole('button', { name: /delete/i }));
+      await user.click(screen.getByRole('button', { name: /削除を確定/ }));
 
       await waitFor(() => {
         expect(mockMutateAsync).toHaveBeenCalledTimes(1);
@@ -577,7 +577,7 @@ describe('DeleteSourceDialog', () => {
       rerender(<DeleteSourceDialog {...defaultProps} />);
 
       // Second attempt - succeeds
-      await user.click(screen.getByRole('button', { name: /delete/i }));
+      await user.click(screen.getByRole('button', { name: /削除を確定/ }));
 
       await waitFor(() => {
         expect(mockMutateAsync).toHaveBeenCalledTimes(2);

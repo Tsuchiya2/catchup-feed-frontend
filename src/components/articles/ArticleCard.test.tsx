@@ -21,9 +21,7 @@ describe('ArticleCard', () => {
     it('should render article title', () => {
       const article = createMockArticle({ title: 'My Article Title' });
       render(<ArticleCard article={article} />);
-      expect(
-        screen.getByRole('heading', { level: 2, name: 'My Article Title' })
-      ).toBeInTheDocument();
+      expect(screen.getByText('My Article Title')).toBeInTheDocument();
     });
 
     it('should render article summary', () => {
@@ -32,37 +30,24 @@ describe('ArticleCard', () => {
       expect(screen.getByText('This is the summary')).toBeInTheDocument();
     });
 
-    it('should not render summary when empty', () => {
-      const article = createMockArticle({ summary: '' });
-      render(<ArticleCard article={article} />);
-      const articleElement = screen.getByRole('article');
-      expect(articleElement.querySelectorAll('p.text-muted-foreground').length).toBe(0);
-    });
-
-    it('should render source badge when sourceName provided', () => {
+    it('should render source label when sourceName provided', () => {
       const article = createMockArticle();
       render(<ArticleCard article={article} sourceName="Tech Blog" />);
       expect(screen.getByText('Tech Blog')).toBeInTheDocument();
     });
 
-    it('should not render source badge when sourceName not provided', () => {
+    it('should not render source label when sourceName not provided', () => {
       const article = createMockArticle({ source_name: undefined as unknown as string });
       render(<ArticleCard article={article} />);
       expect(screen.queryByText('Tech Blog')).not.toBeInTheDocument();
     });
 
-    it('should render published date', () => {
+    it('should render published date as Japanese relative time', () => {
       const article = createMockArticle({
         published_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
       });
       render(<ArticleCard article={article} />);
-      expect(screen.getByText(/hours? ago/)).toBeInTheDocument();
-    });
-
-    it('should render separator dot when both source and date present', () => {
-      const article = createMockArticle();
-      render(<ArticleCard article={article} sourceName="Tech Blog" />);
-      expect(screen.getByText('·')).toBeInTheDocument();
+      expect(screen.getByText('2時間前')).toBeInTheDocument();
     });
   });
 
@@ -78,7 +63,7 @@ describe('ArticleCard', () => {
       const article = createMockArticle({ title: 'Test Article' });
       render(<ArticleCard article={article} />);
       const link = screen.getByRole('link');
-      expect(link).toHaveAttribute('aria-label', 'Article: Test Article');
+      expect(link).toHaveAttribute('aria-label', '記事: Test Article');
     });
   });
 
@@ -89,7 +74,6 @@ describe('ArticleCard', () => {
       render(<ArticleCard article={article} />);
 
       // The summary text should be truncated with ellipsis
-      // Use a more specific matcher to find the truncated text
       const summaryElement = screen.getByText(/^A+\.\.\.$/);
       expect(summaryElement.textContent?.length).toBeLessThan(200);
     });
@@ -110,29 +94,23 @@ describe('ArticleCard', () => {
       expect(link).toHaveClass('custom-class');
     });
 
-    it('should have hover effects', () => {
+    it('should render as a hairline console row with one-step hover', () => {
       const article = createMockArticle();
       render(<ArticleCard article={article} />);
       const link = screen.getByRole('link');
-      expect(link).toHaveClass('hover:border-primary/50');
-      expect(link).toHaveClass('hover:shadow-glow-sm');
+      expect(link).toHaveClass('border-b');
+      expect(link).toHaveClass('hover:bg-console-hover');
     });
 
     it('should have focus-visible styling', () => {
       const article = createMockArticle();
       render(<ArticleCard article={article} />);
       const link = screen.getByRole('link');
-      expect(link).toHaveClass('focus-visible:ring-2');
+      expect(link).toHaveClass('focus-visible:outline-console-cyan');
     });
   });
 
   describe('Accessibility', () => {
-    it('should have semantic article element', () => {
-      const article = createMockArticle();
-      render(<ArticleCard article={article} />);
-      expect(screen.getByRole('article')).toBeInTheDocument();
-    });
-
     it('should have time element with datetime attribute', () => {
       const publishedAt = '2025-01-15T10:00:00Z';
       const article = createMockArticle({ published_at: publishedAt });
@@ -140,54 +118,42 @@ describe('ArticleCard', () => {
       const timeElement = screen.getByRole('time');
       expect(timeElement).toHaveAttribute('datetime', publishedAt);
     });
-
-    it('should have proper heading hierarchy', () => {
-      const article = createMockArticle();
-      render(<ArticleCard article={article} />);
-      expect(screen.getByRole('heading', { level: 2 })).toBeInTheDocument();
-    });
   });
 
   describe('Edge Cases', () => {
     it('should handle missing title gracefully', () => {
       const article = createMockArticle({ title: '' });
       render(<ArticleCard article={article} />);
-      expect(
-        screen.getByRole('heading', { level: 2, name: 'Untitled Article' })
-      ).toBeInTheDocument();
+      expect(screen.getByText('(無題)')).toBeInTheDocument();
     });
 
     it('should handle whitespace-only title', () => {
       const article = createMockArticle({ title: '   ' });
       render(<ArticleCard article={article} />);
-      expect(
-        screen.getByRole('heading', { level: 2, name: 'Untitled Article' })
-      ).toBeInTheDocument();
+      expect(screen.getByText('(無題)')).toBeInTheDocument();
     });
 
     it('should handle whitespace-only summary', () => {
-      const article = createMockArticle({ summary: '   ' });
+      const article = createMockArticle({ summary: '   ', title: 'Title only' });
       render(<ArticleCard article={article} />);
-      // Whitespace summary should not render as visible content
-      const articleElement = screen.getByRole('article');
-      const paragraphs = articleElement.querySelectorAll('p');
-      expect(paragraphs.length).toBe(0);
+      // Whitespace summary should not render a summary line
+      expect(screen.getByText('Title only')).toBeInTheDocument();
+      expect(screen.queryByText(/^\s+$/)).not.toBeInTheDocument();
     });
 
     it('should handle null published_at', () => {
       const article = createMockArticle();
       article.published_at = null as unknown as string;
       render(<ArticleCard article={article} />);
-      // Should not crash and time element should not be present
+      // Should not crash; mono position degrades to an em dash
       expect(screen.queryByRole('time')).not.toBeInTheDocument();
+      expect(screen.getByText('—')).toBeInTheDocument();
     });
 
     it('should handle special characters in title', () => {
       const article = createMockArticle({ title: '<script>alert("xss")</script>' });
       render(<ArticleCard article={article} />);
-      expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent(
-        '<script>alert("xss")</script>'
-      );
+      expect(screen.getByText('<script>alert("xss")</script>')).toBeInTheDocument();
     });
 
     it('should handle very long source name', () => {

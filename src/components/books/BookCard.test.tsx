@@ -34,8 +34,8 @@ describe('BookCard (book PDF management)', () => {
     render(<BookCard book={uploaded} onDelete={vi.fn()} />);
 
     expect(screen.getByText('実用 Go 言語')).toBeInTheDocument();
-    expect(screen.getByText('golang-book.pdf')).toBeInTheDocument();
-    expect(screen.getByText('1.0 MB')).toBeInTheDocument();
+    expect(screen.getByText(/golang-book\.pdf/)).toBeInTheDocument();
+    expect(screen.getByText(/1\.0 MB/)).toBeInTheDocument();
   });
 
   it('shows the pending status badge with the nightly-batch note', () => {
@@ -59,15 +59,16 @@ describe('BookCard (book PDF management)', () => {
 
     expect(screen.getByText('CLI 取り込み')).toBeInTheDocument();
     expect(screen.queryByTestId(BOOK_TEST_IDS.DELETE_BUTTON)).not.toBeInTheDocument();
-    // CLI books have no file on the Pi: size / upload time render as "-"
-    expect(screen.getAllByText('-')).toHaveLength(2);
+    // CLI books have no file on the Pi: upload time degrades to an em dash
+    expect(screen.getByText('—')).toBeInTheDocument();
+    expect(screen.getByText('CLI 管理')).toBeInTheDocument();
   });
 
   it('shows chunk count and done status for an ingested book', () => {
     render(<BookCard book={cliIngested} onDelete={vi.fn()} />);
 
     expect(screen.getByTestId(BOOK_TEST_IDS.STATUS_BADGE)).toHaveTextContent('完了');
-    expect(screen.getByText('412')).toBeInTheDocument();
+    expect(screen.getByText(/412 チャンク/)).toBeInTheDocument();
   });
 
   it('shows the failed status with a re-upload hint', () => {

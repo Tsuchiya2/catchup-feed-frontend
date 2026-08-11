@@ -34,18 +34,18 @@ describe('SourceCard', () => {
       expect(screen.getByRole('heading', { level: 3, name: 'Tech Blog' })).toBeInTheDocument();
     });
 
-    it('should render RSS icon', () => {
+    it('should render the kind label in mono type', () => {
       const source = createMockSource();
-      const { container } = render(<SourceCard source={source} />);
-      const icon = container.querySelector('svg');
-      expect(icon).toBeInTheDocument();
-      expect(icon).toHaveClass('text-primary');
+      render(<SourceCard source={source} />);
+      const kind = screen.getByTestId('source-kind-badge');
+      expect(kind).toBeInTheDocument();
+      expect(kind).toHaveClass('font-mono');
     });
 
     it('should render status badge', () => {
       const source = createMockSource({ active: true });
       render(<SourceCard source={source} />);
-      expect(screen.getByText('Active')).toBeInTheDocument();
+      expect(screen.getByText('有効')).toBeInTheDocument();
     });
 
     it('should render added time', () => {
@@ -53,19 +53,19 @@ describe('SourceCard', () => {
         created_at: new Date(NOW.getTime() - 2 * 60 * 60 * 1000).toISOString(),
       });
       render(<SourceCard source={source} />);
-      expect(screen.getByText('Added 2 hours ago')).toBeInTheDocument();
+      expect(screen.getByText('2時間前')).toBeInTheDocument();
     });
 
     it('should render category badge', () => {
       const source = createMockSource({ category: 'ai' });
       render(<SourceCard source={source} />);
-      expect(screen.getByLabelText('Category: ai')).toHaveTextContent('ai');
+      expect(screen.getByLabelText('カテゴリ: ai')).toHaveTextContent('ai');
     });
 
     it('should render language badge when lang is set', () => {
       const source = createMockSource({ lang: 'ja' });
       render(<SourceCard source={source} />);
-      expect(screen.getByLabelText('Language: ja')).toHaveTextContent('ja');
+      expect(screen.getByLabelText('言語: ja')).toHaveTextContent('ja');
     });
 
     it('should fall back to the RSS kind badge when kind is missing (pre-Phase 2 backend)', () => {
@@ -77,7 +77,7 @@ describe('SourceCard', () => {
     it('should render the Newsletter kind badge for newsletter sources', () => {
       const source = createMockSource({ kind: 'newsletter' });
       render(<SourceCard source={source} />);
-      expect(screen.getByTestId('source-kind-badge')).toHaveTextContent('Newsletter');
+      expect(screen.getByTestId('source-kind-badge')).toHaveTextContent('NEWS');
     });
 
     it('should not render language badge when lang is empty', () => {
@@ -91,13 +91,13 @@ describe('SourceCard', () => {
     it('should show Active badge for active source', () => {
       const source = createMockSource({ active: true });
       render(<SourceCard source={source} />);
-      expect(screen.getByText('Active')).toBeInTheDocument();
+      expect(screen.getByText('有効')).toBeInTheDocument();
     });
 
     it('should show Inactive badge for inactive source', () => {
       const source = createMockSource({ active: false });
       render(<SourceCard source={source} />);
-      expect(screen.getByText('Inactive')).toBeInTheDocument();
+      expect(screen.getByText('無効')).toBeInTheDocument();
     });
   });
 
@@ -108,11 +108,12 @@ describe('SourceCard', () => {
       expect(container.firstChild).toHaveClass('custom-class');
     });
 
-    it('should have flex column layout', () => {
+    it('should lay out as a console list row', () => {
       const source = createMockSource();
       const { container } = render(<SourceCard source={source} />);
       expect(container.firstChild).toHaveClass('flex');
-      expect(container.firstChild).toHaveClass('flex-col');
+      expect(container.firstChild).toHaveClass('items-center');
+      expect(container.firstChild).toHaveClass('border-b');
     });
 
     it('should truncate long source name', () => {
@@ -125,7 +126,7 @@ describe('SourceCard', () => {
     it('should truncate long feed URL', () => {
       const source = createMockSource({ feed_url: 'https://example.com/' + 'a'.repeat(100) });
       render(<SourceCard source={source} />);
-      const link = screen.getByRole('link', { name: /visit feed:/i });
+      const link = screen.getByRole('link', { name: /フィードを開く:/ });
       expect(link).toHaveClass('truncate');
     });
   });
@@ -140,20 +141,19 @@ describe('SourceCard', () => {
     it('should have aria-label with source name', () => {
       const source = createMockSource({ name: 'Tech Blog' });
       render(<SourceCard source={source} />);
-      expect(screen.getByRole('listitem')).toHaveAttribute('aria-label', 'Source: Tech Blog');
+      expect(screen.getByRole('listitem')).toHaveAttribute('aria-label', 'ソース: Tech Blog');
     });
 
-    it('should hide RSS icon from screen readers', () => {
+    it('should expose the kind label to screen readers', () => {
       const source = createMockSource();
-      const { container } = render(<SourceCard source={source} />);
-      const icon = container.querySelector('svg');
-      expect(icon).toHaveAttribute('aria-hidden', 'true');
+      render(<SourceCard source={source} />);
+      expect(screen.getByLabelText('種別: RSS')).toBeInTheDocument();
     });
 
     it('should have accessible feed URL with aria-label', () => {
       const source = createMockSource({ feed_url: 'https://example.com/feed' });
       render(<SourceCard source={source} />);
-      expect(screen.getByLabelText('Visit feed: https://example.com/feed')).toBeInTheDocument();
+      expect(screen.getByLabelText('フィードを開く: https://example.com/feed')).toBeInTheDocument();
     });
 
     it('should have time element for added date', () => {
@@ -162,14 +162,14 @@ describe('SourceCard', () => {
       render(<SourceCard source={source} />);
       const timeElement = screen.getByRole('time');
       expect(timeElement).toHaveAttribute('datetime', createdAt);
-      expect(timeElement).toHaveAttribute('aria-label', 'Added: 1 hour ago');
+      expect(timeElement).toHaveAttribute('aria-label', '追加: 1時間前');
     });
 
     it('should have proper title attribute for truncated URL', () => {
       const longUrl = 'https://example.com/' + 'a'.repeat(100);
       const source = createMockSource({ feed_url: longUrl });
       render(<SourceCard source={source} />);
-      const link = screen.getByRole('link', { name: /visit feed:/i });
+      const link = screen.getByRole('link', { name: /フィードを開く:/ });
       expect(link).toHaveAttribute('title', longUrl);
     });
   });
@@ -179,7 +179,7 @@ describe('SourceCard', () => {
       const source = createMockSource({ feed_url: 'https://example.com/feed.xml' });
       render(<SourceCard source={source} />);
 
-      const link = screen.getByRole('link', { name: /visit feed:/i });
+      const link = screen.getByRole('link', { name: /フィードを開く:/ });
       expect(link).toBeInTheDocument();
       expect(link).toHaveAttribute('href', 'https://example.com/feed.xml');
     });
@@ -189,7 +189,7 @@ describe('SourceCard', () => {
       render(<SourceCard source={source} />);
 
       // No anchor is rendered for a javascript: scheme.
-      expect(screen.queryByRole('link', { name: /visit feed:/i })).not.toBeInTheDocument();
+      expect(screen.queryByRole('link', { name: /フィードを開く:/ })).not.toBeInTheDocument();
       // The raw value is still shown (as text) so the admin can see/fix it.
       expect(screen.getByText('javascript:alert(document.cookie)')).toBeInTheDocument();
     });
@@ -198,7 +198,7 @@ describe('SourceCard', () => {
       const source = createMockSource({ feed_url: 'https://example.com/feed.xml' });
       render(<SourceCard source={source} />);
 
-      const link = screen.getByRole('link', { name: /visit feed:/i });
+      const link = screen.getByRole('link', { name: /フィードを開く:/ });
       expect(link).toHaveAttribute('target', '_blank');
     });
 
@@ -206,7 +206,7 @@ describe('SourceCard', () => {
       const source = createMockSource({ feed_url: 'https://example.com/feed.xml' });
       render(<SourceCard source={source} />);
 
-      const link = screen.getByRole('link', { name: /visit feed:/i });
+      const link = screen.getByRole('link', { name: /フィードを開く:/ });
       expect(link).toHaveAttribute('rel', 'noopener noreferrer');
     });
 
@@ -214,15 +214,15 @@ describe('SourceCard', () => {
       const source = createMockSource({ feed_url: 'https://example.com/feed.xml' });
       render(<SourceCard source={source} />);
 
-      const link = screen.getByRole('link', { name: /visit feed:/i });
-      expect(link).toHaveAttribute('aria-label', 'Visit feed: https://example.com/feed.xml');
+      const link = screen.getByRole('link', { name: /フィードを開く:/ });
+      expect(link).toHaveAttribute('aria-label', 'フィードを開く: https://example.com/feed.xml');
     });
 
     it('should show tooltip with full URL', () => {
       const source = createMockSource({ feed_url: 'https://example.com/feed.xml' });
       render(<SourceCard source={source} />);
 
-      const link = screen.getByRole('link', { name: /visit feed:/i });
+      const link = screen.getByRole('link', { name: /フィードを開く:/ });
       expect(link).toHaveAttribute('title', 'https://example.com/feed.xml');
     });
 
@@ -230,7 +230,7 @@ describe('SourceCard', () => {
       const source = createMockSource({ feed_url: 'https://example.com/' + 'a'.repeat(100) });
       render(<SourceCard source={source} />);
 
-      const link = screen.getByRole('link', { name: /visit feed:/i });
+      const link = screen.getByRole('link', { name: /フィードを開く:/ });
       expect(link).toHaveClass('truncate');
     });
 
@@ -238,7 +238,7 @@ describe('SourceCard', () => {
       const source = createMockSource({ feed_url: 'https://example.com/feed.xml' });
       render(<SourceCard source={source} />);
 
-      const link = screen.getByRole('link', { name: /visit feed:/i });
+      const link = screen.getByRole('link', { name: /フィードを開く:/ });
 
       // Link should be focusable (not have tabIndex -1)
       expect(link).not.toHaveAttribute('tabIndex', '-1');
@@ -252,19 +252,18 @@ describe('SourceCard', () => {
       const source = createMockSource({ feed_url: 'https://example.com/feed.xml' });
       render(<SourceCard source={source} />);
 
-      const link = screen.getByRole('link', { name: /visit feed:/i });
-      expect(link).toHaveClass('hover:text-primary');
-      expect(link).toHaveClass('transition-colors');
-      expect(link).toHaveClass('focus-visible:ring-2');
+      const link = screen.getByRole('link', { name: /フィードを開く:/ });
+      expect(link).toHaveClass('hover:underline');
+      expect(link).toHaveClass('focus-visible:outline-console-cyan');
     });
 
     it('should maintain block-level layout', () => {
       const source = createMockSource({ feed_url: 'https://example.com/feed.xml' });
       render(<SourceCard source={source} />);
 
-      const link = screen.getByRole('link', { name: /visit feed:/i });
+      const link = screen.getByRole('link', { name: /フィードを開く:/ });
       expect(link).toHaveClass('block');
-      expect(link).toHaveClass('text-xs');
+      expect(link).toHaveClass('font-mono');
     });
   });
 
@@ -274,7 +273,7 @@ describe('SourceCard', () => {
         created_at: new Date(NOW.getTime() - 30 * 1000).toISOString(), // 30 seconds ago
       });
       render(<SourceCard source={source} />);
-      expect(screen.getByText('Added Just now')).toBeInTheDocument();
+      expect(screen.getByText('たった今')).toBeInTheDocument();
     });
 
     it('should show minutes for source added within last hour', () => {
@@ -282,7 +281,7 @@ describe('SourceCard', () => {
         created_at: new Date(NOW.getTime() - 45 * 60 * 1000).toISOString(),
       });
       render(<SourceCard source={source} />);
-      expect(screen.getByText('Added 45 minutes ago')).toBeInTheDocument();
+      expect(screen.getByText('45分前')).toBeInTheDocument();
     });
 
     it('should show hours for source added within last day', () => {
@@ -290,7 +289,7 @@ describe('SourceCard', () => {
         created_at: new Date(NOW.getTime() - 5 * 60 * 60 * 1000).toISOString(),
       });
       render(<SourceCard source={source} />);
-      expect(screen.getByText('Added 5 hours ago')).toBeInTheDocument();
+      expect(screen.getByText('5時間前')).toBeInTheDocument();
     });
 
     it('should show days for source added within last week', () => {
@@ -298,7 +297,7 @@ describe('SourceCard', () => {
         created_at: new Date(NOW.getTime() - 3 * 24 * 60 * 60 * 1000).toISOString(),
       });
       render(<SourceCard source={source} />);
-      expect(screen.getByText('Added 3 days ago')).toBeInTheDocument();
+      expect(screen.getByText('3日前')).toBeInTheDocument();
     });
   });
 
@@ -313,9 +312,9 @@ describe('SourceCard', () => {
       });
       render(<SourceCard source={source} />);
       expect(screen.getByText('Minimal')).toBeInTheDocument();
-      const link = screen.getByRole('link', { name: /visit feed:/i });
+      const link = screen.getByRole('link', { name: /フィードを開く:/ });
       expect(link).toHaveTextContent('https://min.com');
-      expect(screen.getByText('Added Unknown')).toBeInTheDocument();
+      expect(screen.getByText('—')).toBeInTheDocument();
     });
 
     it('should handle special characters in source name', () => {
@@ -335,7 +334,7 @@ describe('SourceCard', () => {
     it('should show "Unknown" when created_at is empty', () => {
       const source = createMockSource({ created_at: '' });
       render(<SourceCard source={source} />);
-      expect(screen.getByText('Added Unknown')).toBeInTheDocument();
+      expect(screen.getByText('—')).toBeInTheDocument();
     });
   });
 
@@ -445,7 +444,7 @@ describe('SourceCard', () => {
         render(<SourceCard source={source} onEdit={mockOnEdit} />);
 
         const editButton = screen.getByTestId('source-edit-button');
-        expect(editButton).toHaveAttribute('aria-label', 'Edit source: Tech Blog');
+        expect(editButton).toHaveAttribute('aria-label', 'ソースを編集: Tech Blog');
       });
 
       it('should have correct aria-label for different source names', () => {
@@ -453,7 +452,7 @@ describe('SourceCard', () => {
         render(<SourceCard source={source} onEdit={mockOnEdit} />);
 
         const editButton = screen.getByTestId('source-edit-button');
-        expect(editButton).toHaveAttribute('aria-label', 'Edit source: News Feed 123');
+        expect(editButton).toHaveAttribute('aria-label', 'ソースを編集: News Feed 123');
       });
 
       it('should have correct data-testid', () => {
@@ -503,8 +502,8 @@ describe('SourceCard', () => {
         render(<SourceCard source={source} onEdit={mockOnEdit} />);
 
         const editButton = screen.getByTestId('source-edit-button');
-        expect(editButton).toHaveClass('h-8');
-        expect(editButton).toHaveClass('w-8');
+        expect(editButton).toHaveClass('h-9');
+        expect(editButton).toHaveClass('w-9');
       });
 
       it('should not shrink in flex layout', () => {
@@ -544,8 +543,8 @@ describe('SourceCard', () => {
         // All elements should be present
         expect(screen.getByRole('heading', { name: 'Tech Blog' })).toBeInTheDocument();
         expect(screen.getByTestId('source-edit-button')).toBeInTheDocument();
-        expect(screen.getByRole('link', { name: /visit feed:/i })).toBeInTheDocument();
-        expect(screen.getByText('Added 1 hour ago')).toBeInTheDocument();
+        expect(screen.getByRole('link', { name: /フィードを開く:/ })).toBeInTheDocument();
+        expect(screen.getByText('1時間前')).toBeInTheDocument();
       });
     });
 
@@ -555,7 +554,7 @@ describe('SourceCard', () => {
         render(<SourceCard source={source} onEdit={mockOnEdit} />);
 
         const editButton = screen.getByTestId('source-edit-button');
-        expect(editButton).toHaveAttribute('aria-label', 'Edit source: <script>XSS</script>');
+        expect(editButton).toHaveAttribute('aria-label', 'ソースを編集: <script>XSS</script>');
 
         fireEvent.click(editButton);
         expect(mockOnEdit).toHaveBeenCalledWith(source);
@@ -566,7 +565,7 @@ describe('SourceCard', () => {
         render(<SourceCard source={source} onEdit={mockOnEdit} />);
 
         const editButton = screen.getByTestId('source-edit-button');
-        expect(editButton).toHaveAttribute('aria-label', 'Edit source: 日本語ソース 🎉');
+        expect(editButton).toHaveAttribute('aria-label', 'ソースを編集: 日本語ソース 🎉');
 
         fireEvent.click(editButton);
         expect(mockOnEdit).toHaveBeenCalledWith(source);
@@ -578,7 +577,7 @@ describe('SourceCard', () => {
         render(<SourceCard source={source} onEdit={mockOnEdit} />);
 
         const editButton = screen.getByTestId('source-edit-button');
-        expect(editButton).toHaveAttribute('aria-label', `Edit source: ${longName}`);
+        expect(editButton).toHaveAttribute('aria-label', `ソースを編集: ${longName}`);
       });
     });
   });
@@ -689,7 +688,7 @@ describe('SourceCard', () => {
         render(<SourceCard source={source} onDelete={mockOnDelete} />);
 
         const deleteButton = screen.getByTestId('source-delete-button');
-        expect(deleteButton).toHaveAttribute('aria-label', 'Delete source: Tech Blog');
+        expect(deleteButton).toHaveAttribute('aria-label', 'ソースを削除: Tech Blog');
       });
 
       it('delete button has correct aria-label for different source names', () => {
@@ -697,7 +696,7 @@ describe('SourceCard', () => {
         render(<SourceCard source={source} onDelete={mockOnDelete} />);
 
         const deleteButton = screen.getByTestId('source-delete-button');
-        expect(deleteButton).toHaveAttribute('aria-label', 'Delete source: News Feed 123');
+        expect(deleteButton).toHaveAttribute('aria-label', 'ソースを削除: News Feed 123');
       });
 
       it('delete button has correct data-testid', () => {
@@ -747,8 +746,8 @@ describe('SourceCard', () => {
         render(<SourceCard source={source} onDelete={mockOnDelete} />);
 
         const deleteButton = screen.getByTestId('source-delete-button');
-        expect(deleteButton).toHaveClass('h-8');
-        expect(deleteButton).toHaveClass('w-8');
+        expect(deleteButton).toHaveClass('h-9');
+        expect(deleteButton).toHaveClass('w-9');
       });
 
       it('delete button does not shrink in flex layout', () => {
@@ -799,8 +798,8 @@ describe('SourceCard', () => {
         // All elements should be present
         expect(screen.getByRole('heading', { name: 'Tech Blog' })).toBeInTheDocument();
         expect(screen.getByTestId('source-delete-button')).toBeInTheDocument();
-        expect(screen.getByRole('link', { name: /visit feed:/i })).toBeInTheDocument();
-        expect(screen.getByText('Added 1 hour ago')).toBeInTheDocument();
+        expect(screen.getByRole('link', { name: /フィードを開く:/ })).toBeInTheDocument();
+        expect(screen.getByText('1時間前')).toBeInTheDocument();
       });
     });
 
@@ -810,7 +809,7 @@ describe('SourceCard', () => {
         render(<SourceCard source={source} onDelete={mockOnDelete} />);
 
         const deleteButton = screen.getByTestId('source-delete-button');
-        expect(deleteButton).toHaveAttribute('aria-label', 'Delete source: <script>XSS</script>');
+        expect(deleteButton).toHaveAttribute('aria-label', 'ソースを削除: <script>XSS</script>');
 
         fireEvent.click(deleteButton);
         expect(mockOnDelete).toHaveBeenCalledWith(source);
@@ -821,7 +820,7 @@ describe('SourceCard', () => {
         render(<SourceCard source={source} onDelete={mockOnDelete} />);
 
         const deleteButton = screen.getByTestId('source-delete-button');
-        expect(deleteButton).toHaveAttribute('aria-label', 'Delete source: 日本語ソース 🎉');
+        expect(deleteButton).toHaveAttribute('aria-label', 'ソースを削除: 日本語ソース 🎉');
 
         fireEvent.click(deleteButton);
         expect(mockOnDelete).toHaveBeenCalledWith(source);
@@ -833,7 +832,7 @@ describe('SourceCard', () => {
         render(<SourceCard source={source} onDelete={mockOnDelete} />);
 
         const deleteButton = screen.getByTestId('source-delete-button');
-        expect(deleteButton).toHaveAttribute('aria-label', `Delete source: ${longName}`);
+        expect(deleteButton).toHaveAttribute('aria-label', `ソースを削除: ${longName}`);
       });
     });
   });
@@ -853,7 +852,7 @@ describe('SourceCard', () => {
       expect(screen.getByRole('switch')).toBeInTheDocument();
 
       // Should NOT show badge
-      expect(screen.queryByText('Active')).not.toBeInTheDocument();
+      expect(screen.queryByText('有効')).not.toBeInTheDocument();
     });
 
     it('should render StatusBadge when onUpdateActive is not provided', () => {
@@ -861,7 +860,7 @@ describe('SourceCard', () => {
       render(<SourceCard source={source} />);
 
       // Should show badge (fallback when no callback provided)
-      expect(screen.getByText('Active')).toBeInTheDocument();
+      expect(screen.getByText('有効')).toBeInTheDocument();
 
       // Should NOT show toggle
       expect(screen.queryByRole('switch')).not.toBeInTheDocument();
@@ -885,23 +884,23 @@ describe('SourceCard', () => {
       expect(toggle).not.toBeChecked();
 
       // Verify aria-label includes source name
-      expect(screen.getByLabelText('Toggle Tech Blog active status')).toBeInTheDocument();
+      expect(screen.getByLabelText('Tech Blog の有効状態を切り替え')).toBeInTheDocument();
     });
 
     it('should pass correct props to StatusBadge for active source', () => {
       const source = createMockSource({ active: true });
       render(<SourceCard source={source} />);
 
-      expect(screen.getByText('Active')).toBeInTheDocument();
-      expect(screen.getByLabelText('Status: Active')).toBeInTheDocument();
+      expect(screen.getByText('有効')).toBeInTheDocument();
+      expect(screen.getByLabelText('状態: 有効')).toBeInTheDocument();
     });
 
     it('should pass correct props to StatusBadge for inactive source', () => {
       const source = createMockSource({ active: false });
       render(<SourceCard source={source} />);
 
-      expect(screen.getByText('Inactive')).toBeInTheDocument();
-      expect(screen.getByLabelText('Status: Inactive')).toBeInTheDocument();
+      expect(screen.getByText('無効')).toBeInTheDocument();
+      expect(screen.getByLabelText('状態: 無効')).toBeInTheDocument();
     });
 
     it('should pass onUpdateActive callback to ActiveToggle', () => {
@@ -945,14 +944,14 @@ describe('SourceCard', () => {
       const { rerender } = render(<SourceCard source={source} />);
 
       // Initial: no callback - should show badge
-      expect(screen.getByText('Active')).toBeInTheDocument();
+      expect(screen.getByText('有効')).toBeInTheDocument();
       expect(screen.queryByRole('switch')).not.toBeInTheDocument();
 
       // Re-render with onUpdateActive
       rerender(<SourceCard source={source} onUpdateActive={mockOnUpdateActive} />);
 
       // Should now show toggle
-      expect(screen.queryByText('Active')).not.toBeInTheDocument();
+      expect(screen.queryByText('有効')).not.toBeInTheDocument();
       expect(screen.getByRole('switch')).toBeInTheDocument();
     });
   });

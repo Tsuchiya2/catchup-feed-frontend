@@ -25,36 +25,36 @@ describe('DateRangePicker', () => {
     it('should render From and To date inputs', () => {
       render(<DateRangePicker fromDate={null} toDate={null} onChange={vi.fn()} />);
 
-      expect(screen.getByLabelText('From')).toBeInTheDocument();
-      expect(screen.getByLabelText('To')).toBeInTheDocument();
+      expect(screen.getByLabelText('開始日')).toBeInTheDocument();
+      expect(screen.getByLabelText('終了日')).toBeInTheDocument();
     });
 
     it('should render quick range buttons', () => {
       render(<DateRangePicker fromDate={null} toDate={null} onChange={vi.fn()} />);
 
-      expect(screen.getByRole('button', { name: 'Last 7 Days' })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'Last 30 Days' })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'This Year' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: '直近7日' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: '直近30日' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: '直近1年' })).toBeInTheDocument();
       expect(screen.queryByRole('button', { name: 'Today' })).not.toBeInTheDocument();
     });
 
     it('should show Clear button when dates are set', () => {
       render(<DateRangePicker fromDate="2025-01-01" toDate="2025-01-15" onChange={vi.fn()} />);
 
-      expect(screen.getByRole('button', { name: 'Clear' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'クリア' })).toBeInTheDocument();
     });
 
     it('should not show Clear button when dates are null', () => {
       render(<DateRangePicker fromDate={null} toDate={null} onChange={vi.fn()} />);
 
-      expect(screen.queryByRole('button', { name: 'Clear' })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'クリア' })).not.toBeInTheDocument();
     });
 
     it('should render with initial dates', () => {
       render(<DateRangePicker fromDate="2025-01-01" toDate="2025-01-15" onChange={vi.fn()} />);
 
-      expect(screen.getByLabelText('From')).toHaveValue('2025-01-01');
-      expect(screen.getByLabelText('To')).toHaveValue('2025-01-15');
+      expect(screen.getByLabelText('開始日')).toHaveValue('2025-01-01');
+      expect(screen.getByLabelText('終了日')).toHaveValue('2025-01-15');
     });
 
     it('should apply custom className', () => {
@@ -76,7 +76,7 @@ describe('DateRangePicker', () => {
       const onChange = vi.fn();
       render(<DateRangePicker fromDate={null} toDate={null} onChange={onChange} />);
 
-      changeDateInput('From', '2025-01-01');
+      changeDateInput('開始日', '2025-01-01');
 
       expect(onChange).toHaveBeenCalledWith('2025-01-01', null);
     });
@@ -85,7 +85,7 @@ describe('DateRangePicker', () => {
       const onChange = vi.fn();
       render(<DateRangePicker fromDate="2025-01-01" toDate={null} onChange={onChange} />);
 
-      changeDateInput('To', '2025-01-15');
+      changeDateInput('終了日', '2025-01-15');
 
       expect(onChange).toHaveBeenCalledWith('2025-01-01', '2025-01-15');
     });
@@ -94,7 +94,7 @@ describe('DateRangePicker', () => {
       const onChange = vi.fn();
       render(<DateRangePicker fromDate="2025-01-01" toDate="2025-01-15" onChange={onChange} />);
 
-      changeDateInput('From', '');
+      changeDateInput('開始日', '');
 
       expect(onChange).toHaveBeenCalledWith(null, '2025-01-15');
     });
@@ -105,7 +105,7 @@ describe('DateRangePicker', () => {
       const onChange = vi.fn();
       render(<DateRangePicker fromDate={null} toDate={null} onChange={onChange} />);
 
-      fireEvent.click(screen.getByRole('button', { name: 'Last 7 Days' }));
+      fireEvent.click(screen.getByRole('button', { name: '直近7日' }));
 
       expect(onChange).toHaveBeenCalledWith('2025-01-08', '2025-01-15');
     });
@@ -114,7 +114,7 @@ describe('DateRangePicker', () => {
       const onChange = vi.fn();
       render(<DateRangePicker fromDate={null} toDate={null} onChange={onChange} />);
 
-      fireEvent.click(screen.getByRole('button', { name: 'Last 30 Days' }));
+      fireEvent.click(screen.getByRole('button', { name: '直近30日' }));
 
       expect(onChange).toHaveBeenCalledWith('2024-12-16', '2025-01-15');
     });
@@ -123,7 +123,7 @@ describe('DateRangePicker', () => {
       const onChange = vi.fn();
       render(<DateRangePicker fromDate={null} toDate={null} onChange={onChange} />);
 
-      fireEvent.click(screen.getByRole('button', { name: 'This Year' }));
+      fireEvent.click(screen.getByRole('button', { name: '直近1年' }));
 
       expect(onChange).toHaveBeenCalledWith('2024-01-15', '2025-01-15');
     });
@@ -134,7 +134,7 @@ describe('DateRangePicker', () => {
       const onChange = vi.fn();
       render(<DateRangePicker fromDate="2025-01-01" toDate="2025-01-15" onChange={onChange} />);
 
-      fireEvent.click(screen.getByRole('button', { name: 'Clear' }));
+      fireEvent.click(screen.getByRole('button', { name: 'クリア' }));
 
       expect(onChange).toHaveBeenCalledWith(null, null);
     });
@@ -142,13 +142,13 @@ describe('DateRangePicker', () => {
     it('should show Clear button when only fromDate is set', () => {
       render(<DateRangePicker fromDate="2025-01-01" toDate={null} onChange={vi.fn()} />);
 
-      expect(screen.getByRole('button', { name: 'Clear' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'クリア' })).toBeInTheDocument();
     });
 
     it('should show Clear button when only toDate is set', () => {
       render(<DateRangePicker fromDate={null} toDate="2025-01-15" onChange={vi.fn()} />);
 
-      expect(screen.getByRole('button', { name: 'Clear' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'クリア' })).toBeInTheDocument();
     });
   });
 
@@ -157,9 +157,9 @@ describe('DateRangePicker', () => {
       const onChange = vi.fn();
       render(<DateRangePicker fromDate="2025-01-15" toDate={null} onChange={onChange} />);
 
-      changeDateInput('To', '2025-01-01');
+      changeDateInput('終了日', '2025-01-01');
 
-      expect(screen.getByRole('alert')).toHaveTextContent('End date must be after start date');
+      expect(screen.getByRole('alert')).toHaveTextContent('終了日は開始日以降にしてください');
       // onChange should not be called with invalid dates
       expect(onChange).not.toHaveBeenCalled();
     });
@@ -168,7 +168,7 @@ describe('DateRangePicker', () => {
       const onChange = vi.fn();
       render(<DateRangePicker fromDate="2025-01-01" toDate={null} onChange={onChange} />);
 
-      changeDateInput('To', '2025-01-15');
+      changeDateInput('終了日', '2025-01-15');
 
       expect(screen.queryByRole('alert')).not.toBeInTheDocument();
       expect(onChange).toHaveBeenCalled();
@@ -178,7 +178,7 @@ describe('DateRangePicker', () => {
       const onChange = vi.fn();
       render(<DateRangePicker fromDate="2025-01-15" toDate={null} onChange={onChange} />);
 
-      changeDateInput('To', '2025-01-15');
+      changeDateInput('終了日', '2025-01-15');
 
       expect(screen.queryByRole('alert')).not.toBeInTheDocument();
       expect(onChange).toHaveBeenCalledWith('2025-01-15', '2025-01-15');
@@ -189,11 +189,11 @@ describe('DateRangePicker', () => {
       render(<DateRangePicker fromDate="2025-01-15" toDate={null} onChange={onChange} />);
 
       // First trigger an error
-      changeDateInput('To', '2025-01-01');
+      changeDateInput('終了日', '2025-01-01');
       expect(screen.getByRole('alert')).toBeInTheDocument();
 
       // Then use quick range to clear error
-      fireEvent.click(screen.getByRole('button', { name: 'Last 7 Days' }));
+      fireEvent.click(screen.getByRole('button', { name: '直近7日' }));
       expect(screen.queryByRole('alert')).not.toBeInTheDocument();
     });
   });
@@ -202,8 +202,8 @@ describe('DateRangePicker', () => {
     it('should disable all inputs when disabled prop is true', () => {
       render(<DateRangePicker fromDate={null} toDate={null} onChange={vi.fn()} disabled={true} />);
 
-      expect(screen.getByLabelText('From')).toBeDisabled();
-      expect(screen.getByLabelText('To')).toBeDisabled();
+      expect(screen.getByLabelText('開始日')).toBeDisabled();
+      expect(screen.getByLabelText('終了日')).toBeDisabled();
     });
 
     it('should disable all buttons when disabled prop is true', () => {
@@ -216,17 +216,17 @@ describe('DateRangePicker', () => {
         />
       );
 
-      expect(screen.getByRole('button', { name: 'Last 7 Days' })).toBeDisabled();
-      expect(screen.getByRole('button', { name: 'Last 30 Days' })).toBeDisabled();
-      expect(screen.getByRole('button', { name: 'This Year' })).toBeDisabled();
-      expect(screen.getByRole('button', { name: 'Clear' })).toBeDisabled();
+      expect(screen.getByRole('button', { name: '直近7日' })).toBeDisabled();
+      expect(screen.getByRole('button', { name: '直近30日' })).toBeDisabled();
+      expect(screen.getByRole('button', { name: '直近1年' })).toBeDisabled();
+      expect(screen.getByRole('button', { name: 'クリア' })).toBeDisabled();
     });
 
     it('should not disable inputs by default', () => {
       render(<DateRangePicker fromDate={null} toDate={null} onChange={vi.fn()} />);
 
-      expect(screen.getByLabelText('From')).not.toBeDisabled();
-      expect(screen.getByLabelText('To')).not.toBeDisabled();
+      expect(screen.getByLabelText('開始日')).not.toBeDisabled();
+      expect(screen.getByLabelText('終了日')).not.toBeDisabled();
     });
   });
 
@@ -234,8 +234,8 @@ describe('DateRangePicker', () => {
     it('should have labeled inputs', () => {
       render(<DateRangePicker fromDate={null} toDate={null} onChange={vi.fn()} />);
 
-      const fromInput = screen.getByLabelText('From');
-      const toInput = screen.getByLabelText('To');
+      const fromInput = screen.getByLabelText('開始日');
+      const toInput = screen.getByLabelText('終了日');
 
       expect(fromInput).toHaveAttribute('id', 'from-date');
       expect(toInput).toHaveAttribute('id', 'to-date');
@@ -244,16 +244,16 @@ describe('DateRangePicker', () => {
     it('should have aria-describedby on inputs when error exists', () => {
       render(<DateRangePicker fromDate="2025-01-15" toDate={null} onChange={vi.fn()} />);
 
-      changeDateInput('To', '2025-01-01');
+      changeDateInput('終了日', '2025-01-01');
 
-      expect(screen.getByLabelText('From')).toHaveAttribute('aria-describedby', 'date-error');
-      expect(screen.getByLabelText('To')).toHaveAttribute('aria-describedby', 'date-error');
+      expect(screen.getByLabelText('開始日')).toHaveAttribute('aria-describedby', 'date-error');
+      expect(screen.getByLabelText('終了日')).toHaveAttribute('aria-describedby', 'date-error');
     });
 
     it('should have role=alert on error message', () => {
       render(<DateRangePicker fromDate="2025-01-15" toDate={null} onChange={vi.fn()} />);
 
-      changeDateInput('To', '2025-01-01');
+      changeDateInput('終了日', '2025-01-01');
 
       expect(screen.getByRole('alert')).toBeInTheDocument();
     });

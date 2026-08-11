@@ -1,8 +1,7 @@
 import * as React from 'react';
 import Link from 'next/link';
-import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { formatRelativeTime } from '@/lib/utils/formatDate';
+import { formatRelativeTimeJa } from '@/lib/utils/relativeTimeJa';
 import { truncateText } from '@/lib/utils/truncate';
 import { normalizeSourceName } from '@/utils/article';
 import type { Article } from '@/types/api';
@@ -14,20 +13,14 @@ interface ArticleCardProps {
 }
 
 /**
- * ArticleCard Component
+ * ArticleCard — one row of the console article list (放送卓改訂版).
  *
- * Displays an article in list view with:
- * - Title (bold, larger font)
- * - Summary (2-line truncated, muted)
- * - Metadata: Source badge, Published date
- * - Hover effects for interactivity (cyber/glow theme)
+ * List form per design handoff: a 1px-framed panel holds hairline-divided
+ * rows; each row is relative time (mono) / title + summary / source label
+ * (mono). No card chrome, no shadows, hover moves the background one step.
  *
- * Links to article detail page (/articles/[id])
- *
+ * Links to the article detail page (/articles/[id]).
  * Memoized to prevent unnecessary re-renders in lists.
- *
- * @example
- * <ArticleCard article={article} sourceName="Tech Blog" />
  */
 export const ArticleCard = React.memo(function ArticleCard({
   article,
@@ -35,7 +28,7 @@ export const ArticleCard = React.memo(function ArticleCard({
   className,
 }: ArticleCardProps) {
   // Safe field access with fallbacks
-  const title = article.title?.trim() || 'Untitled Article';
+  const title = article.title?.trim() || '(無題)';
   const summary = article.summary?.trim() || '';
   const publishedDate = article.published_at;
   const displaySourceName = normalizeSourceName(sourceName ?? article.source_name);
@@ -44,44 +37,33 @@ export const ArticleCard = React.memo(function ArticleCard({
     <Link
       href={`/articles/${article.id}`}
       className={cn(
-        'group block rounded-lg border bg-card p-6 shadow-sm transition-all duration-300',
-        'hover:border-primary/50 hover:shadow-glow-sm',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+        'flex items-center gap-4 border-b border-console-line-1 px-[18px] py-3.5 transition-colors duration-[120ms] ease-out last:border-b-0 hover:bg-console-hover',
+        'focus-visible:outline focus-visible:outline-1 focus-visible:-outline-offset-1 focus-visible:outline-console-cyan',
         className
       )}
-      aria-label={`Article: ${title}`}
+      aria-label={`記事: ${title}`}
     >
-      <article className="flex flex-col space-y-3">
-        {/* Article Title */}
-        <h2 className="text-xl font-bold leading-tight text-foreground transition-colors group-hover:text-primary">
-          {title}
-        </h2>
-
-        {/* Article Summary */}
+      {publishedDate ? (
+        <time
+          dateTime={publishedDate}
+          className="w-[72px] shrink-0 font-mono text-[11.5px] text-console-ink-faint"
+        >
+          {formatRelativeTimeJa(publishedDate)}
+        </time>
+      ) : (
+        <span className="w-[72px] shrink-0 font-mono text-[11.5px] text-console-ink-ghost">—</span>
+      )}
+      <span className="min-w-0 flex-1">
+        <span className="block truncate text-[13.5px] text-console-ink">{title}</span>
         {summary && (
-          <p className="text-sm leading-relaxed text-muted-foreground line-clamp-2">
+          <span className="mt-0.5 block truncate text-[12px] text-console-ink-weak">
             {truncateText(summary, 150)}
-          </p>
+          </span>
         )}
-
-        {/* Metadata Row */}
-        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-          {/* Source Badge */}
-          <Badge variant="secondary" className="font-normal">
-            {displaySourceName}
-          </Badge>
-
-          {/* Published Date */}
-          {publishedDate && (
-            <>
-              <span className="text-muted-foreground/50">·</span>
-              <time dateTime={publishedDate} className="tabular-nums">
-                {formatRelativeTime(publishedDate)}
-              </time>
-            </>
-          )}
-        </div>
-      </article>
+      </span>
+      <span className="hidden max-w-[160px] shrink-0 truncate font-mono text-[10.5px] text-console-ink-faint sm:block">
+        {displaySourceName}
+      </span>
     </Link>
   );
 });

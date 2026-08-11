@@ -75,7 +75,7 @@ export function DeleteBookDialog({ book, isOpen, onClose, onSuccess }: DeleteBoo
         </DialogHeader>
 
         {error && (
-          <div role="alert" className="rounded-md bg-destructive/15 p-3 text-sm text-destructive">
+          <div role="alert" className="border border-destructive p-3 text-sm text-destructive">
             {error.message || '削除に失敗しました。もう一度お試しください。'}
           </div>
         )}

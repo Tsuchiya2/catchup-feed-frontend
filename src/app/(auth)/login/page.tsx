@@ -3,75 +3,74 @@
 import * as React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
 import { LoginForm } from '@/components/auth/LoginForm';
 import { useAuth } from '@/hooks/useAuth';
 
 /**
- * Login Page
+ * Login Page — 放送卓(改訂版) §2
  *
- * Public page that displays the login form.
- * Features a cyber/tech theme matching the brand logo.
- * Authenticated users will be redirected to /dashboard by middleware.
+ * Always dark (brand-fixed). Admin login only — the page states that the
+ * service is operated for personal use and shows no sign-up affordance.
+ * Authenticated users are redirected to /dashboard by the proxy.
  */
 export default function LoginPage() {
   const { login } = useAuth();
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-4 py-12 sm:px-6 lg:px-8">
-      {/* Background Effects */}
-      <div className="pointer-events-none absolute inset-0 bg-cyber-radial" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_-10%,hsl(190_100%_50%/0.12),transparent)]" />
-
-      {/* Content */}
-      <div className="relative w-full max-w-md space-y-8">
-        {/* Logo and Title */}
-        <div className="text-center">
-          <div className="mb-6 flex justify-center">
-            <div className="relative">
-              <div className="absolute -inset-3 rounded-full bg-primary/20 blur-xl" />
-              <Image
-                src="/catch-feed-icon.webp"
-                alt="Catchup Feed"
-                width={64}
-                height={64}
-                className="relative rounded-2xl shadow-glow"
-              />
-            </div>
-          </div>
-          <h1 className="text-glow-sm text-3xl font-bold tracking-tight">Catchup Feed</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Sign in to access your personalized news feed
-          </p>
-        </div>
-
-        <LoginForm onLogin={login} />
-
-        {/* Back to Home Link */}
-        <div className="text-center">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-primary"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Home
-          </Link>
-        </div>
-
-        {/* Legal Links */}
-        <div className="flex justify-center gap-6">
+    <div className="console-dark flex min-h-screen flex-col bg-[#0d0f10] text-[#e6e4e0]">
+      {/* Header (same lockup as landing; brand links back to /) */}
+      <header className="flex min-h-[63px] items-center justify-between gap-4 border-b border-[#1a1e20] px-5 py-2.5 sm:max-desk:px-8 desk:pl-12 desk:pr-10">
+        <Link href="/" className="flex items-center gap-3">
+          <span aria-hidden className="h-[7px] w-[7px] rounded-full bg-console-off" />
+          <span className="text-[17px] font-bold tracking-[.02em] text-[#e6e4e0]">
+            Catchup Feed
+          </span>
+        </Link>
+        <nav className="flex items-center gap-[26px] font-mono text-[11.5px] text-[#6d7276]">
           <Link
             href="/terms"
-            className="text-xs text-muted-foreground transition-colors hover:text-primary"
+            className="flex min-h-[44px] items-center transition-colors duration-[120ms] ease-out hover:text-[#9aa0a4]"
           >
-            Terms of Service
+            利用規約
           </Link>
           <Link
             href="/privacy"
-            className="text-xs text-muted-foreground transition-colors hover:text-primary"
+            className="flex min-h-[44px] items-center transition-colors duration-[120ms] ease-out hover:text-[#9aa0a4]"
           >
-            Privacy Policy
+            プライバシー
           </Link>
+        </nav>
+      </header>
+
+      {/* Body: form + logo panel (stacked below 900px, 2 columns above) */}
+      <div className="flex flex-1 flex-col desk:grid desk:grid-cols-2">
+        <div className="relative order-1 shrink-0 overflow-hidden border-b border-[#1a1e20] bg-console-logo max-sm:h-[200px] sm:max-desk:h-[420px] desk:order-2 desk:border-b-0 desk:border-l">
+          <Image
+            src="/catchup-feed-logo.png"
+            alt=""
+            fill
+            priority
+            sizes="(min-width: 900px) 50vw, 100vw"
+            className="object-contain"
+          />
+        </div>
+
+        <div className="order-2 flex flex-1 flex-col gap-[26px] px-5 py-10 sm:px-12 desk:order-1 desk:pb-12 desk:pt-24">
+          <h1 className="text-[26px] font-bold leading-[1.5] desk:text-[38px]">ログイン</h1>
+
+          <LoginForm onLogin={login} />
+
+          <p className="max-w-[420px] font-mono text-[11.5px] leading-[2] text-[#6d7276]">
+            このサービスは個人利用の範囲で運用しております。
+          </p>
+
+          {/* OFF AIR line — static copy, not live status */}
+          <div className="mt-auto flex items-center gap-3 pt-10">
+            <span aria-hidden className="h-[7px] w-[7px] rounded-full bg-console-off" />
+            <span className="font-mono text-[11px] tracking-[.22em] text-[#3a4145]">
+              OFF AIR — 次の送出は 05:00
+            </span>
+          </div>
         </div>
       </div>
     </div>

@@ -6,7 +6,7 @@ import type { Article } from '@/types/api';
  * ArticleCard Component
  *
  * Displays an article in list view with title, summary, source badge, and published date.
- * Features hover effects consistent with the cyber/glow theme.
+ * Rendered as a hairline console list row (放送卓改訂版).
  *
  * Links to article detail page (/articles/[id])
  */

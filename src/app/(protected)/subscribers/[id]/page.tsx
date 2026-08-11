@@ -17,10 +17,10 @@ import { DeactivateSubscriberDialog } from '@/components/subscribers/DeactivateS
 import { AccessLogList } from '@/components/access-logs/AccessLogList';
 import { useSubscriber } from '@/hooks/useSubscribers';
 import { useAccessLogs } from '@/hooks/useAccessLogs';
-import { formatRelativeTime } from '@/lib/utils/formatDate';
+import { formatRelativeTimeJa } from '@/lib/utils/relativeTimeJa';
 
 /**
- * Friend detail page
+ * Friend detail page — 放送卓(改訂版)
  *
  * - Profile (name / email / note / status)
  * - Feed token management (issue with one-time URL display, revoke)
@@ -41,26 +41,20 @@ export default function SubscriberDetailPage() {
   const [isDeactivateOpen, setIsDeactivateOpen] = React.useState(false);
 
   const breadcrumbItems = [
-    { label: 'Friends', href: '/subscribers' },
-    { label: subscriber?.name || 'Loading...', href: undefined },
+    { label: '友人', href: '/subscribers' },
+    { label: subscriber?.name || '読み込み中…', href: undefined },
   ];
 
   return (
-    <div className="container py-8">
-      <div className="mb-6">
-        <Breadcrumb items={breadcrumbItems} />
-      </div>
+    <div className="flex flex-1 flex-col gap-5 max-sm:p-5 sm:max-desk:p-7 desk:px-8 desk:py-7">
+      <Breadcrumb items={breadcrumbItems} className="mb-0" />
 
       {/* Error State */}
-      {error && (
-        <div className="mb-6">
-          <ErrorMessage error={error} onRetry={refetch} />
-        </div>
-      )}
+      {error && <ErrorMessage error={error} onRetry={refetch} />}
 
       {/* Loading State */}
       {isLoading && (
-        <div className="mx-auto max-w-3xl space-y-6">
+        <div className="mx-auto w-full max-w-3xl space-y-5">
           <Skeleton className="h-32 w-full" />
           <Skeleton className="h-48 w-full" />
         </div>
@@ -69,12 +63,12 @@ export default function SubscriberDetailPage() {
       {/* Not Found State */}
       {!isLoading && !error && !subscriber && (
         <EmptyState
-          title="Friend not found"
-          description="This friend doesn't exist or has been removed."
-          icon={<UserRound className="h-12 w-12" />}
+          title="友人が見つかりません"
+          description="この友人は存在しないか、すでに削除されています。"
+          icon={<UserRound className="h-10 w-10" />}
           action={
-            <Button asChild variant="outline">
-              <Link href="/subscribers">Back to Friends</Link>
+            <Button asChild variant="outline" size="sm">
+              <Link href="/subscribers">友人一覧に戻る</Link>
             </Button>
           }
         />
@@ -82,53 +76,54 @@ export default function SubscriberDetailPage() {
 
       {/* Detail */}
       {!isLoading && !error && subscriber && (
-        <div className="mx-auto max-w-3xl space-y-6">
-          {/* Profile card */}
+        <div className="mx-auto w-full max-w-3xl space-y-5">
+          {/* Profile panel */}
           <Card>
-            <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2 space-y-0 pb-4">
-              <CardTitle className="flex flex-wrap items-center gap-2 text-xl">
-                {subscriber.name}
+            <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2 space-y-0 border-b border-console-line-1 pb-3">
+              <div className="flex flex-wrap items-center gap-2.5">
+                <span className="text-[15px] font-bold text-console-ink">{subscriber.name}</span>
                 {subscriber.active ? (
-                  <Badge variant="success">Active</Badge>
+                  <Badge variant="success">有効</Badge>
                 ) : (
-                  <Badge variant="secondary">Deactivated</Badge>
+                  <Badge variant="secondary">無効化済</Badge>
                 )}
-              </CardTitle>
-              <div className="flex items-center gap-1">
+              </div>
+              <div className="flex items-center gap-1.5">
                 <Button variant="outline" size="sm" onClick={() => setIsEditOpen(true)}>
                   <Pencil className="mr-1 h-4 w-4" />
-                  Edit
+                  編集
                 </Button>
                 {subscriber.active && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="text-destructive hover:text-destructive"
-                    onClick={() => setIsDeactivateOpen(true)}
-                  >
+                  <Button variant="outline" size="sm" onClick={() => setIsDeactivateOpen(true)}>
                     <UserRoundX className="mr-1 h-4 w-4" />
-                    Deactivate
+                    無効化
                   </Button>
                 )}
               </div>
             </CardHeader>
-            <CardContent className="space-y-2 text-sm">
+            <CardContent className="space-y-2 pt-4 text-[13px] leading-[1.9]">
               {subscriber.email && (
                 <p>
-                  <span className="text-muted-foreground">Email: </span>
-                  {subscriber.email}
+                  <span className="font-mono text-[11px] tracking-[.12em] text-console-ink-faint">
+                    EMAIL{' '}
+                  </span>
+                  <span className="font-mono text-[12px] text-console-ink-sub">
+                    {subscriber.email}
+                  </span>
                 </p>
               )}
               {subscriber.note && (
-                <p>
-                  <span className="text-muted-foreground">Note: </span>
+                <p className="text-console-ink-sub">
+                  <span className="font-mono text-[11px] tracking-[.12em] text-console-ink-faint">
+                    メモ{' '}
+                  </span>
                   {subscriber.note}
                 </p>
               )}
-              <p className="text-xs text-muted-foreground">
-                Added {formatRelativeTime(subscriber.created_at)}
+              <p className="font-mono text-[10.5px] text-console-ink-faint">
+                追加 {formatRelativeTimeJa(subscriber.created_at)}
                 {subscriber.deactivated_at && (
-                  <> · Deactivated {formatRelativeTime(subscriber.deactivated_at)}</>
+                  <> ／ 無効化 {formatRelativeTimeJa(subscriber.deactivated_at)}</>
                 )}
               </p>
             </CardContent>
@@ -139,16 +134,16 @@ export default function SubscriberDetailPage() {
 
           {/* Recent accesses */}
           <Card>
-            <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2 space-y-0 pb-4">
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <History className="h-5 w-5 text-primary" aria-hidden="true" />
-                Recent Accesses
+            <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2 space-y-0 border-b border-console-line-1 pb-3">
+              <CardTitle className="flex items-center gap-2">
+                <History className="h-4 w-4" aria-hidden="true" />
+                最近のアクセス
               </CardTitle>
               <Button asChild variant="ghost" size="sm">
-                <Link href={`/access-logs?subscriber=${subscriber.id}`}>View all</Link>
+                <Link href={`/access-logs?subscriber=${subscriber.id}`}>すべて見る</Link>
               </Button>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-2">
               {logsError && <ErrorMessage error={logsError} />}
               {logsLoading && <Skeleton className="h-24 w-full" />}
               {!logsLoading && !logsError && <AccessLogList logs={logs} hideSubscriber />}
@@ -156,11 +151,11 @@ export default function SubscriberDetailPage() {
           </Card>
 
           {/* Back */}
-          <div className="pt-2">
-            <Button asChild variant="ghost" className="gap-2">
+          <div className="pt-1">
+            <Button asChild variant="ghost" size="sm" className="gap-2">
               <Link href="/subscribers">
                 <ArrowLeft className="h-4 w-4" />
-                Back to Friends
+                友人一覧に戻る
               </Link>
             </Button>
           </div>

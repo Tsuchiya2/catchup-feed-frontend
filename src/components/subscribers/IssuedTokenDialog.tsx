@@ -72,22 +72,22 @@ export function IssuedTokenDialog({ issued, subscriberName, onClose }: IssuedTok
         onInteractOutside={(event) => event.preventDefault()}
       >
         <DialogHeader>
-          <DialogTitle>Subscription URL for {subscriberName}</DialogTitle>
+          <DialogTitle>{subscriberName} の購読 URL</DialogTitle>
           <DialogDescription>
-            Share this URL with {subscriberName} — pasting it into a podcast app subscribes to the
-            radio feed.
+            この URL を {subscriberName}{' '}
+            に渡してください。ポッドキャストアプリに貼り付けるとラジオを購読できます。
           </DialogDescription>
         </DialogHeader>
 
         {/* One-time warning */}
         <div
           role="alert"
-          className="flex items-start gap-2 rounded-md border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive"
+          className="flex items-start gap-2 border border-destructive p-3 text-[13px] leading-[1.9] text-destructive"
         >
           <TriangleAlert className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
           <p>
-            This URL is shown <strong>only once</strong> and cannot be displayed again after you
-            close this dialog. Copy it now. If it is lost, revoke the token and issue a new one.
+            この URL が表示されるのは<strong>今回の一度だけ</strong>
+            です。閉じると二度と表示できません。今すぐコピーしてください。失くした場合は、このトークンを失効させて再発行してください。
           </p>
         </div>
 
@@ -95,7 +95,7 @@ export function IssuedTokenDialog({ issued, subscriberName, onClose }: IssuedTok
         <div className="space-y-2">
           <p
             data-testid={SUBSCRIBER_TEST_IDS.ISSUED_TOKEN_FEED_URL}
-            className="select-all break-all rounded-md border border-primary/30 bg-primary/5 p-3 font-mono text-sm text-foreground"
+            className="select-all break-all border border-console-cyan bg-console-bg p-3 font-mono text-[12.5px] leading-[1.8] text-console-ink"
           >
             {issued.feed_url}
           </p>
@@ -104,17 +104,17 @@ export function IssuedTokenDialog({ issued, subscriberName, onClose }: IssuedTok
             className="w-full"
             onClick={handleCopy}
             data-testid={SUBSCRIBER_TEST_IDS.COPY_FEED_URL_BUTTON}
-            aria-label="Copy subscription URL"
+            aria-label="購読 URL をコピー"
           >
             {copied ? (
               <>
                 <Check className="mr-2 h-4 w-4" />
-                Copied!
+                コピーしました
               </>
             ) : (
               <>
                 <Copy className="mr-2 h-4 w-4" />
-                Copy URL
+                URL をコピー
               </>
             )}
           </Button>
@@ -122,7 +122,7 @@ export function IssuedTokenDialog({ issued, subscriberName, onClose }: IssuedTok
 
         <DialogFooter>
           <Button type="button" variant="outline" onClick={() => handleOpenChange(false)}>
-            I saved the URL — close
+            URL を保存した — 閉じる
           </Button>
         </DialogFooter>
       </DialogContent>

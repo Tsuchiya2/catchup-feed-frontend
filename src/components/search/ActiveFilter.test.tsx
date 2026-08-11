@@ -8,33 +8,33 @@ describe('ActiveFilter', () => {
     it('should render with label', () => {
       render(<ActiveFilter value={null} onChange={vi.fn()} />);
 
-      expect(screen.getByLabelText('Status')).toBeInTheDocument();
+      expect(screen.getByLabelText('状態')).toBeInTheDocument();
     });
 
     it('should render all status options', () => {
       render(<ActiveFilter value={null} onChange={vi.fn()} />);
 
-      expect(screen.getByRole('option', { name: 'All' })).toBeInTheDocument();
-      expect(screen.getByRole('option', { name: 'Active Only' })).toBeInTheDocument();
-      expect(screen.getByRole('option', { name: 'Inactive Only' })).toBeInTheDocument();
+      expect(screen.getByRole('option', { name: 'すべて' })).toBeInTheDocument();
+      expect(screen.getByRole('option', { name: '有効のみ' })).toBeInTheDocument();
+      expect(screen.getByRole('option', { name: '無効のみ' })).toBeInTheDocument();
     });
 
     it('should show All when value is null', () => {
       render(<ActiveFilter value={null} onChange={vi.fn()} />);
 
-      expect(screen.getByLabelText('Status')).toHaveValue('');
+      expect(screen.getByLabelText('状態')).toHaveValue('');
     });
 
     it('should show Active Only when value is true', () => {
       render(<ActiveFilter value={true} onChange={vi.fn()} />);
 
-      expect(screen.getByLabelText('Status')).toHaveValue('true');
+      expect(screen.getByLabelText('状態')).toHaveValue('true');
     });
 
     it('should show Inactive Only when value is false', () => {
       render(<ActiveFilter value={false} onChange={vi.fn()} />);
 
-      expect(screen.getByLabelText('Status')).toHaveValue('false');
+      expect(screen.getByLabelText('状態')).toHaveValue('false');
     });
 
     it('should apply custom className', () => {
@@ -52,7 +52,7 @@ describe('ActiveFilter', () => {
       const onChange = vi.fn();
       render(<ActiveFilter value={null} onChange={onChange} />);
 
-      await user.selectOptions(screen.getByLabelText('Status'), 'true');
+      await user.selectOptions(screen.getByLabelText('状態'), 'true');
 
       expect(onChange).toHaveBeenCalledWith(true);
     });
@@ -62,7 +62,7 @@ describe('ActiveFilter', () => {
       const onChange = vi.fn();
       render(<ActiveFilter value={null} onChange={onChange} />);
 
-      await user.selectOptions(screen.getByLabelText('Status'), 'false');
+      await user.selectOptions(screen.getByLabelText('状態'), 'false');
 
       expect(onChange).toHaveBeenCalledWith(false);
     });
@@ -72,7 +72,7 @@ describe('ActiveFilter', () => {
       const onChange = vi.fn();
       render(<ActiveFilter value={true} onChange={onChange} />);
 
-      await user.selectOptions(screen.getByLabelText('Status'), '');
+      await user.selectOptions(screen.getByLabelText('状態'), '');
 
       expect(onChange).toHaveBeenCalledWith(null);
     });
@@ -82,7 +82,7 @@ describe('ActiveFilter', () => {
       const onChange = vi.fn();
       render(<ActiveFilter value={true} onChange={onChange} />);
 
-      await user.selectOptions(screen.getByLabelText('Status'), 'false');
+      await user.selectOptions(screen.getByLabelText('状態'), 'false');
 
       expect(onChange).toHaveBeenCalledWith(false);
     });
@@ -92,13 +92,13 @@ describe('ActiveFilter', () => {
     it('should disable select when disabled prop is true', () => {
       render(<ActiveFilter value={null} onChange={vi.fn()} disabled={true} />);
 
-      expect(screen.getByLabelText('Status')).toBeDisabled();
+      expect(screen.getByLabelText('状態')).toBeDisabled();
     });
 
     it('should not disable select by default', () => {
       render(<ActiveFilter value={null} onChange={vi.fn()} />);
 
-      expect(screen.getByLabelText('Status')).not.toBeDisabled();
+      expect(screen.getByLabelText('状態')).not.toBeDisabled();
     });
   });
 
@@ -106,13 +106,13 @@ describe('ActiveFilter', () => {
     it('should have aria-label', () => {
       render(<ActiveFilter value={null} onChange={vi.fn()} />);
 
-      expect(screen.getByRole('combobox', { name: 'Filter by status' })).toBeInTheDocument();
+      expect(screen.getByRole('combobox', { name: '状態で絞り込む' })).toBeInTheDocument();
     });
 
     it('should have associated label', () => {
       render(<ActiveFilter value={null} onChange={vi.fn()} />);
 
-      const select = screen.getByLabelText('Status');
+      const select = screen.getByLabelText('状態');
       expect(select).toHaveAttribute('id', 'active-filter');
     });
   });

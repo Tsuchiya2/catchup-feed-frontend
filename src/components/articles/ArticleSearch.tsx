@@ -111,16 +111,16 @@ export function ArticleSearch({
   const showClearButton = React.useMemo(() => hasActiveFilters(searchState), [searchState]);
 
   return (
-    <Card className={cn('mb-6', className)}>
+    <Card className={cn('', className)}>
       <CardHeader className="pb-4">
-        <CardTitle className="text-lg">Search & Filter Articles</CardTitle>
+        <CardTitle>検索・絞り込み</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Keyword Search */}
         <SearchInput
           value={searchState.keyword}
           onChange={handleKeywordChange}
-          placeholder="Search by title or summary..."
+          placeholder="タイトル・要約で検索…"
           isLoading={isLoading}
         />
 
@@ -143,7 +143,7 @@ export function ArticleSearch({
         {showClearButton && (
           <div className="flex justify-end">
             <Button type="button" variant="ghost" size="sm" onClick={handleClearAll}>
-              Clear All Filters
+              条件をクリア
             </Button>
           </div>
         )}

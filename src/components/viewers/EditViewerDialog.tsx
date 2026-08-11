@@ -69,10 +69,10 @@ export function EditViewerDialog({ viewer, isOpen, onClose, onSuccess }: EditVie
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Edit Viewer</DialogTitle>
+          <DialogTitle>視聴者を編集</DialogTitle>
           <DialogDescription>
-            Update {viewer.name}&apos;s account. Leave the password blank to keep their current
-            password.
+            {viewer.name}{' '}
+            のアカウントを更新します。パスワード欄を空のままにすると現在のパスワードが維持されます。
           </DialogDescription>
         </DialogHeader>
 

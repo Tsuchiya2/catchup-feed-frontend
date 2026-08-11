@@ -1,26 +1,18 @@
 /**
- * SourceCard Component
+ * SourceCard Component — one row of the console source list (放送卓改訂版).
  *
- * Displays a source (RSS feed) in a card format with:
- * - Source name and RSS icon
- * - Edit button (when onEdit provided)
- * - Delete button (when onDelete provided)
- * - Feed URL (truncated with tooltip)
- * - Category and language badges
- * - Active/Inactive toggle (when onUpdateActive provided) or status badge
- * - Added (created_at) timestamp
- * - Cyber/glow theme styling
+ * List form per design handoff: hairline-divided row inside a 1px-framed
+ * panel. Shows kind label (mono), name + category/lang, feed URL (mono),
+ * active toggle (admin) or status label (viewer), and edit/delete actions.
  *
- * Single-administrator system (C-7/C-20): pages behind authentication
- * always render management controls, so there is no role branching here.
+ * Single-administrator system (C-7/C-20): the presence of the callbacks
+ * decides whether management controls render (viewer = read-only, D-27).
  */
 import * as React from 'react';
-import { Rss, Tv, Podcast, Newspaper, Pencil, Trash2, type LucideIcon } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
+import { Pencil, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { formatRelativeTime } from '@/lib/utils/formatDate';
+import { formatRelativeTimeJa } from '@/lib/utils/relativeTimeJa';
 import { safeExternalHref } from '@/lib/utils/safeExternalHref';
 import type { Source, SourceKind } from '@/types/api';
 import { StatusBadge } from './StatusBadge';
@@ -28,14 +20,14 @@ import { ActiveToggle } from './ActiveToggle';
 import { SOURCE_TEST_IDS, SOURCE_ARIA_LABELS } from '@/constants/source';
 
 /**
- * Display metadata per source kind (icon + badge label).
+ * Mono label per source kind.
  * Sources from a pre-Phase 2 backend may omit `kind`; treat them as 'rss'.
  */
-const KIND_META: Record<SourceKind, { label: string; Icon: LucideIcon }> = {
-  rss: { label: 'RSS', Icon: Rss },
-  youtube: { label: 'YouTube', Icon: Tv },
-  podcast: { label: 'Podcast', Icon: Podcast },
-  newsletter: { label: 'Newsletter', Icon: Newspaper },
+const KIND_LABELS: Record<SourceKind, string> = {
+  rss: 'RSS',
+  youtube: 'YT',
+  podcast: 'POD',
+  newsletter: 'NEWS',
 };
 
 /**
@@ -55,19 +47,8 @@ interface SourceCardProps {
 }
 
 /**
- * SourceCard displays a source in a card format.
- *
+ * SourceCard displays a source as a console list row.
  * Memoized to prevent unnecessary re-renders in lists.
- *
- * @example
- * ```tsx
- * <SourceCard
- *   source={source}
- *   onUpdateActive={handleUpdateActive}
- *   onEdit={handleEdit}
- *   onDelete={handleDelete}
- * />
- * ```
  */
 export const SourceCard = React.memo(function SourceCard({
   source,
@@ -76,9 +57,8 @@ export const SourceCard = React.memo(function SourceCard({
   onEdit,
   onDelete,
 }: SourceCardProps) {
-  const createdAt = source.created_at ? formatRelativeTime(source.created_at) : 'Unknown';
-  const kindMeta = KIND_META[source.kind ?? 'rss'];
-  const KindIcon = kindMeta.Icon;
+  const createdAt = source.created_at ? formatRelativeTimeJa(source.created_at) : '—';
+  const kindLabel = KIND_LABELS[source.kind ?? 'rss'];
 
   // feed_url is externally sourced; only render a clickable link for safe
   // (http/https) schemes to neutralize javascript:/data: XSS (H-2).
@@ -98,110 +78,117 @@ export const SourceCard = React.memo(function SourceCard({
   );
 
   return (
-    <Card
-      className={cn('flex flex-col', className)}
+    <div
       role="listitem"
-      aria-label={`Source: ${source.name}`}
+      aria-label={`ソース: ${source.name}`}
+      className={cn(
+        'flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-console-line-1 px-[18px] py-3.5 last:border-b-0',
+        className
+      )}
     >
-      <CardContent className="flex flex-col gap-4 p-6">
-        {/* Icon and Name */}
-        <div className="flex items-start gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-primary/30 bg-primary/10 transition-all duration-300 group-hover:border-primary/50 group-hover:shadow-glow-sm">
-            <KindIcon className="h-5 w-5 text-primary" aria-hidden="true" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2">
-              <h3 className="truncate text-lg font-semibold text-foreground">{source.name}</h3>
-              {onEdit && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 shrink-0"
-                  onClick={() => onEdit(source)}
-                  data-testid={SOURCE_TEST_IDS.EDIT_BUTTON}
-                  aria-label={SOURCE_ARIA_LABELS.EDIT_BUTTON(source.name)}
-                >
-                  <Pencil className="h-4 w-4" />
-                </Button>
-              )}
-              {onDelete && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 shrink-0 text-destructive hover:text-destructive"
-                  onClick={() => onDelete(source)}
-                  data-testid={SOURCE_TEST_IDS.DELETE_BUTTON}
-                  aria-label={SOURCE_ARIA_LABELS.DELETE_BUTTON(source.name)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              )}
-            </div>
-          </div>
-        </div>
+      <span
+        data-testid={SOURCE_TEST_IDS.KIND_BADGE}
+        aria-label={`種別: ${kindLabel}`}
+        className="w-[44px] shrink-0 font-mono text-[10.5px] tracking-[.12em] text-console-ink-faint"
+      >
+        {kindLabel}
+      </span>
 
-        {/* Kind, Category and Language */}
-        <div className="flex flex-wrap items-center gap-2">
-          <Badge
-            variant="secondary"
-            data-testid={SOURCE_TEST_IDS.KIND_BADGE}
-            aria-label={`Type: ${kindMeta.label}`}
+      <div className="min-w-0 flex-1 basis-[220px]">
+        <div className="flex flex-wrap items-baseline gap-x-2.5">
+          <h3
+            className={cn(
+              'truncate text-[13.5px]',
+              source.active ? 'text-console-ink' : 'text-console-ink-faint'
+            )}
           >
-            {kindMeta.label}
-          </Badge>
-          <Badge variant="outline" aria-label={`Category: ${source.category}`}>
+            {source.name}
+          </h3>
+          <span
+            className="font-mono text-[10.5px] text-console-ink-faint"
+            aria-label={`カテゴリ: ${source.category}`}
+          >
             {source.category}
-          </Badge>
+          </span>
           {source.lang && (
-            <Badge variant="secondary" aria-label={`Language: ${source.lang}`}>
-              {source.lang}
-            </Badge>
-          )}
-        </div>
-
-        {/* Feed URL */}
-        <div className="min-w-0">
-          {safeFeedHref ? (
-            <a
-              href={safeFeedHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block truncate text-xs text-muted-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              title={source.feed_url}
-              aria-label={`Visit feed: ${source.feed_url}`}
+            <span
+              className="font-mono text-[10.5px] text-console-ink-ghost"
+              aria-label={`言語: ${source.lang}`}
             >
-              {source.feed_url}
-            </a>
-          ) : (
-            // Unsafe / unparseable scheme: show the raw value without a link.
-            <span className="block truncate text-xs text-muted-foreground" title={source.feed_url}>
-              {source.feed_url}
+              {source.lang}
             </span>
           )}
         </div>
-
-        {/* Status and Last Crawled */}
-        <div className="flex items-center justify-between gap-2 pt-2">
-          {/* Conditional rendering: Toggle when updatable, Badge otherwise */}
-          {onUpdateActive ? (
-            <ActiveToggle
-              sourceId={source.id}
-              sourceName={source.name}
-              initialActive={source.active}
-              onToggle={handleToggle}
-            />
-          ) : (
-            <StatusBadge active={source.active} />
-          )}
-          <time
-            className="text-xs text-muted-foreground"
-            dateTime={source.created_at || undefined}
-            aria-label={`Added: ${createdAt}`}
+        {safeFeedHref ? (
+          <a
+            href={safeFeedHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block max-w-full truncate font-mono text-[10.5px] text-console-ink-weak hover:underline focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-console-cyan"
+            title={source.feed_url}
+            aria-label={`フィードを開く: ${source.feed_url}`}
           >
-            Added {createdAt}
-          </time>
+            {source.feed_url}
+          </a>
+        ) : (
+          // Unsafe / unparseable scheme: show the raw value without a link.
+          <span
+            className="block max-w-full truncate font-mono text-[10.5px] text-console-ink-weak"
+            title={source.feed_url}
+          >
+            {source.feed_url}
+          </span>
+        )}
+      </div>
+
+      <time
+        className="hidden shrink-0 font-mono text-[10.5px] text-console-ink-ghost lg:block"
+        dateTime={source.created_at || undefined}
+        aria-label={`追加: ${createdAt}`}
+      >
+        {createdAt}
+      </time>
+
+      {/* Conditional rendering: Toggle when updatable, status label otherwise */}
+      {onUpdateActive ? (
+        <ActiveToggle
+          sourceId={source.id}
+          sourceName={source.name}
+          initialActive={source.active}
+          onToggle={handleToggle}
+        />
+      ) : (
+        <StatusBadge active={source.active} />
+      )}
+
+      {(onEdit || onDelete) && (
+        <div className="flex shrink-0 items-center gap-1">
+          {onEdit && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-9 w-9 shrink-0"
+              onClick={() => onEdit(source)}
+              data-testid={SOURCE_TEST_IDS.EDIT_BUTTON}
+              aria-label={SOURCE_ARIA_LABELS.EDIT_BUTTON(source.name)}
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+          )}
+          {onDelete && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-9 w-9 shrink-0 text-console-ink-weak hover:text-destructive"
+              onClick={() => onDelete(source)}
+              data-testid={SOURCE_TEST_IDS.DELETE_BUTTON}
+              aria-label={SOURCE_ARIA_LABELS.DELETE_BUTTON(source.name)}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          )}
         </div>
-      </CardContent>
-    </Card>
+      )}
+    </div>
   );
 });

@@ -15,7 +15,7 @@ test.describe('Source Delete', () => {
   });
 
   test('should delete a source after confirmation', async ({ page }) => {
-    await page.getByRole('button', { name: 'Delete source: Go Blog' }).click();
+    await page.getByRole('button', { name: 'ソースを削除: Go Blog' }).click();
 
     await expect(page.getByTestId('source-delete-dialog')).toBeVisible();
 
@@ -30,7 +30,7 @@ test.describe('Source Delete', () => {
   });
 
   test('should keep the source when cancelling the dialog', async ({ page }) => {
-    await page.getByRole('button', { name: 'Delete source: Go Blog' }).click();
+    await page.getByRole('button', { name: 'ソースを削除: Go Blog' }).click();
     await expect(page.getByTestId('source-delete-dialog')).toBeVisible();
 
     await page.getByTestId('source-delete-cancel-button').click();
@@ -42,7 +42,7 @@ test.describe('Source Delete', () => {
   test('should surface an error when deletion fails', async ({ page }) => {
     await page.route(/\/sources\/1$/, (route) => fulfillJsonError(route, 400, { error: 'delete failed' }));
 
-    await page.getByRole('button', { name: 'Delete source: Go Blog' }).click();
+    await page.getByRole('button', { name: 'ソースを削除: Go Blog' }).click();
     await page.getByTestId('source-delete-confirm-button').click();
 
     await expect(page.getByTestId('source-delete-error')).toBeVisible();

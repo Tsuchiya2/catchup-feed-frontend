@@ -99,7 +99,7 @@ export function DateRangePicker({
       const fromTime = new Date(from).getTime();
       const toTime = new Date(to).getTime();
       if (toTime < fromTime) {
-        setError('End date must be after start date');
+        setError('終了日は開始日以降にしてください');
         return false;
       }
     }
@@ -145,8 +145,11 @@ export function DateRangePicker({
     <div className={cn('space-y-3', className)}>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
         <div className="flex-1 space-y-1.5">
-          <Label htmlFor="from-date" className="text-sm font-medium">
-            From
+          <Label
+            htmlFor="from-date"
+            className="font-mono text-[11px] tracking-[.18em] text-console-ink-weak"
+          >
+            開始日
           </Label>
           <Input
             id="from-date"
@@ -154,13 +157,16 @@ export function DateRangePicker({
             value={fromDate || ''}
             onChange={handleFromChange}
             disabled={disabled}
-            className="w-full"
+            className="w-full font-mono text-[12px]"
             aria-describedby={error ? 'date-error' : undefined}
           />
         </div>
         <div className="flex-1 space-y-1.5">
-          <Label htmlFor="to-date" className="text-sm font-medium">
-            To
+          <Label
+            htmlFor="to-date"
+            className="font-mono text-[11px] tracking-[.18em] text-console-ink-weak"
+          >
+            終了日
           </Label>
           <Input
             id="to-date"
@@ -168,14 +174,14 @@ export function DateRangePicker({
             value={toDate || ''}
             onChange={handleToChange}
             disabled={disabled}
-            className="w-full"
+            className="w-full font-mono text-[12px]"
             aria-describedby={error ? 'date-error' : undefined}
           />
         </div>
       </div>
 
       {error && (
-        <p id="date-error" className="text-sm text-destructive" role="alert">
+        <p id="date-error" className="font-mono text-[11px] text-destructive" role="alert">
           {error}
         </p>
       )}
@@ -188,7 +194,7 @@ export function DateRangePicker({
           onClick={() => handleQuickRange('week')}
           disabled={disabled}
         >
-          Last 7 Days
+          直近7日
         </Button>
         <Button
           type="button"
@@ -197,7 +203,7 @@ export function DateRangePicker({
           onClick={() => handleQuickRange('month')}
           disabled={disabled}
         >
-          Last 30 Days
+          直近30日
         </Button>
         <Button
           type="button"
@@ -206,11 +212,11 @@ export function DateRangePicker({
           onClick={() => handleQuickRange('year')}
           disabled={disabled}
         >
-          This Year
+          直近1年
         </Button>
         {(fromDate || toDate) && (
           <Button type="button" variant="ghost" size="sm" onClick={handleClear} disabled={disabled}>
-            Clear
+            クリア
           </Button>
         )}
       </div>

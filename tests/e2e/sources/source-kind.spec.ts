@@ -13,7 +13,7 @@ test.describe('Source Kind', () => {
   });
 
   test('shows the kind badge on existing sources (explicit rss)', async ({ page }) => {
-    const goBlogCard = page.getByRole('listitem', { name: 'Source: Go Blog' });
+    const goBlogCard = page.getByRole('listitem', { name: 'ソース: Go Blog' });
     await expect(goBlogCard.getByTestId('source-kind-badge')).toHaveText('RSS');
   });
 
@@ -21,12 +21,12 @@ test.describe('Source Kind', () => {
     page,
   }) => {
     // The Hacker News mock omits `kind` on purpose (see mock-data.ts).
-    const hnCard = page.getByRole('listitem', { name: 'Source: Hacker News' });
+    const hnCard = page.getByRole('listitem', { name: 'ソース: Hacker News' });
     await expect(hnCard.getByTestId('source-kind-badge')).toHaveText('RSS');
   });
 
   test('creates a YouTube source with kind and format help', async ({ page }) => {
-    await page.getByRole('button', { name: 'Add Source' }).click();
+    await page.getByRole('button', { name: 'ソースを追加' }).click();
 
     const kindSelect = page.getByTestId('source-kind-select');
     await expect(kindSelect).toHaveValue('rss');
@@ -51,13 +51,13 @@ test.describe('Source Kind', () => {
     const request = await createRequest;
     expect(request.postDataJSON()).toMatchObject({ kind: 'youtube' });
 
-    const newCard = page.getByRole('listitem', { name: 'Source: Some Channel' });
+    const newCard = page.getByRole('listitem', { name: 'ソース: Some Channel' });
     await expect(newCard).toBeVisible();
-    await expect(newCard.getByTestId('source-kind-badge')).toHaveText('YouTube');
+    await expect(newCard.getByTestId('source-kind-badge')).toHaveText('YT');
   });
 
   test('pre-selects the current kind in the edit dialog', async ({ page }) => {
-    await page.getByRole('button', { name: 'Edit source: Go Blog' }).click();
+    await page.getByRole('button', { name: 'ソースを編集: Go Blog' }).click();
 
     await expect(page.getByTestId('source-edit-dialog')).toBeVisible();
     await expect(page.getByTestId('source-kind-select')).toHaveValue('rss');

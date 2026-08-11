@@ -9,9 +9,9 @@ test.describe('Friends List', () => {
   });
 
   test('should list friends with active/deactivated status', async ({ page }) => {
-    await expect(page.getByRole('heading', { name: 'Friends' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: '友人' })).toBeVisible();
     // 3 active (Alice, Bob, Dave), 1 deactivated (Carol)
-    await expect(page.getByText('3 active, 1 deactivated')).toBeVisible();
+    await expect(page.getByText('有効 3 名 ／ 無効化 1 名')).toBeVisible();
 
     await expect(page.getByRole('heading', { name: 'Alice', exact: true })).toBeVisible();
     // Carol stays visible after soft delete (history preserved)
@@ -19,7 +19,7 @@ test.describe('Friends List', () => {
   });
 
   test('should add a friend', async ({ page }) => {
-    await page.getByRole('button', { name: 'Add Friend' }).first().click();
+    await page.getByRole('button', { name: '友人を追加' }).first().click();
     await expect(page.getByRole('dialog')).toBeVisible();
 
     await page.getByTestId('subscriber-name-input').fill('Erin');
@@ -33,11 +33,11 @@ test.describe('Friends List', () => {
     await createRequest;
 
     await expect(page.getByRole('heading', { name: 'Erin', exact: true })).toBeVisible();
-    await expect(page.getByText('4 active, 1 deactivated')).toBeVisible();
+    await expect(page.getByText('有効 4 名 ／ 無効化 1 名')).toBeVisible();
   });
 
   test('should edit a friend', async ({ page }) => {
-    await page.getByRole('button', { name: 'Edit friend: Alice' }).click();
+    await page.getByRole('button', { name: '友人を編集: Alice' }).click();
     await expect(page.getByRole('dialog')).toBeVisible();
 
     await page.getByTestId('subscriber-name-input').fill('Alice Updated');
@@ -47,7 +47,7 @@ test.describe('Friends List', () => {
   });
 
   test('should deactivate a friend (soft delete keeps the card)', async ({ page }) => {
-    await page.getByRole('button', { name: 'Deactivate friend: Bob' }).click();
+    await page.getByRole('button', { name: '友人を無効化: Bob' }).click();
     await expect(page.getByTestId('subscriber-deactivate-dialog')).toBeVisible();
 
     const deactivateRequest = page.waitForRequest(
@@ -57,21 +57,21 @@ test.describe('Friends List', () => {
     await deactivateRequest;
 
     // Soft delete: Bob is still listed, but the counts shift
-    await expect(page.getByText('2 active, 2 deactivated')).toBeVisible();
+    await expect(page.getByText('有効 2 名 ／ 無効化 2 名')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Bob', exact: true })).toBeVisible();
   });
 
   test('should navigate to the friend detail page via Manage', async ({ page }) => {
-    await page.getByRole('link', { name: 'Manage Alice' }).click();
+    await page.getByRole('link', { name: 'Alice を管理' }).click();
 
     await expect(page).toHaveURL(/\/subscribers\/1/);
-    await expect(page.getByText('Feed Tokens')).toBeVisible();
+    await expect(page.getByText('フィードトークン')).toBeVisible();
   });
 
   test('should show empty state when there are no friends', async ({ page, api }) => {
     api.subscribers = [];
     await page.goto('/subscribers');
 
-    await expect(page.getByText('No friends yet')).toBeVisible();
+    await expect(page.getByText('友人はまだいません')).toBeVisible();
   });
 });

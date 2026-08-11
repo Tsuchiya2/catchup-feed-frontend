@@ -26,9 +26,9 @@ export const GRADE_OPTIONS: ReadonlyArray<{
  * book_review status labels for the book management screen.
  */
 export const BOOK_STATUS_LABELS: Record<string, string> = {
-  idle: 'Idle',
-  active: 'In progress',
-  finished: 'Finished',
+  idle: '待機',
+  active: '進行中',
+  finished: '読了',
 };
 
 /**

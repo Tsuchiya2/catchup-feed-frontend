@@ -1,55 +1,272 @@
 'use client';
 
 import * as React from 'react';
-import { FileText, Rss } from 'lucide-react';
-import { StatisticsCard } from '@/components/dashboard/StatisticsCard';
-import { RecentArticlesList } from '@/components/dashboard/RecentArticlesList';
-import { ErrorMessage } from '@/components/common/ErrorMessage';
-import { useDashboardStats } from '@/hooks/useDashboardStats';
+import Link from 'next/link';
+import { cn } from '@/lib/utils';
+import { useArticles } from '@/hooks/useArticles';
+import { useSources } from '@/hooks/useSources';
+import { useAccessLogSummary } from '@/hooks/useAccessLogs';
+import { useAuth } from '@/hooks/useAuth';
+import { ConsoleClock } from '@/components/console/ConsoleClock';
+import { formatRelativeTimeJa } from '@/lib/utils/relativeTimeJa';
+import type { SourceKind } from '@/types/api';
 
 /**
- * Dashboard Page
+ * Dashboard (概況) — 放送卓(改訂版) §3
  *
- * Protected page that displays user statistics and recent articles.
- * Features cyber/tech theme matching the brand.
- * Requires authentication - unauthenticated users will be redirected by middleware.
+ * Did this morning's episode go out, and is there enough material for
+ * tomorrow? Episode / batch / retention data has no backend API yet, so those
+ * panels degrade to hairline frames with `—` (README ローディング spec) —
+ * no fabricated values.
  */
+
+const KIND_LABELS: Record<SourceKind, string> = {
+  rss: 'RSS',
+  youtube: 'YT',
+  podcast: 'POD',
+  newsletter: 'NEWS',
+};
+
+/** Days without access before a friend counts as neglected (C-8: ~3 weeks). */
+const NEGLECT_THRESHOLD_DAYS = 21;
+
+function PanelHeading({ children }: { children: React.ReactNode }) {
+  return (
+    <h2 className="font-mono text-[11px] tracking-[.2em] text-console-ink-weak">{children}</h2>
+  );
+}
+
+function MetricTile({
+  label,
+  value,
+  accent = false,
+  className,
+}: {
+  label: string;
+  value: string;
+  accent?: boolean;
+  className?: string;
+}) {
+  return (
+    <div className={cn('border-console-line-1 p-4', className)}>
+      <p className="font-mono text-[11px] tracking-[.18em] text-console-ink-weak">{label}</p>
+      <p
+        className={cn(
+          'mt-2 font-mono text-[28px] leading-none',
+          accent ? 'text-console-cyan' : 'text-console-ink'
+        )}
+      >
+        {value}
+      </p>
+    </div>
+  );
+}
+
 export default function DashboardPage() {
-  const { stats, isLoading, error } = useDashboardStats();
+  const { logout } = useAuth();
+  const {
+    articles,
+    pagination,
+    isLoading: articlesLoading,
+    error: articlesError,
+  } = useArticles({ limit: 3 });
+  const { sources } = useSources();
+  const { summary, isLoading: summaryLoading, error: summaryError } = useAccessLogSummary();
+
+  const kindBySourceId = React.useMemo(() => {
+    const map = new Map<number, SourceKind>();
+    for (const source of sources) {
+      map.set(source.id, source.kind ?? 'rss');
+    }
+    return map;
+  }, [sources]);
+
+  const totalArticles = articlesLoading ? '—' : String(pagination.total);
 
   return (
-    <div className="container py-8">
-      {/* Page Header */}
-      <div className="mb-8">
-        <h1 className="text-glow-sm text-3xl font-bold tracking-tight">Dashboard</h1>
-        <p className="mt-2 text-muted-foreground">Your personalized news feed overview</p>
-      </div>
-
-      {/* Error State */}
-      {error && (
-        <div className="mb-6">
-          <ErrorMessage error={error} onRetry={() => window.location.reload()} />
+    <div className="flex flex-1 flex-col">
+      {/* Status band — episode state needs a backend API; degrade to `—` */}
+      <div className="flex h-[58px] shrink-0 items-center justify-between border-b border-console-line-2 bg-console-band px-5 sm:px-8">
+        <div className="flex items-center gap-3 font-mono text-[11.5px]">
+          <span aria-hidden className="h-2 w-2 rounded-full bg-console-off" />
+          <span className="tracking-[.2em] text-console-ink-weak">—</span>
+          <span className="text-console-ink-weak">第—号 ／ — JST ／ —</span>
         </div>
-      )}
-
-      {/* Statistics Cards */}
-      <div className="mb-8 grid gap-4 md:grid-cols-2 lg:grid-cols-2">
-        <StatisticsCard
-          title="Total Articles"
-          value={stats.totalArticles}
-          icon={<FileText className="h-4 w-4" />}
-          isLoading={isLoading}
-        />
-        <StatisticsCard
-          title="Total Sources"
-          value={stats.totalSources}
-          icon={<Rss className="h-4 w-4" />}
-          isLoading={isLoading}
-        />
+        <div className="hidden items-center gap-4 desk:flex">
+          <ConsoleClock className="text-[11.5px] text-console-ink-weak" />
+          <button
+            type="button"
+            onClick={logout}
+            className="flex min-h-[36px] items-center border border-console-line-3 px-3.5 text-[12px] text-console-ink-sub transition-colors duration-[120ms] ease-out hover:bg-console-hover"
+          >
+            ログアウト
+          </button>
+        </div>
       </div>
 
-      {/* Recent Articles List */}
-      <RecentArticlesList articles={stats.recentArticles} isLoading={isLoading} />
+      <div className="flex flex-1 flex-col gap-5 max-sm:p-5 sm:max-desk:p-7 desk:py-7 desk:pl-8 desk:pr-8">
+        {/* Metric tiles (< 900px only; README responsive spec) */}
+        <div className="grid grid-cols-2 border border-console-line-2 bg-console-panel sm:grid-cols-4 desk:hidden">
+          <MetricTile label="EPISODE" value="—" className="hidden sm:block" />
+          <MetricTile label="尺" value="—" className="hidden sm:block sm:border-l" />
+          <MetricTile label="記事" value={totalArticles} className="sm:border-l" />
+          <MetricTile label="要約待ち" value="—" accent className="border-l" />
+        </div>
+
+        <div className="grid flex-1 grid-cols-1 gap-[26px] sm:max-desk:grid-cols-[1.4fr_1fr] desk:grid-cols-[1.55fr_1fr]">
+          {/* Left column */}
+          <div className="flex min-w-0 flex-col gap-5">
+            {/* 今朝の構成 — episode segments API not available yet */}
+            <section className="border border-console-line-2 bg-console-panel">
+              <header className="flex items-center justify-between border-b border-console-line-1 px-[18px] py-3">
+                <PanelHeading>今朝の構成</PanelHeading>
+                <span className="font-mono text-[11px] text-console-cyan">
+                  — 記事 ／ — 書籍 ／ — 問
+                </span>
+              </header>
+              {[0, 1, 2].map((i) => (
+                <div
+                  key={i}
+                  className={cn(
+                    'flex items-center gap-4 px-[18px] py-3',
+                    i < 2 && 'border-b border-console-line-1'
+                  )}
+                >
+                  <span className="w-[46px] shrink-0 font-mono text-[12px] text-console-cyan">
+                    —
+                  </span>
+                  <span className="min-h-[20px] flex-1" />
+                </div>
+              ))}
+            </section>
+
+            {/* 明朝の候補 — latest crawled articles */}
+            <section>
+              <header className="flex items-center justify-between pb-2">
+                <PanelHeading>明朝の候補</PanelHeading>
+                <Link
+                  href="/articles"
+                  className="font-mono text-[11px] text-console-cyan hover:underline"
+                >
+                  {articlesLoading ? '—' : pagination.total} 件すべて見る
+                </Link>
+              </header>
+              {articlesError && (
+                <p className="border-t border-console-line-2 py-3 font-mono text-[11px] text-console-warn">
+                  記事の取得に失敗しました
+                </p>
+              )}
+              {!articlesError &&
+                (articlesLoading || articles.length === 0
+                  ? [0, 1, 2].map((i) => (
+                      <div
+                        key={i}
+                        className="flex items-center gap-4 border-t border-console-line-2 py-3.5"
+                      >
+                        <span className="w-[72px] shrink-0 font-mono text-[11.5px] text-console-ink-faint">
+                          —
+                        </span>
+                        <span className="min-h-[20px] flex-1" />
+                      </div>
+                    ))
+                  : articles.map((article) => (
+                      <div
+                        key={article.id}
+                        className="flex items-center gap-4 border-t border-console-line-2 py-3.5"
+                      >
+                        <span className="w-[72px] shrink-0 font-mono text-[11.5px] text-console-ink-faint">
+                          {formatRelativeTimeJa(article.published_at)}
+                        </span>
+                        <Link
+                          href={`/articles/${article.id}`}
+                          className="min-w-0 flex-1 truncate text-[13.5px] text-console-ink hover:underline"
+                        >
+                          {article.title}
+                        </Link>
+                        <span className="shrink-0 font-mono text-[10.5px] text-console-ink-faint">
+                          {KIND_LABELS[kindBySourceId.get(article.source_id) ?? 'rss']}
+                        </span>
+                      </div>
+                    )))}
+            </section>
+          </div>
+
+          {/* Right column */}
+          <div className="flex min-w-0 flex-col gap-[18px]">
+            {/* 夜間バッチ — jobs API not available yet */}
+            <section className="border border-console-line-2 bg-console-panel px-[18px] py-4">
+              <PanelHeading>夜間バッチ</PanelHeading>
+              <div className="mt-3 flex flex-col gap-2.5 font-mono text-[12px]">
+                {['書籍取り込み', '文字起こし', '番組生成', '要約系統'].map((label) => (
+                  <div key={label} className="flex items-center justify-between gap-4">
+                    <span className="text-console-ink-sub">{label}</span>
+                    <span className="text-console-cyan">—</span>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* 受信状況 — per-friend last access (real data) */}
+            <section className="border border-console-line-2 bg-console-panel px-[18px] py-4">
+              <PanelHeading>受信状況</PanelHeading>
+              {summaryError && (
+                <p className="mt-3 font-mono text-[11px] text-console-warn">
+                  受信状況の取得に失敗しました
+                </p>
+              )}
+              {!summaryError && (
+                <div className="mt-2 flex flex-col">
+                  {summaryLoading || summary.length === 0 ? (
+                    <div className="flex items-center justify-between py-1.5">
+                      <span className="min-h-[20px] flex-1" />
+                      <span className="font-mono text-[11px] text-console-ink-faint">—</span>
+                    </div>
+                  ) : (
+                    summary.map((row) => {
+                      const neglected =
+                        row.days_since_last_access === null ||
+                        row.days_since_last_access >= NEGLECT_THRESHOLD_DAYS;
+                      return (
+                        <div
+                          key={row.subscriber_id}
+                          className="flex items-center justify-between gap-4 py-1.5"
+                        >
+                          <span className="truncate text-[13.5px] text-console-ink">
+                            {row.subscriber_name}
+                          </span>
+                          <span
+                            className={cn(
+                              'shrink-0 font-mono text-[11px]',
+                              neglected ? 'text-console-warn' : 'text-console-cyan'
+                            )}
+                          >
+                            {formatRelativeTimeJa(row.last_accessed_at)}
+                          </span>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              )}
+            </section>
+
+            {/* 定着 30日 — retention API not available yet */}
+            <section className="border border-console-line-2 bg-console-panel px-[18px] py-4">
+              <PanelHeading>定着 30日</PanelHeading>
+              <div className="mt-3 h-[54px]" />
+              <div className="mt-2 flex items-center justify-between font-mono text-[11px]">
+                <span className="text-console-ink-sub">正答率</span>
+                <span className="text-console-ink-weak">— → —</span>
+              </div>
+            </section>
+
+            <div className="mt-auto font-mono text-[11px] leading-[2] text-console-ink-faint">
+              <p>クイズ在庫 — ／ 飽和閾値 —</p>
+              <p>episodes/ — ／ 保持 —</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

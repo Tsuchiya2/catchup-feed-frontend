@@ -1,13 +1,13 @@
 'use client';
 
 import * as React from 'react';
-import { Button } from '@/components/ui/button';
-import { AlertTriangle } from 'lucide-react';
 
 /**
- * Global Error Boundary
+ * Global Error Boundary — 放送卓(改訂版)
  *
- * Catches errors in the application and displays a user-friendly error page.
+ * Quiet console-styled failure screen. This system is designed to degrade
+ * ("壊れても翌日勝手に戻る"), so the tone is calm: warm accent, no red
+ * except destructive confirmations, mono status line, hairline buttons.
  */
 export default function Error({
   error,
@@ -22,36 +22,36 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-4 py-12">
-      <div className="mx-auto max-w-md text-center">
-        {/* Error Icon */}
-        <div className="mb-6 flex justify-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-destructive/10 text-destructive">
-            <AlertTriangle className="h-8 w-8" />
-          </div>
-        </div>
-
-        {/* Error Message */}
-        <h1 className="mb-2 text-2xl font-bold">Something went wrong!</h1>
-        <p className="mb-6 text-muted-foreground">
-          We apologize for the inconvenience. An unexpected error occurred.
+    <div className="flex min-h-screen flex-col items-center justify-center bg-console-bg px-5 py-12 text-console-ink">
+      <div className="w-full max-w-md border border-console-line-2 bg-console-panel p-8">
+        <p className="font-mono text-[11px] tracking-[.22em] text-console-warn">ERROR</p>
+        <h1 className="mt-3 text-[17px] font-bold leading-[1.6]">問題が発生しました</h1>
+        <p className="mt-2 text-[13px] leading-[2] text-console-ink-weak [text-wrap:pretty]">
+          予期しないエラーが発生しました。再試行しても直らない場合は、時間をおいてからやり直してください。
         </p>
 
         {/* Error Details (Development Only) */}
         {process.env.NODE_ENV === 'development' && error.message && (
-          <div className="mb-6 rounded-lg bg-muted p-4 text-left">
-            <p className="text-sm font-mono text-muted-foreground">{error.message}</p>
-          </div>
+          <p className="mt-4 border border-console-line-2 p-3 font-mono text-[11px] leading-[1.8] text-console-ink-weak">
+            {error.message}
+          </p>
         )}
 
-        {/* Action Buttons */}
-        <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
-          <Button onClick={reset} variant="default">
-            Try Again
-          </Button>
-          <Button onClick={() => (window.location.href = '/')} variant="outline">
-            Go Home
-          </Button>
+        <div className="mt-6 flex flex-col gap-2 sm:flex-row">
+          <button
+            type="button"
+            onClick={reset}
+            className="flex min-h-[44px] items-center justify-center bg-console-sel-bg px-5 text-[13px] font-bold text-console-sel-ink transition-colors duration-[120ms] ease-out hover:bg-console-sel-hover focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-console-cyan"
+          >
+            再試行
+          </button>
+          <button
+            type="button"
+            onClick={() => (window.location.href = '/')}
+            className="flex min-h-[44px] items-center justify-center border border-console-line-3 px-5 text-[13px] text-console-ink-sub transition-colors duration-[120ms] ease-out hover:bg-console-hover focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-console-cyan"
+          >
+            トップへ戻る
+          </button>
         </div>
       </div>
     </div>

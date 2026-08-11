@@ -188,8 +188,8 @@ export function SourceForm({
   };
 
   // Submit button text based on mode
-  const submitButtonText = mode === 'create' ? 'Add Source' : 'Save Changes';
-  const loadingButtonText = mode === 'create' ? 'Adding...' : 'Saving...';
+  const submitButtonText = mode === 'create' ? '追加する' : '保存する';
+  const loadingButtonText = mode === 'create' ? '追加中…' : '保存中…';
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -197,7 +197,7 @@ export function SourceForm({
       <ErrorAlert error={error} />
 
       {/* Name Field */}
-      <FormField label="Name" required htmlFor="source-name" error={errors.name}>
+      <FormField label="名前" required htmlFor="source-name" error={errors.name}>
         <Input
           id="source-name"
           data-testid={SOURCE_TEST_IDS.NAME_INPUT}
@@ -205,7 +205,7 @@ export function SourceForm({
           value={formData.name}
           onChange={(e) => handleChange('name', e.target.value)}
           onBlur={() => handleBlur('name')}
-          placeholder="e.g., Tech Blog"
+          placeholder="例: Tech Blog"
           aria-required="true"
           aria-invalid={!!errors.name}
           aria-describedby={errors.name ? 'source-name-error' : undefined}
@@ -215,7 +215,7 @@ export function SourceForm({
       </FormField>
 
       {/* Kind Field (constrained select; native element for the mobile picker) */}
-      <FormField label="Type" required htmlFor="source-kind">
+      <FormField label="種別" required htmlFor="source-kind">
         <select
           id="source-kind"
           data-testid={SOURCE_TEST_IDS.KIND_SELECT}
@@ -223,7 +223,7 @@ export function SourceForm({
           value={formData.kind}
           onChange={(e) => handleKindChange(e.target.value as SourceKind)}
           disabled={isLoading}
-          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:border-primary/50 focus-visible:shadow-glow-sm disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+          className="console-field flex h-10 w-full disabled:cursor-not-allowed md:text-sm"
         >
           {KIND_OPTIONS.map((option) => (
             <option key={option.value} value={option.value}>
@@ -234,7 +234,7 @@ export function SourceForm({
       </FormField>
 
       {/* Feed URL Field */}
-      <FormField label="Feed URL" required htmlFor="source-feedURL" error={errors.feedURL}>
+      <FormField label="フィード URL" required htmlFor="source-feedURL" error={errors.feedURL}>
         <Input
           id="source-feedURL"
           type="url"
@@ -259,15 +259,18 @@ export function SourceForm({
           maxLength={SOURCE_CONFIG.URL_MAX_LENGTH}
         />
         {formData.kind === 'youtube' && (
-          <p id="source-feedURL-help" className="text-xs text-muted-foreground">
-            For YouTube channels, use the RSS form:
+          <p
+            id="source-feedURL-help"
+            className="font-mono text-[11px] leading-[1.8] text-console-ink-faint"
+          >
+            YouTube チャンネルは RSS 形式で指定します:
             https://www.youtube.com/feeds/videos.xml?channel_id=...
           </p>
         )}
       </FormField>
 
       {/* Category Field */}
-      <FormField label="Category" required htmlFor="source-category" error={errors.category}>
+      <FormField label="カテゴリ" required htmlFor="source-category" error={errors.category}>
         <Input
           id="source-category"
           data-testid={SOURCE_TEST_IDS.CATEGORY_INPUT}
@@ -275,7 +278,7 @@ export function SourceForm({
           value={formData.category}
           onChange={(e) => handleChange('category', e.target.value)}
           onBlur={() => handleBlur('category')}
-          placeholder="e.g., dev"
+          placeholder="例: dev"
           aria-required="true"
           aria-invalid={!!errors.category}
           aria-describedby={errors.category ? 'source-category-error' : undefined}
@@ -285,7 +288,7 @@ export function SourceForm({
       </FormField>
 
       {/* Lang Field */}
-      <FormField label="Language" htmlFor="source-lang" error={errors.lang}>
+      <FormField label="言語" htmlFor="source-lang" error={errors.lang}>
         <Input
           id="source-lang"
           data-testid={SOURCE_TEST_IDS.LANG_INPUT}
@@ -293,7 +296,7 @@ export function SourceForm({
           value={formData.lang}
           onChange={(e) => handleChange('lang', e.target.value)}
           onBlur={() => handleBlur('lang')}
-          placeholder="e.g., ja, en (optional)"
+          placeholder="例: ja, en(任意)"
           aria-invalid={!!errors.lang}
           aria-describedby={errors.lang ? 'source-lang-error' : undefined}
           disabled={isLoading}
@@ -311,14 +314,9 @@ export function SourceForm({
           data-testid={SOURCE_TEST_IDS.CANCEL_BUTTON}
           aria-label={SOURCE_ARIA_LABELS.CANCEL_BUTTON}
         >
-          Cancel
+          キャンセル
         </Button>
-        <Button
-          type="submit"
-          disabled={isLoading}
-          data-testid={SOURCE_TEST_IDS.SAVE_BUTTON}
-          aria-label={mode === 'create' ? 'Add source' : SOURCE_ARIA_LABELS.SAVE_BUTTON}
-        >
+        <Button type="submit" disabled={isLoading} data-testid={SOURCE_TEST_IDS.SAVE_BUTTON}>
           {isLoading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />

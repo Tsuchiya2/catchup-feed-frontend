@@ -45,19 +45,19 @@ describe('Pagination', () => {
   describe('Previous Button', () => {
     it('should disable previous button on first page', () => {
       render(<Pagination currentPage={1} totalPages={5} onPageChange={mockOnPageChange} />);
-      const prevButton = screen.getByLabelText('Go to previous page');
+      const prevButton = screen.getByLabelText('前のページへ');
       expect(prevButton).toBeDisabled();
     });
 
     it('should enable previous button when not on first page', () => {
       render(<Pagination currentPage={2} totalPages={5} onPageChange={mockOnPageChange} />);
-      const prevButton = screen.getByLabelText('Go to previous page');
+      const prevButton = screen.getByLabelText('前のページへ');
       expect(prevButton).not.toBeDisabled();
     });
 
     it('should call onPageChange with previous page when clicked', () => {
       render(<Pagination currentPage={3} totalPages={5} onPageChange={mockOnPageChange} />);
-      const prevButton = screen.getByLabelText('Go to previous page');
+      const prevButton = screen.getByLabelText('前のページへ');
       fireEvent.click(prevButton);
       expect(mockOnPageChange).toHaveBeenCalledWith(2);
     });
@@ -66,19 +66,19 @@ describe('Pagination', () => {
   describe('Next Button', () => {
     it('should disable next button on last page', () => {
       render(<Pagination currentPage={5} totalPages={5} onPageChange={mockOnPageChange} />);
-      const nextButton = screen.getByLabelText('Go to next page');
+      const nextButton = screen.getByLabelText('次のページへ');
       expect(nextButton).toBeDisabled();
     });
 
     it('should enable next button when not on last page', () => {
       render(<Pagination currentPage={4} totalPages={5} onPageChange={mockOnPageChange} />);
-      const nextButton = screen.getByLabelText('Go to next page');
+      const nextButton = screen.getByLabelText('次のページへ');
       expect(nextButton).not.toBeDisabled();
     });
 
     it('should call onPageChange with next page when clicked', () => {
       render(<Pagination currentPage={3} totalPages={5} onPageChange={mockOnPageChange} />);
-      const nextButton = screen.getByLabelText('Go to next page');
+      const nextButton = screen.getByLabelText('次のページへ');
       fireEvent.click(nextButton);
       expect(mockOnPageChange).toHaveBeenCalledWith(4);
     });
@@ -87,27 +87,27 @@ describe('Pagination', () => {
   describe('Page Numbers (7 or fewer pages)', () => {
     it('should show all pages when totalPages is 3', () => {
       render(<Pagination currentPage={1} totalPages={3} onPageChange={mockOnPageChange} />);
-      expect(screen.getByLabelText('Go to page 1')).toBeInTheDocument();
-      expect(screen.getByLabelText('Go to page 2')).toBeInTheDocument();
-      expect(screen.getByLabelText('Go to page 3')).toBeInTheDocument();
+      expect(screen.getByLabelText('1 ページへ')).toBeInTheDocument();
+      expect(screen.getByLabelText('2 ページへ')).toBeInTheDocument();
+      expect(screen.getByLabelText('3 ページへ')).toBeInTheDocument();
     });
 
     it('should show all pages when totalPages is 7', () => {
       render(<Pagination currentPage={4} totalPages={7} onPageChange={mockOnPageChange} />);
       for (let i = 1; i <= 7; i++) {
-        expect(screen.getByLabelText(`Go to page ${i}`)).toBeInTheDocument();
+        expect(screen.getByLabelText(`${i} ページへ`)).toBeInTheDocument();
       }
     });
 
     it('should highlight current page', () => {
       render(<Pagination currentPage={3} totalPages={5} onPageChange={mockOnPageChange} />);
-      const currentButton = screen.getByLabelText('Go to page 3');
+      const currentButton = screen.getByLabelText('3 ページへ');
       expect(currentButton).toHaveAttribute('aria-current', 'page');
     });
 
     it('should call onPageChange when page button is clicked', () => {
       render(<Pagination currentPage={1} totalPages={5} onPageChange={mockOnPageChange} />);
-      const pageButton = screen.getByLabelText('Go to page 3');
+      const pageButton = screen.getByLabelText('3 ページへ');
       fireEvent.click(pageButton);
       expect(mockOnPageChange).toHaveBeenCalledWith(3);
     });
@@ -118,11 +118,11 @@ describe('Pagination', () => {
       render(<Pagination currentPage={2} totalPages={10} onPageChange={mockOnPageChange} />);
 
       // Should show: 1, 2, 3, 4, ..., 10
-      expect(screen.getByLabelText('Go to page 1')).toBeInTheDocument();
-      expect(screen.getByLabelText('Go to page 2')).toBeInTheDocument();
-      expect(screen.getByLabelText('Go to page 3')).toBeInTheDocument();
-      expect(screen.getByLabelText('Go to page 4')).toBeInTheDocument();
-      expect(screen.getByLabelText('Go to page 10')).toBeInTheDocument();
+      expect(screen.getByLabelText('1 ページへ')).toBeInTheDocument();
+      expect(screen.getByLabelText('2 ページへ')).toBeInTheDocument();
+      expect(screen.getByLabelText('3 ページへ')).toBeInTheDocument();
+      expect(screen.getByLabelText('4 ページへ')).toBeInTheDocument();
+      expect(screen.getByLabelText('10 ページへ')).toBeInTheDocument();
       expect(screen.getByText('...')).toBeInTheDocument();
     });
 
@@ -130,11 +130,11 @@ describe('Pagination', () => {
       render(<Pagination currentPage={9} totalPages={10} onPageChange={mockOnPageChange} />);
 
       // Should show: 1, ..., 7, 8, 9, 10
-      expect(screen.getByLabelText('Go to page 1')).toBeInTheDocument();
-      expect(screen.getByLabelText('Go to page 7')).toBeInTheDocument();
-      expect(screen.getByLabelText('Go to page 8')).toBeInTheDocument();
-      expect(screen.getByLabelText('Go to page 9')).toBeInTheDocument();
-      expect(screen.getByLabelText('Go to page 10')).toBeInTheDocument();
+      expect(screen.getByLabelText('1 ページへ')).toBeInTheDocument();
+      expect(screen.getByLabelText('7 ページへ')).toBeInTheDocument();
+      expect(screen.getByLabelText('8 ページへ')).toBeInTheDocument();
+      expect(screen.getByLabelText('9 ページへ')).toBeInTheDocument();
+      expect(screen.getByLabelText('10 ページへ')).toBeInTheDocument();
       expect(screen.getByText('...')).toBeInTheDocument();
     });
 
@@ -142,11 +142,11 @@ describe('Pagination', () => {
       render(<Pagination currentPage={5} totalPages={10} onPageChange={mockOnPageChange} />);
 
       // Should show: 1, ..., 4, 5, 6, ..., 10
-      expect(screen.getByLabelText('Go to page 1')).toBeInTheDocument();
-      expect(screen.getByLabelText('Go to page 4')).toBeInTheDocument();
-      expect(screen.getByLabelText('Go to page 5')).toBeInTheDocument();
-      expect(screen.getByLabelText('Go to page 6')).toBeInTheDocument();
-      expect(screen.getByLabelText('Go to page 10')).toBeInTheDocument();
+      expect(screen.getByLabelText('1 ページへ')).toBeInTheDocument();
+      expect(screen.getByLabelText('4 ページへ')).toBeInTheDocument();
+      expect(screen.getByLabelText('5 ページへ')).toBeInTheDocument();
+      expect(screen.getByLabelText('6 ページへ')).toBeInTheDocument();
+      expect(screen.getByLabelText('10 ページへ')).toBeInTheDocument();
 
       // Should have two ellipsis elements
       const ellipsisElements = screen.getAllByText('...');
@@ -173,7 +173,7 @@ describe('Pagination', () => {
           itemsPerPage={10}
         />
       );
-      expect(screen.getByText('Showing 1-10 of 50 items')).toBeInTheDocument();
+      expect(screen.getByText('1–10 ／ 50 件')).toBeInTheDocument();
     });
 
     it('should calculate correct range for middle pages', () => {
@@ -186,7 +186,7 @@ describe('Pagination', () => {
           itemsPerPage={10}
         />
       );
-      expect(screen.getByText('Showing 21-30 of 50 items')).toBeInTheDocument();
+      expect(screen.getByText('21–30 ／ 50 件')).toBeInTheDocument();
     });
 
     it('should show correct end value for last partial page', () => {
@@ -199,7 +199,7 @@ describe('Pagination', () => {
           itemsPerPage={10}
         />
       );
-      expect(screen.getByText('Showing 41-47 of 47 items')).toBeInTheDocument();
+      expect(screen.getByText('41–47 ／ 47 件')).toBeInTheDocument();
     });
 
     it('should not show items text when totalItems is not provided', () => {
@@ -211,7 +211,7 @@ describe('Pagination', () => {
           itemsPerPage={10}
         />
       );
-      expect(screen.queryByText(/Showing/)).not.toBeInTheDocument();
+      expect(screen.queryByText(/件/)).not.toBeInTheDocument();
     });
 
     it('should not show items text when itemsPerPage is not provided', () => {
@@ -223,7 +223,7 @@ describe('Pagination', () => {
           totalItems={50}
         />
       );
-      expect(screen.queryByText(/Showing/)).not.toBeInTheDocument();
+      expect(screen.queryByText(/件/)).not.toBeInTheDocument();
     });
 
     it('should have aria-live for screen readers', () => {
@@ -236,7 +236,7 @@ describe('Pagination', () => {
           itemsPerPage={10}
         />
       );
-      const itemsText = screen.getByText('Showing 1-10 of 50 items');
+      const itemsText = screen.getByText('1–10 ／ 50 件');
       expect(itemsText).toHaveAttribute('aria-live', 'polite');
     });
   });
@@ -244,29 +244,29 @@ describe('Pagination', () => {
   describe('Mobile View', () => {
     it('should show page indicator text on mobile', () => {
       render(<Pagination currentPage={3} totalPages={10} onPageChange={mockOnPageChange} />);
-      expect(screen.getByText('Page 3 of 10')).toBeInTheDocument();
+      expect(screen.getByText('3 / 10')).toBeInTheDocument();
     });
   });
 
   describe('Edge Cases', () => {
     it('should handle page 1 of 2', () => {
       render(<Pagination currentPage={1} totalPages={2} onPageChange={mockOnPageChange} />);
-      expect(screen.getByLabelText('Go to previous page')).toBeDisabled();
-      expect(screen.getByLabelText('Go to next page')).not.toBeDisabled();
+      expect(screen.getByLabelText('前のページへ')).toBeDisabled();
+      expect(screen.getByLabelText('次のページへ')).not.toBeDisabled();
     });
 
     it('should handle page 2 of 2', () => {
       render(<Pagination currentPage={2} totalPages={2} onPageChange={mockOnPageChange} />);
-      expect(screen.getByLabelText('Go to previous page')).not.toBeDisabled();
-      expect(screen.getByLabelText('Go to next page')).toBeDisabled();
+      expect(screen.getByLabelText('前のページへ')).not.toBeDisabled();
+      expect(screen.getByLabelText('次のページへ')).toBeDisabled();
     });
 
     it('should handle very large page numbers', () => {
       render(<Pagination currentPage={500} totalPages={1000} onPageChange={mockOnPageChange} />);
-      expect(screen.getByText('Page 500 of 1000')).toBeInTheDocument();
-      expect(screen.getByLabelText('Go to page 499')).toBeInTheDocument();
-      expect(screen.getByLabelText('Go to page 500')).toBeInTheDocument();
-      expect(screen.getByLabelText('Go to page 501')).toBeInTheDocument();
+      expect(screen.getByText('500 / 1000')).toBeInTheDocument();
+      expect(screen.getByLabelText('499 ページへ')).toBeInTheDocument();
+      expect(screen.getByLabelText('500 ページへ')).toBeInTheDocument();
+      expect(screen.getByLabelText('501 ページへ')).toBeInTheDocument();
     });
   });
 
@@ -278,9 +278,9 @@ describe('Pagination', () => {
 
     it('should have aria-labels for all interactive elements', () => {
       render(<Pagination currentPage={3} totalPages={5} onPageChange={mockOnPageChange} />);
-      expect(screen.getByLabelText('Go to previous page')).toBeInTheDocument();
-      expect(screen.getByLabelText('Go to next page')).toBeInTheDocument();
-      expect(screen.getByLabelText('Go to page 1')).toBeInTheDocument();
+      expect(screen.getByLabelText('前のページへ')).toBeInTheDocument();
+      expect(screen.getByLabelText('次のページへ')).toBeInTheDocument();
+      expect(screen.getByLabelText('1 ページへ')).toBeInTheDocument();
     });
 
     it('should mark current page with aria-current', () => {

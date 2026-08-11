@@ -6,14 +6,13 @@ import { ArrowLeft, BookOpen } from 'lucide-react';
 import { PageHeader } from '@/components/common/PageHeader';
 import { ErrorMessage } from '@/components/common/ErrorMessage';
 import { EmptyState } from '@/components/common/EmptyState';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { BookCard } from '@/components/learning/BookCard';
 import { useLearningBooks, useActivateBook, useDeactivateBook } from '@/hooks/useLearning';
 import type { LearningBook } from '@/types/api';
 
 /**
- * Learning — book management (D-20)
+ * Learning — book management (D-20) — 放送卓(改訂版)
  *
  * Lists ingested books with progress, and lets the user pick the single
  * in-progress book. Activating a book swaps out whatever was active
@@ -59,35 +58,37 @@ export default function LearningBooksPage() {
   const activeBook = books.find((b) => b.review_status === 'active');
 
   return (
-    <div className="container py-8">
-      <div className="mb-2">
-        <Button asChild variant="ghost" size="sm" className="text-muted-foreground">
-          <Link href="/learning">
-            <ArrowLeft className="mr-1 h-4 w-4" />
-            Review
-          </Link>
-        </Button>
-      </div>
-
+    <div className="flex flex-1 flex-col gap-5 max-sm:p-5 sm:max-desk:p-7 desk:px-8 desk:py-7">
       <PageHeader
-        title="Books"
+        title="書籍の復習"
         description={
-          activeBook
-            ? `進行中: ${activeBook.title}`
-            : '書籍の復習コーナーで進める1冊を選ぶ(同時に1冊)'
+          isLoading
+            ? '—'
+            : activeBook
+              ? `進行中: ${activeBook.title}`
+              : '書籍の復習コーナーで進める1冊を選ぶ(同時に1冊)'
+        }
+        action={
+          <Button asChild variant="ghost" size="sm" className="text-console-ink-weak">
+            <Link href="/learning">
+              <ArrowLeft className="mr-1 h-4 w-4" />
+              復習へ戻る
+            </Link>
+          </Button>
         }
       />
 
-      {error && (
-        <div className="mb-6">
-          <ErrorMessage error={error} onRetry={refetch} />
-        </div>
-      )}
+      {error && <ErrorMessage error={error} onRetry={refetch} />}
 
       {isLoading && (
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="border border-console-line-2 bg-console-panel" aria-hidden>
           {Array.from({ length: 3 }).map((_, i) => (
-            <Skeleton key={i} className="h-48 w-full rounded-lg" />
+            <div
+              key={i}
+              className="flex items-center gap-4 border-b border-console-line-1 px-[18px] py-3.5 last:border-b-0"
+            >
+              <span className="min-h-[42px] flex-1" />
+            </div>
           ))}
         </div>
       )}
@@ -96,12 +97,12 @@ export default function LearningBooksPage() {
         <EmptyState
           title="取り込み済みの書籍はありません"
           description="書籍の取り込み(ingest)は Mac 側の CLI で行います。取り込むとここに並びます。"
-          icon={<BookOpen className="h-12 w-12" />}
+          icon={<BookOpen className="h-10 w-10" />}
         />
       )}
 
       {!isLoading && !error && books.length > 0 && (
-        <div className="grid gap-4 md:grid-cols-2" role="list">
+        <div className="border border-console-line-2 bg-console-panel" role="list">
           {books.map((book) => (
             <BookCard
               key={book.id}

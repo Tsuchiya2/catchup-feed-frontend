@@ -20,11 +20,11 @@ describe('ErrorAlert', () => {
     expect(screen.getByText('Something went wrong')).toBeInTheDocument();
   });
 
-  it('displays default title "Error"', () => {
+  it('displays default title "エラー"', () => {
     const error = new Error('Test error');
     render(<ErrorAlert error={error} />);
 
-    expect(screen.getByText('Error')).toBeInTheDocument();
+    expect(screen.getByText('エラー')).toBeInTheDocument();
   });
 
   it('displays custom title when provided', () => {
@@ -38,14 +38,14 @@ describe('ErrorAlert', () => {
     const error = new Error('Test error');
     render(<ErrorAlert error={error} />);
 
-    expect(screen.queryByLabelText('Dismiss error')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('エラーを閉じる')).not.toBeInTheDocument();
   });
 
   it('shows dismiss button when onDismiss is provided', () => {
     const error = new Error('Test error');
     render(<ErrorAlert error={error} onDismiss={() => {}} />);
 
-    expect(screen.getByLabelText('Dismiss error')).toBeInTheDocument();
+    expect(screen.getByLabelText('エラーを閉じる')).toBeInTheDocument();
   });
 
   it('calls onDismiss when dismiss button is clicked', async () => {
@@ -55,7 +55,7 @@ describe('ErrorAlert', () => {
 
     render(<ErrorAlert error={error} onDismiss={onDismiss} />);
 
-    await user.click(screen.getByLabelText('Dismiss error'));
+    await user.click(screen.getByLabelText('エラーを閉じる'));
 
     expect(onDismiss).toHaveBeenCalledTimes(1);
   });

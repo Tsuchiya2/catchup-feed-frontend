@@ -1,11 +1,11 @@
 {
   "name": "Catchup Feed",
   "short_name": "Catchup",
-  "description": "Your personal feed aggregator and reader",
+  "description": "早朝に技術情報を10分間の音声でお届け。",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#0ea5e9",
+  "background_color": "#0d0f10",
+  "theme_color": "#0d0f10",
   "orientation": "portrait-primary",
   "icons": [
     {
@@ -110,7 +110,11 @@
       ]
     }
   ],
-  "categories": ["news", "productivity", "lifestyle"],
+  "categories": [
+    "news",
+    "productivity",
+    "lifestyle"
+  ],
   "screenshots": [],
   "iarc_rating_id": "",
   "prefer_related_applications": false,

@@ -103,8 +103,8 @@ export function EditSourceDialog({ isOpen, onClose, source, onSuccess }: EditSou
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent data-testid={SOURCE_TEST_IDS.EDIT_DIALOG}>
         <DialogHeader>
-          <DialogTitle>Edit Source</DialogTitle>
-          <DialogDescription>Edit the source details below.</DialogDescription>
+          <DialogTitle>ソースを編集</DialogTitle>
+          <DialogDescription>ソースの内容を編集します。</DialogDescription>
         </DialogHeader>
 
         <SourceForm

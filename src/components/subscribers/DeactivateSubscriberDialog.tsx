@@ -71,17 +71,15 @@ export function DeactivateSubscriberDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <UserRoundX className="h-5 w-5 text-destructive" aria-hidden="true" />
-            Deactivate {subscriber.name}?
+            {subscriber.name} を無効化しますか?
           </DialogTitle>
           <DialogDescription asChild>
             <div className="space-y-2">
               <p>
-                This deactivates the friend instead of deleting them: their record and access
-                history are kept, but their feed tokens stop working and no new episodes will be
-                delivered.
+                削除ではなく無効化です。記録とアクセス履歴は残りますが、フィードトークンは使えなくなり、新しいエピソードは届かなくなります。
               </p>
-              <p className="text-xs text-muted-foreground">
-                Deactivation is a soft delete — nothing is permanently removed.
+              <p className="text-xs text-console-ink-faint">
+                無効化は論理削除です — データが完全に消えることはありません。
               </p>
             </div>
           </DialogDescription>
@@ -91,7 +89,7 @@ export function DeactivateSubscriberDialog({
 
         <DialogFooter className="gap-2">
           <Button type="button" variant="outline" onClick={handleClose} disabled={isPending}>
-            Cancel
+            キャンセル
           </Button>
           <Button
             type="button"
@@ -103,10 +101,10 @@ export function DeactivateSubscriberDialog({
             {isPending ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Deactivating...
+                無効化中…
               </>
             ) : (
-              'Deactivate'
+              '無効化する'
             )}
           </Button>
         </DialogFooter>

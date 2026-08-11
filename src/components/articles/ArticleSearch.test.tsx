@@ -57,39 +57,39 @@ describe('ArticleSearch', () => {
     it('should render with title', () => {
       render(<ArticleSearch searchState={defaultSearchState} onSearchChange={vi.fn()} />);
 
-      expect(screen.getByText('Search & Filter Articles')).toBeInTheDocument();
+      expect(screen.getByText('検索・絞り込み')).toBeInTheDocument();
     });
 
     it('should render search input', () => {
       render(<ArticleSearch searchState={defaultSearchState} onSearchChange={vi.fn()} />);
 
-      expect(screen.getByPlaceholderText('Search by title or summary...')).toBeInTheDocument();
+      expect(screen.getByPlaceholderText('タイトル・要約で検索…')).toBeInTheDocument();
     });
 
     it('should render source filter', () => {
       render(<ArticleSearch searchState={defaultSearchState} onSearchChange={vi.fn()} />);
 
-      expect(screen.getByLabelText('Source')).toBeInTheDocument();
+      expect(screen.getByLabelText('ソース')).toBeInTheDocument();
     });
 
     it('should render date range picker', () => {
       render(<ArticleSearch searchState={defaultSearchState} onSearchChange={vi.fn()} />);
 
-      expect(screen.getByLabelText('From')).toBeInTheDocument();
-      expect(screen.getByLabelText('To')).toBeInTheDocument();
+      expect(screen.getByLabelText('開始日')).toBeInTheDocument();
+      expect(screen.getByLabelText('終了日')).toBeInTheDocument();
     });
 
     it('should not show Clear All Filters button when no filters active', () => {
       render(<ArticleSearch searchState={defaultSearchState} onSearchChange={vi.fn()} />);
 
-      expect(screen.queryByRole('button', { name: 'Clear All Filters' })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: '条件をクリア' })).not.toBeInTheDocument();
     });
 
     it('should show Clear All Filters button when filters are active', () => {
       const searchState = { ...defaultSearchState, keyword: 'test' };
       render(<ArticleSearch searchState={searchState} onSearchChange={vi.fn()} />);
 
-      expect(screen.getByRole('button', { name: 'Clear All Filters' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: '条件をクリア' })).toBeInTheDocument();
     });
 
     it('should apply custom className', () => {
@@ -110,22 +110,22 @@ describe('ArticleSearch', () => {
       const searchState = { ...defaultSearchState, keyword: 'React' };
       render(<ArticleSearch searchState={searchState} onSearchChange={vi.fn()} />);
 
-      expect(screen.getByPlaceholderText('Search by title or summary...')).toHaveValue('React');
+      expect(screen.getByPlaceholderText('タイトル・要約で検索…')).toHaveValue('React');
     });
 
     it('should display current source selection', () => {
       const searchState = { ...defaultSearchState, sourceId: 1 };
       render(<ArticleSearch searchState={searchState} onSearchChange={vi.fn()} />);
 
-      expect(screen.getByLabelText('Source')).toHaveValue('1');
+      expect(screen.getByLabelText('ソース')).toHaveValue('1');
     });
 
     it('should display current date range', () => {
       const searchState = { ...defaultSearchState, fromDate: '2025-01-01', toDate: '2025-01-15' };
       render(<ArticleSearch searchState={searchState} onSearchChange={vi.fn()} />);
 
-      expect(screen.getByLabelText('From')).toHaveValue('2025-01-01');
-      expect(screen.getByLabelText('To')).toHaveValue('2025-01-15');
+      expect(screen.getByLabelText('開始日')).toHaveValue('2025-01-01');
+      expect(screen.getByLabelText('終了日')).toHaveValue('2025-01-15');
     });
   });
 
@@ -135,7 +135,7 @@ describe('ArticleSearch', () => {
       const onSearchChange = vi.fn();
       render(<ArticleSearch searchState={defaultSearchState} onSearchChange={onSearchChange} />);
 
-      await user.selectOptions(screen.getByLabelText('Source'), '1');
+      await user.selectOptions(screen.getByLabelText('ソース'), '1');
 
       expect(onSearchChange).toHaveBeenCalledWith({
         ...defaultSearchState,
@@ -154,7 +154,7 @@ describe('ArticleSearch', () => {
       };
       render(<ArticleSearch searchState={searchState} onSearchChange={onSearchChange} />);
 
-      await user.click(screen.getByRole('button', { name: 'Clear All Filters' }));
+      await user.click(screen.getByRole('button', { name: '条件をクリア' }));
 
       expect(onSearchChange).toHaveBeenCalledWith({
         keyword: '',
@@ -172,9 +172,7 @@ describe('ArticleSearch', () => {
       );
 
       // The search input should show loading spinner
-      const searchContainer = screen.getByPlaceholderText(
-        'Search by title or summary...'
-      ).parentElement;
+      const searchContainer = screen.getByPlaceholderText('タイトル・要約で検索…').parentElement;
       expect(searchContainer?.querySelector('.animate-spin')).toBeInTheDocument();
     });
   });
@@ -184,28 +182,28 @@ describe('ArticleSearch', () => {
       const searchState = { ...defaultSearchState, keyword: 'test' };
       render(<ArticleSearch searchState={searchState} onSearchChange={vi.fn()} />);
 
-      expect(screen.getByRole('button', { name: 'Clear All Filters' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: '条件をクリア' })).toBeInTheDocument();
     });
 
     it('should show Clear All when sourceId is set', () => {
       const searchState = { ...defaultSearchState, sourceId: 1 };
       render(<ArticleSearch searchState={searchState} onSearchChange={vi.fn()} />);
 
-      expect(screen.getByRole('button', { name: 'Clear All Filters' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: '条件をクリア' })).toBeInTheDocument();
     });
 
     it('should show Clear All when fromDate is set', () => {
       const searchState = { ...defaultSearchState, fromDate: '2025-01-01' };
       render(<ArticleSearch searchState={searchState} onSearchChange={vi.fn()} />);
 
-      expect(screen.getByRole('button', { name: 'Clear All Filters' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: '条件をクリア' })).toBeInTheDocument();
     });
 
     it('should show Clear All when toDate is set', () => {
       const searchState = { ...defaultSearchState, toDate: '2025-01-15' };
       render(<ArticleSearch searchState={searchState} onSearchChange={vi.fn()} />);
 
-      expect(screen.getByRole('button', { name: 'Clear All Filters' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: '条件をクリア' })).toBeInTheDocument();
     });
   });
 });

@@ -3,23 +3,21 @@
 import * as React from 'react';
 import { Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Activity, History } from 'lucide-react';
 import { PageHeader } from '@/components/common/PageHeader';
 import { ErrorMessage } from '@/components/common/ErrorMessage';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
 import { AccessLogSummaryTable } from '@/components/access-logs/AccessLogSummaryTable';
 import { AccessLogList } from '@/components/access-logs/AccessLogList';
 import { useAccessLogs, useAccessLogSummary } from '@/hooks/useAccessLogs';
 import { useSubscribers } from '@/hooks/useSubscribers';
 
 /**
- * Access Logs page content
+ * Access Logs page — 放送卓(改訂版)
  *
  * Top: per-friend summary with neglect detection (friends who never
  * accessed the feed or have been silent for 2-3+ weeks float to the top
- * with a colored badge — the project goal is feedback, so spotting
+ * with a bordered warm label — the project goal is feedback, so spotting
  * silence matters more than raw counts).
  *
  * Bottom: chronological access timeline, filterable by friend
@@ -48,18 +46,15 @@ function AccessLogsPageContent() {
   };
 
   return (
-    <div className="container py-8">
-      <PageHeader title="Access Logs" description="Who is still listening — and who went quiet" />
+    <div className="flex flex-1 flex-col gap-5 max-sm:p-5 sm:max-desk:p-7 desk:px-8 desk:py-7">
+      <PageHeader title="アクセスログ" description="誰がまだ聴いていて、誰が静かになったか" />
 
       {/* Summary: neglect detection */}
-      <Card className="mb-6 mt-6">
-        <CardHeader className="pb-4">
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <Activity className="h-5 w-5 text-primary" aria-hidden="true" />
-            Per-friend Summary
-          </CardTitle>
+      <Card>
+        <CardHeader className="border-b border-console-line-1 pb-3">
+          <CardTitle>友人ごとの集計</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-3">
           {summaryResult.error && (
             <ErrorMessage error={summaryResult.error} onRetry={summaryResult.refetch} />
           )}
@@ -75,24 +70,24 @@ function AccessLogsPageContent() {
 
       {/* Timeline */}
       <Card>
-        <CardHeader className="flex flex-col gap-3 pb-4 sm:flex-row sm:items-center sm:justify-between">
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <History className="h-5 w-5 text-primary" aria-hidden="true" />
-            Timeline
-          </CardTitle>
+        <CardHeader className="flex flex-col gap-3 border-b border-console-line-1 pb-3 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
+          <CardTitle>タイムライン</CardTitle>
           {/* Friend filter */}
           <div className="flex items-center gap-2">
-            <Label htmlFor="subscriber-filter" className="whitespace-nowrap text-sm">
-              Friend
-            </Label>
+            <label
+              htmlFor="subscriber-filter"
+              className="whitespace-nowrap font-mono text-[11px] tracking-[.18em] text-console-ink-weak"
+            >
+              友人
+            </label>
             <select
               id="subscriber-filter"
               value={validSubscriberId ?? ''}
               onChange={(e) => handleFilterChange(e.target.value)}
-              className="flex h-10 w-full min-w-[10rem] rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              aria-label="Filter timeline by friend"
+              className="console-field h-9 w-full min-w-[10rem] text-[13px]"
+              aria-label="タイムラインを友人で絞り込む"
             >
-              <option value="">All friends</option>
+              <option value="">すべての友人</option>
               {subscribers.map((s) => (
                 <option key={s.id} value={s.id}>
                   {s.name}
@@ -101,15 +96,15 @@ function AccessLogsPageContent() {
             </select>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-2">
           {logsResult.error && (
             <ErrorMessage error={logsResult.error} onRetry={logsResult.refetch} />
           )}
           {logsResult.isLoading && (
-            <div className="space-y-2">
-              <Skeleton className="h-12 w-full" />
-              <Skeleton className="h-12 w-full" />
-              <Skeleton className="h-12 w-full" />
+            <div className="space-y-2 py-2">
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
             </div>
           )}
           {!logsResult.isLoading && !logsResult.error && <AccessLogList logs={logsResult.logs} />}
@@ -126,7 +121,8 @@ export default function AccessLogsPage() {
   return (
     <Suspense
       fallback={
-        <div className="container py-8">
+        <div className="flex flex-1 flex-col gap-5 max-sm:p-5 sm:max-desk:p-7 desk:px-8 desk:py-7">
+          <PageHeader title="アクセスログ" description="—" />
           <Skeleton className="h-64 w-full" />
         </div>
       }

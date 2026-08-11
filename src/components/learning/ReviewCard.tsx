@@ -24,10 +24,12 @@ interface ReviewCardProps {
   onGrade: (result: GradeResult) => void;
 }
 
+/* 復習はバイオレット系統(README 原則5)。塗りは使わず 1px 枠のみ。 */
 const GRADE_BUTTON_STYLES: Record<GradeResult, string> = {
-  good: 'border-[#00ffff]/50 bg-[#a0ffff]/10 text-[#a0ffff] hover:bg-[#a0ffff]/20 hover:shadow-[0_0_12px_#00ffff60]',
-  fuzzy: 'border-primary/40 bg-primary/10 text-primary hover:bg-primary/20 hover:shadow-glow-sm',
-  forgot: 'border-border bg-muted/30 text-muted-foreground hover:bg-muted/60 hover:text-foreground',
+  good: 'border-console-violet text-console-violet hover:bg-console-hover',
+  fuzzy: 'border-console-line-3 text-console-ink-sub hover:bg-console-hover',
+  forgot:
+    'border-console-line-2 text-console-ink-faint hover:bg-console-hover hover:text-console-ink-sub',
 };
 
 /**
@@ -43,13 +45,13 @@ export function ReviewCard({ review, onGrade }: ReviewCardProps) {
     <Card
       className="mx-auto w-full max-w-xl"
       data-testid={LEARNING_TEST_IDS.REVIEW_CARD}
-      aria-label={`Review: ${review.concept}`}
+      aria-label={`復習: ${review.concept}`}
     >
       <CardContent className="flex flex-col gap-5 p-6">
         {/* Concept heading */}
         <div className="flex items-center gap-2">
-          <Badge variant="outline">Review</Badge>
-          <span className="min-w-0 truncate text-sm font-medium text-muted-foreground">
+          <Badge variant="outline">復習</Badge>
+          <span className="min-w-0 truncate text-[13px] text-console-ink-weak">
             {review.concept}
           </span>
         </div>
@@ -62,14 +64,16 @@ export function ReviewCard({ review, onGrade }: ReviewCardProps) {
           data-testid={LEARNING_TEST_IDS.REVEAL_BUTTON}
           aria-expanded={revealed}
           className={cn(
-            'rounded-lg border border-border/60 bg-background/40 p-4 text-left transition-colors',
-            !revealed && 'cursor-pointer hover:border-primary/40 hover:bg-accent/40',
+            'border border-console-line-2 bg-console-bg p-4 text-left transition-colors duration-[120ms] ease-out',
+            !revealed && 'cursor-pointer hover:bg-console-hover',
             revealed && 'cursor-default'
           )}
         >
-          <p className="text-lg leading-relaxed text-foreground">{review.question}</p>
+          <p className="text-[15px] leading-[2.1] text-console-ink [text-wrap:pretty]">
+            {review.question}
+          </p>
           {!revealed && (
-            <p className="mt-3 text-xs uppercase tracking-wide text-muted-foreground">
+            <p className="mt-3 font-mono text-[10.5px] tracking-[.18em] text-console-ink-faint">
               タップで答えを表示
             </p>
           )}
@@ -77,11 +81,8 @@ export function ReviewCard({ review, onGrade }: ReviewCardProps) {
 
         {/* Answer */}
         {revealed && (
-          <div
-            data-testid={LEARNING_TEST_IDS.ANSWER}
-            className="rounded-lg border border-primary/20 bg-primary/5 p-4"
-          >
-            <p className="whitespace-pre-line text-base leading-relaxed text-foreground">
+          <div data-testid={LEARNING_TEST_IDS.ANSWER} className="border border-console-violet p-4">
+            <p className="whitespace-pre-line text-[14px] leading-[2] text-console-ink [text-wrap:pretty]">
               {review.answer}
             </p>
           </div>
@@ -98,14 +99,14 @@ export function ReviewCard({ review, onGrade }: ReviewCardProps) {
                 data-testid={`${LEARNING_TEST_IDS.GRADE_BUTTON}-${result}`}
                 aria-label={label}
                 className={cn(
-                  'flex flex-col items-center justify-center gap-1 rounded-lg border py-4 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+                  'flex min-h-[44px] flex-col items-center justify-center gap-1 border py-4 transition-colors duration-[120ms] ease-out focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-console-cyan',
                   GRADE_BUTTON_STYLES[result]
                 )}
               >
                 <span className="text-2xl leading-none" aria-hidden="true">
                   {symbol}
                 </span>
-                <span className="text-xs font-medium">{label}</span>
+                <span className="text-[11.5px]">{label}</span>
               </button>
             ))}
           </div>

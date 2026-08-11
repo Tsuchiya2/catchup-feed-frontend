@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.13.0](https://github.com/Tsuchiya2/catchup-feed-frontend/compare/catchup-feed-frontend-v1.12.0...catchup-feed-frontend-v1.13.0) (2026-08-11)
+
+
+### Features
+
+* 放送卓(改訂版)デザインの基盤と主要4画面を実装 ([06387d1](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/06387d11bc08ff1f8b020222e88aaaabeb222f22))
+* 放送卓デザインへの全面リデザイン ([8a80771](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/8a80771a9afe9efa7fb7326a3d110f512794fbd8))
+* 残り全画面を放送卓デザインに統一 ([246f07d](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/246f07d9252d62864d5aaf28be9563d4f6d26bf4))
+
+
+### Bug Fixes
+
+* 規約・プライバシーから招待の表現を削除 ([b303682](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/b3036823b49e8cdbcb84c1006635e850bda65ef1))
+
+
+### Miscellaneous
+
+* ロゴ刷新に伴い PWA アイコン・OG 画像・favicon を差し替え ([773f2e7](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/773f2e70723ded8a7688f414964280fb41eca035))
+
 ## [1.12.0](https://github.com/Tsuchiya2/catchup-feed-frontend/compare/catchup-feed-frontend-v1.11.1...catchup-feed-frontend-v1.12.0) (2026-08-08)
 
 

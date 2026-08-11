@@ -8,33 +8,31 @@ test.describe('Dashboard', () => {
   });
 
   test('should display statistics from the API', async ({ page }) => {
-    await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: '今朝の構成' })).toBeVisible();
 
-    // Total Articles = pagination.total, Total Sources = list length
-    // (the stat value is the only .text-2xl node in each card)
-    await expect(page.getByText('Total Articles')).toBeVisible();
+    // 明朝の候補 links to the full article list with the total count
     await expect(
-      page.locator('div.text-2xl').filter({ hasText: new RegExp(`^${ARTICLE_COUNT}$`) })
+      page.getByRole('link', { name: `${ARTICLE_COUNT} 件すべて見る` })
     ).toBeVisible();
-    await expect(page.getByText('Total Sources')).toBeVisible();
-    await expect(page.locator('div.text-2xl').filter({ hasText: /^3$/ })).toBeVisible();
+    // 受信状況 panel shows per-friend last access (real data)
+    await expect(page.getByRole('heading', { name: '受信状況' })).toBeVisible();
   });
 
   test('should display recent articles', async ({ page }) => {
     await expect(page.getByText('Go 1.25 Released')).toBeVisible();
   });
 
-  test('should show the main navigation', async ({ page }) => {
-    const nav = page.getByTestId('header-nav-desktop');
-    for (const item of ['Dashboard', 'Articles', 'Sources', 'Friends', 'Access Logs']) {
-      await expect(nav.getByRole('link', { name: item })).toBeVisible();
+  test('should show the console rail navigation', async ({ page }) => {
+    const rail = page.locator('aside');
+    for (const item of ['概況', '記事', 'ソース', '書籍', '友人', '視聴者', 'アクセスログ', '復習']) {
+      await expect(rail.getByRole('link', { name: item, exact: true })).toBeVisible();
     }
   });
 
-  test('should navigate to friends via the navigation menu', async ({ page }) => {
-    await page.getByTestId('header-nav-desktop').getByRole('link', { name: 'Friends' }).click();
+  test('should navigate to friends via the rail', async ({ page }) => {
+    await page.locator('aside').getByRole('link', { name: '友人', exact: true }).click();
     await expect(page).toHaveURL(/\/subscribers/);
-    await expect(page.getByRole('heading', { name: 'Friends' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: '友人' })).toBeVisible();
   });
 
   test('should show an error message when the stats API fails', async ({ page }) => {
@@ -42,7 +40,6 @@ test.describe('Dashboard', () => {
     await page.route(/\/articles\?/, (route) => fulfillJsonError(route, 400, { error: 'bad request' }));
 
     await page.goto('/dashboard');
-    await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
-    await expect(page.getByText(/error|failed|bad request/i).first()).toBeVisible();
+    await expect(page.getByText('記事の取得に失敗しました').first()).toBeVisible();
   });
 });

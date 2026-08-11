@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { ErrorAlert } from '@/components/common/ErrorAlert';
-import { formatRelativeTime } from '@/lib/utils/formatDate';
+import { formatRelativeTimeJa } from '@/lib/utils/relativeTimeJa';
 import { SUBSCRIBER_TEST_IDS } from '@/constants/subscriber';
 import type { FeedToken } from '@/types/api';
 
@@ -56,16 +56,16 @@ export function RevokeTokenDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <ShieldOff className="h-5 w-5 text-destructive" aria-hidden="true" />
-            Revoke this token?
+            このトークンを失効させますか?
           </DialogTitle>
           <DialogDescription asChild>
             <div className="space-y-2">
               <p>
-                Token issued {formatRelativeTime(token.created_at)} for {subscriberName}.
+                {subscriberName} のトークン(発行: {formatRelativeTimeJa(token.created_at)})です。
               </p>
               <p className="font-medium text-destructive">
-                Revocation cannot be undone. {subscriberName}&apos;s podcast app will stop updating
-                until you issue a new token and share the new URL.
+                失効は取り消せません。新しいトークンを発行して URL を渡し直すまで、{subscriberName}{' '}
+                のポッドキャストアプリは更新されなくなります。
               </p>
             </div>
           </DialogDescription>
@@ -75,7 +75,7 @@ export function RevokeTokenDialog({
 
         <DialogFooter className="gap-2">
           <Button type="button" variant="outline" onClick={onClose} disabled={isPending}>
-            Cancel
+            キャンセル
           </Button>
           <Button
             type="button"
@@ -87,10 +87,10 @@ export function RevokeTokenDialog({
             {isPending ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Revoking...
+                失効処理中…
               </>
             ) : (
-              'Revoke permanently'
+              '完全に失効させる'
             )}
           </Button>
         </DialogFooter>

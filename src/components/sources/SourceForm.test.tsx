@@ -33,10 +33,10 @@ describe('SourceForm', () => {
         />
       );
 
-      const nameInput = screen.getByLabelText('Source name');
-      const urlInput = screen.getByLabelText('Feed URL');
-      const categoryInput = screen.getByLabelText('Category');
-      const langInput = screen.getByLabelText('Language');
+      const nameInput = screen.getByLabelText('ソース名');
+      const urlInput = screen.getByLabelText('フィード URL');
+      const categoryInput = screen.getByLabelText('カテゴリ');
+      const langInput = screen.getByLabelText('言語');
 
       expect(nameInput).toHaveValue('Tech Blog');
       expect(urlInput).toHaveValue('https://example.com/feed.xml');
@@ -56,9 +56,9 @@ describe('SourceForm', () => {
         />
       );
 
-      const submitButton = screen.getByRole('button', { name: /save changes/i });
+      const submitButton = screen.getByRole('button', { name: '保存する' });
       expect(submitButton).toBeInTheDocument();
-      expect(submitButton).toHaveTextContent('Save Changes');
+      expect(submitButton).toHaveTextContent('保存する');
     });
 
     it('should show "Saving..." when isLoading is true', () => {
@@ -73,9 +73,9 @@ describe('SourceForm', () => {
         />
       );
 
-      expect(screen.getByText('Saving...')).toBeInTheDocument();
+      expect(screen.getByText('保存中…')).toBeInTheDocument();
       // Check for loading spinner
-      const loadingIcon = screen.getByText('Saving...').parentElement;
+      const loadingIcon = screen.getByText('保存中…').parentElement;
       expect(loadingIcon?.querySelector('.animate-spin')).toBeInTheDocument();
     });
   });
@@ -92,10 +92,10 @@ describe('SourceForm', () => {
         />
       );
 
-      const nameInput = screen.getByLabelText('Source name');
-      const urlInput = screen.getByLabelText('Feed URL');
-      const categoryInput = screen.getByLabelText('Category');
-      const langInput = screen.getByLabelText('Language');
+      const nameInput = screen.getByLabelText('ソース名');
+      const urlInput = screen.getByLabelText('フィード URL');
+      const categoryInput = screen.getByLabelText('カテゴリ');
+      const langInput = screen.getByLabelText('言語');
 
       expect(nameInput).toHaveValue('');
       expect(urlInput).toHaveValue('');
@@ -114,9 +114,9 @@ describe('SourceForm', () => {
         />
       );
 
-      const submitButton = screen.getByRole('button', { name: /add source/i });
+      const submitButton = screen.getByRole('button', { name: '追加する' });
       expect(submitButton).toBeInTheDocument();
-      expect(submitButton).toHaveTextContent('Add Source');
+      expect(submitButton).toHaveTextContent('追加する');
     });
 
     it('should show "Adding..." when isLoading is true', () => {
@@ -130,9 +130,9 @@ describe('SourceForm', () => {
         />
       );
 
-      expect(screen.getByText('Adding...')).toBeInTheDocument();
+      expect(screen.getByText('追加中…')).toBeInTheDocument();
       // Check for loading spinner
-      const loadingIcon = screen.getByText('Adding...').parentElement;
+      const loadingIcon = screen.getByText('追加中…').parentElement;
       expect(loadingIcon?.querySelector('.animate-spin')).toBeInTheDocument();
     });
   });
@@ -150,7 +150,7 @@ describe('SourceForm', () => {
         />
       );
 
-      const nameInput = screen.getByLabelText('Source name');
+      const nameInput = screen.getByLabelText('ソース名');
 
       // Blur without entering any value
       await user.click(nameInput);
@@ -173,7 +173,7 @@ describe('SourceForm', () => {
         />
       );
 
-      const urlInput = screen.getByLabelText('Feed URL');
+      const urlInput = screen.getByLabelText('フィード URL');
 
       // Enter invalid URL
       await user.type(urlInput, 'not-a-valid-url');
@@ -196,7 +196,7 @@ describe('SourceForm', () => {
         />
       );
 
-      const urlInput = screen.getByLabelText('Feed URL');
+      const urlInput = screen.getByLabelText('フィード URL');
 
       // Blur without entering any value
       await user.click(urlInput);
@@ -219,7 +219,7 @@ describe('SourceForm', () => {
         />
       );
 
-      const categoryInput = screen.getByLabelText('Category');
+      const categoryInput = screen.getByLabelText('カテゴリ');
 
       // Blur without entering any value
       await user.click(categoryInput);
@@ -242,7 +242,7 @@ describe('SourceForm', () => {
         />
       );
 
-      const langInput = screen.getByLabelText('Language');
+      const langInput = screen.getByLabelText('言語');
 
       // Blur without entering any value
       await user.click(langInput);
@@ -265,7 +265,7 @@ describe('SourceForm', () => {
         />
       );
 
-      const nameInput = screen.getByLabelText('Source name');
+      const nameInput = screen.getByLabelText('ソース名');
 
       // Trigger error by blurring empty field
       await user.click(nameInput);
@@ -296,7 +296,7 @@ describe('SourceForm', () => {
         />
       );
 
-      const urlInput = screen.getByLabelText('Feed URL');
+      const urlInput = screen.getByLabelText('フィード URL');
 
       // Enter invalid URL
       await user.type(urlInput, 'invalid');
@@ -328,7 +328,7 @@ describe('SourceForm', () => {
         />
       );
 
-      const submitButton = screen.getByRole('button', { name: /add source/i });
+      const submitButton = screen.getByRole('button', { name: '追加する' });
       await user.click(submitButton);
 
       await waitFor(() => {
@@ -354,7 +354,7 @@ describe('SourceForm', () => {
         />
       );
 
-      expect(screen.getByLabelText('Source type')).toHaveValue('rss');
+      expect(screen.getByLabelText('ソース種別')).toHaveValue('rss');
       expect(screen.queryByText(/youtube\.com\/feeds\/videos\.xml/i)).not.toBeInTheDocument();
     });
 
@@ -370,7 +370,7 @@ describe('SourceForm', () => {
         />
       );
 
-      await user.selectOptions(screen.getByLabelText('Source type'), 'youtube');
+      await user.selectOptions(screen.getByLabelText('ソース種別'), 'youtube');
 
       expect(
         screen.getByText(/https:\/\/www\.youtube\.com\/feeds\/videos\.xml\?channel_id=/i)
@@ -389,14 +389,14 @@ describe('SourceForm', () => {
         />
       );
 
-      await user.type(screen.getByLabelText('Source name'), 'Some Channel');
+      await user.type(screen.getByLabelText('ソース名'), 'Some Channel');
       await user.type(
-        screen.getByLabelText('Feed URL'),
+        screen.getByLabelText('フィード URL'),
         'https://www.youtube.com/feeds/videos.xml?channel_id=UC123'
       );
-      await user.type(screen.getByLabelText('Category'), 'tech');
-      await user.selectOptions(screen.getByLabelText('Source type'), 'youtube');
-      await user.click(screen.getByRole('button', { name: /add source/i }));
+      await user.type(screen.getByLabelText('カテゴリ'), 'tech');
+      await user.selectOptions(screen.getByLabelText('ソース種別'), 'youtube');
+      await user.click(screen.getByRole('button', { name: '追加する' }));
 
       await waitFor(() => {
         expect(mockOnSubmit).toHaveBeenCalledWith({
@@ -421,11 +421,11 @@ describe('SourceForm', () => {
         />
       );
 
-      await user.type(screen.getByLabelText('Source name'), 'Weekly Links');
-      await user.type(screen.getByLabelText('Feed URL'), 'https://newsletter.example.com/rss');
-      await user.type(screen.getByLabelText('Category'), 'tech');
-      await user.selectOptions(screen.getByLabelText('Source type'), 'newsletter');
-      await user.click(screen.getByRole('button', { name: /add source/i }));
+      await user.type(screen.getByLabelText('ソース名'), 'Weekly Links');
+      await user.type(screen.getByLabelText('フィード URL'), 'https://newsletter.example.com/rss');
+      await user.type(screen.getByLabelText('カテゴリ'), 'tech');
+      await user.selectOptions(screen.getByLabelText('ソース種別'), 'newsletter');
+      await user.click(screen.getByRole('button', { name: '追加する' }));
 
       await waitFor(() => {
         expect(mockOnSubmit).toHaveBeenCalledWith({
@@ -456,7 +456,7 @@ describe('SourceForm', () => {
         />
       );
 
-      expect(screen.getByLabelText('Source type')).toHaveValue('podcast');
+      expect(screen.getByLabelText('ソース種別')).toHaveValue('podcast');
     });
   });
 
@@ -473,11 +473,11 @@ describe('SourceForm', () => {
         />
       );
 
-      const nameInput = screen.getByLabelText('Source name');
-      const urlInput = screen.getByLabelText('Feed URL');
-      const categoryInput = screen.getByLabelText('Category');
-      const langInput = screen.getByLabelText('Language');
-      const submitButton = screen.getByRole('button', { name: /add source/i });
+      const nameInput = screen.getByLabelText('ソース名');
+      const urlInput = screen.getByLabelText('フィード URL');
+      const categoryInput = screen.getByLabelText('カテゴリ');
+      const langInput = screen.getByLabelText('言語');
+      const submitButton = screen.getByRole('button', { name: '追加する' });
 
       // Enter values with extra whitespace
       await user.type(nameInput, '  Tech Blog  ');
@@ -509,10 +509,10 @@ describe('SourceForm', () => {
         />
       );
 
-      await user.type(screen.getByLabelText('Source name'), 'Tech Blog');
-      await user.type(screen.getByLabelText('Feed URL'), 'https://example.com/feed.xml');
-      await user.type(screen.getByLabelText('Category'), 'dev');
-      await user.click(screen.getByRole('button', { name: /add source/i }));
+      await user.type(screen.getByLabelText('ソース名'), 'Tech Blog');
+      await user.type(screen.getByLabelText('フィード URL'), 'https://example.com/feed.xml');
+      await user.type(screen.getByLabelText('カテゴリ'), 'dev');
+      await user.click(screen.getByRole('button', { name: '追加する' }));
 
       await waitFor(() => {
         expect(mockOnSubmit).toHaveBeenCalledWith({
@@ -546,8 +546,8 @@ describe('SourceForm', () => {
         />
       );
 
-      const nameInput = screen.getByLabelText('Source name');
-      const submitButton = screen.getByRole('button', { name: /save changes/i });
+      const nameInput = screen.getByLabelText('ソース名');
+      const submitButton = screen.getByRole('button', { name: '保存する' });
 
       // Update name
       await user.clear(nameInput);
@@ -576,12 +576,12 @@ describe('SourceForm', () => {
         />
       );
 
-      const nameInput = screen.getByLabelText('Source name');
-      const urlInput = screen.getByLabelText('Feed URL');
-      const categoryInput = screen.getByLabelText('Category');
-      const langInput = screen.getByLabelText('Language');
-      const submitButton = screen.getByRole('button', { name: /add source/i });
-      const cancelButton = screen.getByRole('button', { name: /cancel/i });
+      const nameInput = screen.getByLabelText('ソース名');
+      const urlInput = screen.getByLabelText('フィード URL');
+      const categoryInput = screen.getByLabelText('カテゴリ');
+      const langInput = screen.getByLabelText('言語');
+      const submitButton = screen.getByRole('button', { name: /追加/ });
+      const cancelButton = screen.getByRole('button', { name: '編集をキャンセル' });
 
       expect(nameInput).toBeDisabled();
       expect(urlInput).toBeDisabled();
@@ -603,8 +603,8 @@ describe('SourceForm', () => {
         />
       );
 
-      const nameInput = screen.getByLabelText('Source name');
-      const submitButton = screen.getByRole('button', { name: /add source/i });
+      const nameInput = screen.getByLabelText('ソース名');
+      const submitButton = screen.getByRole('button', { name: /追加/ });
 
       // Enter valid name but invalid URL (empty)
       await user.type(nameInput, 'Valid Name');
@@ -684,7 +684,7 @@ describe('SourceForm', () => {
         />
       );
 
-      const cancelButton = screen.getByRole('button', { name: /cancel/i });
+      const cancelButton = screen.getByRole('button', { name: '編集をキャンセル' });
       await user.click(cancelButton);
 
       expect(mockOnCancel).toHaveBeenCalledTimes(1);
@@ -701,7 +701,7 @@ describe('SourceForm', () => {
         />
       );
 
-      const cancelButton = screen.getByRole('button', { name: /cancel/i });
+      const cancelButton = screen.getByRole('button', { name: '編集をキャンセル' });
       expect(cancelButton).toBeDisabled();
     });
 
@@ -717,9 +717,9 @@ describe('SourceForm', () => {
         />
       );
 
-      const nameInput = screen.getByLabelText('Source name');
-      const urlInput = screen.getByLabelText('Feed URL');
-      const cancelButton = screen.getByRole('button', { name: /cancel/i });
+      const nameInput = screen.getByLabelText('ソース名');
+      const urlInput = screen.getByLabelText('フィード URL');
+      const cancelButton = screen.getByRole('button', { name: '編集をキャンセル' });
 
       // Enter valid data
       await user.type(nameInput, 'Test Source');
@@ -745,10 +745,10 @@ describe('SourceForm', () => {
         />
       );
 
-      const nameInput = screen.getByLabelText('Source name');
-      const urlInput = screen.getByLabelText('Feed URL');
-      const categoryInput = screen.getByLabelText('Category');
-      const langInput = screen.getByLabelText('Language');
+      const nameInput = screen.getByLabelText('ソース名');
+      const urlInput = screen.getByLabelText('フィード URL');
+      const categoryInput = screen.getByLabelText('カテゴリ');
+      const langInput = screen.getByLabelText('言語');
 
       expect(nameInput).toHaveAttribute('aria-required', 'true');
       expect(nameInput).toHaveAttribute('aria-invalid', 'false');
@@ -773,7 +773,7 @@ describe('SourceForm', () => {
         />
       );
 
-      const nameInput = screen.getByLabelText('Source name');
+      const nameInput = screen.getByLabelText('ソース名');
 
       // Trigger validation error
       await user.click(nameInput);
@@ -796,7 +796,7 @@ describe('SourceForm', () => {
         />
       );
 
-      const urlInput = screen.getByLabelText('Feed URL');
+      const urlInput = screen.getByLabelText('フィード URL');
 
       // Trigger validation error
       await user.click(urlInput);
@@ -820,9 +820,9 @@ describe('SourceForm', () => {
       );
 
       // Select the youtube kind so the format help text is shown
-      await user.selectOptions(screen.getByLabelText('Source type'), 'youtube');
+      await user.selectOptions(screen.getByLabelText('ソース種別'), 'youtube');
 
-      const urlInput = screen.getByLabelText('Feed URL');
+      const urlInput = screen.getByLabelText('フィード URL');
 
       // Trigger validation error while the help text is visible
       await user.click(urlInput);
@@ -847,11 +847,11 @@ describe('SourceForm', () => {
         />
       );
 
-      expect(screen.getByLabelText('Source name')).toBeInTheDocument();
-      expect(screen.getByLabelText('Feed URL')).toBeInTheDocument();
-      expect(screen.getByLabelText('Category')).toBeInTheDocument();
-      expect(screen.getByLabelText('Language')).toBeInTheDocument();
-      expect(screen.getByLabelText('Cancel editing')).toBeInTheDocument();
+      expect(screen.getByLabelText('ソース名')).toBeInTheDocument();
+      expect(screen.getByLabelText('フィード URL')).toBeInTheDocument();
+      expect(screen.getByLabelText('カテゴリ')).toBeInTheDocument();
+      expect(screen.getByLabelText('言語')).toBeInTheDocument();
+      expect(screen.getByLabelText('編集をキャンセル')).toBeInTheDocument();
     });
   });
 
@@ -872,10 +872,10 @@ describe('SourceForm', () => {
         />
       );
 
-      const nameInput = screen.getByLabelText('Source name');
-      const urlInput = screen.getByLabelText('Feed URL');
-      const categoryInput = screen.getByLabelText('Category');
-      const submitButton = screen.getByRole('button', { name: /add source/i });
+      const nameInput = screen.getByLabelText('ソース名');
+      const urlInput = screen.getByLabelText('フィード URL');
+      const categoryInput = screen.getByLabelText('カテゴリ');
+      const submitButton = screen.getByRole('button', { name: '追加する' });
 
       // Enter valid data
       await user.type(nameInput, 'Test Source');
@@ -897,7 +897,7 @@ describe('SourceForm', () => {
       );
 
       // Try to click again (should be disabled)
-      const disabledButton = screen.getByRole('button', { name: /add source/i });
+      const disabledButton = screen.getByRole('button', { name: /追加/ });
       expect(disabledButton).toBeDisabled();
 
       // Should only be called once
@@ -916,8 +916,8 @@ describe('SourceForm', () => {
         />
       );
 
-      const nameInput = screen.getByLabelText('Source name');
-      const submitButton = screen.getByRole('button', { name: /add source/i });
+      const nameInput = screen.getByLabelText('ソース名');
+      const submitButton = screen.getByRole('button', { name: '追加する' });
 
       // Enter whitespace-only value
       await user.type(nameInput, '   ');
@@ -941,10 +941,10 @@ describe('SourceForm', () => {
         />
       );
 
-      const nameInput = screen.getByLabelText('Source name');
-      const urlInput = screen.getByLabelText('Feed URL');
-      const categoryInput = screen.getByLabelText('Category');
-      const langInput = screen.getByLabelText('Language');
+      const nameInput = screen.getByLabelText('ソース名');
+      const urlInput = screen.getByLabelText('フィード URL');
+      const categoryInput = screen.getByLabelText('カテゴリ');
+      const langInput = screen.getByLabelText('言語');
 
       // Name should have maxLength attribute
       expect(nameInput).toHaveAttribute('maxlength', '255');
@@ -968,7 +968,7 @@ describe('SourceForm', () => {
         />
       );
 
-      const urlInput = screen.getByLabelText('Feed URL');
+      const urlInput = screen.getByLabelText('フィード URL');
 
       // Test ftp:// protocol (should fail)
       await user.type(urlInput, 'ftp://example.com/feed');
@@ -1002,8 +1002,8 @@ describe('SourceForm', () => {
         />
       );
 
-      const nameInput = screen.getByLabelText('Source name');
-      const urlInput = screen.getByLabelText('Feed URL');
+      const nameInput = screen.getByLabelText('ソース名');
+      const urlInput = screen.getByLabelText('フィード URL');
 
       // Enter data
       await user.type(nameInput, 'Test Source');

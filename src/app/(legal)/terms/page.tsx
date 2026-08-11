@@ -1,203 +1,94 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Terms of Service - Catchup Feed',
-  description: 'Terms of Service for Catchup Feed',
+  title: '利用規約 - Catchup Feed',
+  description: 'Catchup Feed の利用規約',
 };
+
+/**
+ * Terms of service — 放送卓(改訂版)
+ *
+ * Written for what this service actually is: a self-hosted, personal-use
+ * radio feed shared with a handful of invited friends. No signup flows, no
+ * commercial claims. Body text follows the console reading style
+ * (Noto Sans JP 15px / line-height 2.1 / text-wrap: pretty).
+ */
+
+const SECTIONS: ReadonlyArray<{ heading: string; body: React.ReactNode }> = [
+  {
+    heading: '1. このサービスについて',
+    body: (
+      <p>
+        Catchup
+        Feed(以下「本サービス」)は、管理者が個人利用の範囲で運用する自家ホスティングのシステムです。公開されている記事・動画・音声を収集し、要約して毎朝の音声番組として、管理者本人と管理者が招待した友人に配信します。一般向けの受付・登録は行っていません。
+      </p>
+    ),
+  },
+  {
+    heading: '2. 利用できる人',
+    body: (
+      <p>
+        本サービスを利用できるのは、管理者と、管理者から購読 URL
+        またはアカウントを直接受け取った友人のみです。受け取った購読 URL
+        は本人限りのものとして扱い、第三者へ再配布しないでください。
+      </p>
+    ),
+  },
+  {
+    heading: '3. コンテンツの権利',
+    body: (
+      <p>
+        番組で紹介する記事・動画・音声の権利は、それぞれの提供元に帰属します。本サービスが生成する要約・台本・音声は、原典の理解を助ける個人利用の範囲で作成されるものであり、原典の代替を意図しません。原文へのリンクを原則として併記します。
+      </p>
+    ),
+  },
+  {
+    heading: '4. 禁止事項',
+    body: (
+      <ul className="list-disc space-y-2 pl-6">
+        <li>購読 URL・トークン・アカウントの第三者への譲渡や公開</li>
+        <li>システムへの不正アクセスや、運用を妨げる行為</li>
+        <li>配信されたコンテンツの商用利用や再配布</li>
+      </ul>
+    ),
+  },
+  {
+    heading: '5. 提供の中断・停止',
+    body: (
+      <p>
+        本サービスは「壊れても翌日勝手に戻る」ことを設計目標とする個人運用のシステムです。機材の不在や障害によりエピソードが欠番になること、予告なく提供を中断・終了することがあります。これらについて管理者は責任を負いません。
+      </p>
+    ),
+  },
+  {
+    heading: '6. 規約の変更',
+    body: (
+      <p>
+        本規約は必要に応じて変更されることがあります。変更後の内容は本ページに掲載した時点で効力を持ちます。
+      </p>
+    ),
+  },
+];
 
 export default function TermsPage() {
   return (
-    <article className="mx-auto max-w-4xl">
-      <header className="mb-8">
-        <h1 className="text-glow-sm mb-4 text-4xl font-bold">Terms of Service</h1>
-        <p className="text-muted-foreground">
-          Last updated:{' '}
-          {new Date().toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-          })}
+    <article>
+      <header className="mb-10">
+        <h1 className="text-[26px] font-bold leading-[1.5] tracking-[.01em]">利用規約</h1>
+        <p className="mt-3 font-mono text-[11px] tracking-[.18em] text-[#6d7276]">
+          最終更新 2026.08.11
         </p>
       </header>
 
-      <div className="space-y-8 text-foreground/90">
-        {/* Acceptance of Terms */}
-        <section>
-          <h2 className="text-2xl font-semibold mb-4">1. Acceptance of Terms</h2>
-          <p className="mb-4">
-            Welcome to Catchup Feed. By accessing or using our service, you agree to be bound by
-            these Terms of Service and all applicable laws and regulations. If you do not agree with
-            any of these terms, you are prohibited from using or accessing this service.
-          </p>
-          <p className="mb-4">
-            We reserve the right to update, change, or replace any part of these Terms of Service by
-            posting updates and/or changes to our website. It is your responsibility to check this
-            page periodically for changes. Your continued use of or access to the service following
-            the posting of any changes constitutes acceptance of those changes.
-          </p>
-        </section>
-
-        {/* User Accounts */}
-        <section>
-          <h2 className="text-2xl font-semibold mb-4">2. User Accounts</h2>
-
-          <h3 className="text-xl font-semibold mb-3">2.1 Account Creation</h3>
-          <p className="mb-4">
-            To use certain features of Catchup Feed, you must create an account. When you create an
-            account with us, you must provide information that is accurate, complete, and current at
-            all times. Failure to do so constitutes a breach of the Terms, which may result in
-            immediate termination of your account.
-          </p>
-
-          <h3 className="text-xl font-semibold mb-3">2.2 Account Security</h3>
-          <p className="mb-4">
-            You are responsible for safeguarding the password that you use to access the service and
-            for any activities or actions under your password. You agree not to disclose your
-            password to any third party. You must notify us immediately upon becoming aware of any
-            breach of security or unauthorized use of your account.
-          </p>
-
-          <h3 className="text-xl font-semibold mb-3">2.3 Account Termination</h3>
-          <p className="mb-4">
-            We reserve the right to terminate or suspend your account and access to the service
-            immediately, without prior notice or liability, for any reason whatsoever, including
-            without limitation if you breach the Terms.
-          </p>
-        </section>
-
-        {/* Content and Conduct */}
-        <section>
-          <h2 className="text-2xl font-semibold mb-4">3. Content and Conduct</h2>
-
-          <h3 className="text-xl font-semibold mb-3">3.1 User Content</h3>
-          <p className="mb-4">
-            Our service allows you to configure news sources and preferences. You retain all rights
-            to any content you provide or configure through the service. By using our service, you
-            grant us a license to use, store, and process your configurations to provide the service
-            to you.
-          </p>
-
-          <h3 className="text-xl font-semibold mb-3">3.2 Prohibited Activities</h3>
-          <p className="mb-4">
-            You agree not to engage in any of the following prohibited activities:
-          </p>
-          <ul className="list-disc list-inside space-y-2 mb-4 ml-4">
-            <li>Violating any applicable laws or regulations</li>
-            <li>Attempting to gain unauthorized access to our service or systems</li>
-            <li>Interfering with or disrupting the service or servers</li>
-            <li>Using the service for any illegal or unauthorized purpose</li>
-            <li>Transmitting any viruses, malware, or other malicious code</li>
-            <li>Collecting or harvesting information from other users</li>
-            <li>Impersonating another person or entity</li>
-          </ul>
-        </section>
-
-        {/* Intellectual Property */}
-        <section>
-          <h2 className="text-2xl font-semibold mb-4">4. Intellectual Property</h2>
-
-          <h3 className="text-xl font-semibold mb-3">4.1 Service Content</h3>
-          <p className="mb-4">
-            The service and its original content (excluding content provided by users and
-            third-party sources), features, and functionality are and will remain the exclusive
-            property of Catchup Feed and its licensors. The service is protected by copyright,
-            trademark, and other laws.
-          </p>
-
-          <h3 className="text-xl font-semibold mb-3">4.2 Third-Party Content</h3>
-          <p className="mb-4">
-            Catchup Feed aggregates content from various third-party sources. All rights to such
-            content remain with their respective owners. We do not claim ownership of any
-            third-party content displayed through our service.
-          </p>
-
-          <h3 className="text-xl font-semibold mb-3">4.3 Trademarks</h3>
-          <p className="mb-4">
-            Catchup Feed name, logo, and all related names, logos, product and service names,
-            designs, and slogans are trademarks of Catchup Feed or its affiliates or licensors. You
-            must not use such marks without our prior written permission.
-          </p>
-        </section>
-
-        {/* Limitation of Liability */}
-        <section>
-          <h2 className="text-2xl font-semibold mb-4">5. Limitation of Liability</h2>
-
-          <p className="mb-4">
-            To the maximum extent permitted by applicable law, in no event shall Catchup Feed, its
-            affiliates, directors, employees, or agents be liable for any indirect, incidental,
-            special, consequential, or punitive damages, including without limitation, loss of
-            profits, data, use, goodwill, or other intangible losses, resulting from:
-          </p>
-          <ul className="list-disc list-inside space-y-2 mb-4 ml-4">
-            <li>Your access to or use of or inability to access or use the service</li>
-            <li>Any conduct or content of any third party on the service</li>
-            <li>Any content obtained from the service</li>
-            <li>Unauthorized access, use, or alteration of your transmissions or content</li>
-          </ul>
-
-          <p className="mb-4">
-            The service is provided on an &quot;AS IS&quot; and &quot;AS AVAILABLE&quot; basis.
-            Catchup Feed makes no warranties, expressed or implied, and hereby disclaims and negates
-            all other warranties including, without limitation, implied warranties or conditions of
-            merchantability, fitness for a particular purpose, or non-infringement of intellectual
-            property or other violation of rights.
-          </p>
-        </section>
-
-        {/* Modifications to Service */}
-        <section>
-          <h2 className="text-2xl font-semibold mb-4">6. Modifications to Service</h2>
-
-          <p className="mb-4">
-            We reserve the right to withdraw or amend our service, and any service or material we
-            provide via the service, in our sole discretion without notice. We will not be liable if
-            for any reason all or any part of the service is unavailable at any time or for any
-            period.
-          </p>
-          <p className="mb-4">
-            From time to time, we may restrict access to some parts of the service, or the entire
-            service, to users, including registered users. We may also impose limits on certain
-            features and services or restrict your access to parts or all of the service without
-            notice or liability.
-          </p>
-        </section>
-
-        {/* Termination */}
-        <section>
-          <h2 className="text-2xl font-semibold mb-4">7. Termination</h2>
-
-          <p className="mb-4">
-            We may terminate or suspend your account and bar access to the service immediately,
-            without prior notice or liability, under our sole discretion, for any reason whatsoever
-            and without limitation, including but not limited to a breach of the Terms.
-          </p>
-          <p className="mb-4">
-            If you wish to terminate your account, you may simply discontinue using the service or
-            contact us to request account deletion.
-          </p>
-          <p className="mb-4">
-            All provisions of the Terms which by their nature should survive termination shall
-            survive termination, including, without limitation, ownership provisions, warranty
-            disclaimers, indemnity, and limitations of liability.
-          </p>
-        </section>
-
-        {/* Governing Law */}
-        <section>
-          <h2 className="text-2xl font-semibold mb-4">8. Governing Law</h2>
-
-          <p className="mb-4">
-            These Terms shall be governed and construed in accordance with the laws of the
-            jurisdiction in which Catchup Feed operates, without regard to its conflict of law
-            provisions.
-          </p>
-          <p className="mb-4">
-            Our failure to enforce any right or provision of these Terms will not be considered a
-            waiver of those rights. If any provision of these Terms is held to be invalid or
-            unenforceable by a court, the remaining provisions of these Terms will remain in effect.
-          </p>
-        </section>
+      <div className="flex flex-col gap-10">
+        {SECTIONS.map((section) => (
+          <section key={section.heading}>
+            <h2 className="mb-3 text-[15px] font-bold leading-[1.6]">{section.heading}</h2>
+            <div className="text-[15px] leading-[2.1] text-[#c3c7c9] [text-wrap:pretty]">
+              {section.body}
+            </div>
+          </section>
+        ))}
       </div>
     </article>
   );

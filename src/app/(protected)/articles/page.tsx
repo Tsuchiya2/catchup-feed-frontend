@@ -9,7 +9,6 @@ import { Pagination } from '@/components/common/Pagination';
 import { ArticleCard } from '@/components/articles/ArticleCard';
 import { ErrorMessage } from '@/components/common/ErrorMessage';
 import { EmptyState } from '@/components/common/EmptyState';
-import { Skeleton } from '@/components/ui/skeleton';
 import { useArticles } from '@/hooks/useArticles';
 import { useArticleSearch } from '@/hooks/useArticleSearch';
 import {
@@ -20,6 +19,32 @@ import {
 } from '@/components/articles/ArticleSearch';
 import { PAGINATION_CONFIG } from '@/lib/constants/pagination';
 import { validatePaginationParams } from '@/lib/api/utils/pagination';
+
+/**
+ * Articles list — 放送卓(改訂版)
+ *
+ * Console list form: a 1px-framed panel with hairline-divided rows
+ * (design handoff 未着手の画面). Search / filter sits in its own panel.
+ */
+
+/** Hairline-framed loading rows (README ローディング: no pulse, `—` only). */
+function LoadingRows({ count = 8 }: { count?: number }) {
+  return (
+    <div className="border border-console-line-2 bg-console-panel" aria-hidden>
+      {Array.from({ length: count }).map((_, i) => (
+        <div
+          key={i}
+          className="flex items-center gap-4 border-b border-console-line-1 px-[18px] py-3.5 last:border-b-0"
+        >
+          <span className="w-[72px] shrink-0 font-mono text-[11.5px] text-console-ink-ghost">
+            —
+          </span>
+          <span className="min-h-[20px] flex-1" />
+        </div>
+      ))}
+    </div>
+  );
+}
 
 /**
  * Articles List Page Content
@@ -123,9 +148,9 @@ function ArticlesPageContent() {
   };
 
   return (
-    <div className="container py-8">
+    <div className="flex flex-1 flex-col gap-5 max-sm:p-5 sm:max-desk:p-7 desk:px-8 desk:py-7">
       {/* Page Header */}
-      <PageHeader title="Articles" description="Browse all articles from your sources" />
+      <PageHeader title="記事" description={isLoading ? '— 件' : `全 ${pagination.total} 件`} />
 
       {/* Search and Filter Panel */}
       <ArticleSearch
@@ -135,36 +160,22 @@ function ArticlesPageContent() {
       />
 
       {/* Error State */}
-      {error && (
-        <div className="mb-6">
-          <ErrorMessage error={error} onRetry={refetch} />
-        </div>
-      )}
+      {error && <ErrorMessage error={error} onRetry={refetch} />}
 
       {/* Loading State */}
-      {isLoading && (
-        <div className="space-y-4">
-          {Array.from({ length: 10 }).map((_, i) => (
-            <div key={i} className="rounded-lg border bg-card p-6">
-              <Skeleton className="mb-2 h-6 w-3/4" />
-              <Skeleton className="mb-4 h-4 w-full" />
-              <Skeleton className="h-4 w-1/2" />
-            </div>
-          ))}
-        </div>
-      )}
+      {isLoading && <LoadingRows />}
 
       {/* Empty State */}
       {!isLoading && !error && articles.length === 0 && (
         <EmptyState
-          title={isSearchMode ? 'No articles found' : 'No articles yet'}
+          title={isSearchMode ? '該当する記事がありません' : '記事はまだありません'}
           description={
             isSearchMode
-              ? 'Try adjusting your search keywords or filters.'
-              : 'Articles will appear here once they are added by the feed crawler.'
+              ? 'キーワードや絞り込み条件を変えてみてください。'
+              : 'クローラーが収集した記事がここに並びます。'
           }
           icon={
-            isSearchMode ? <Search className="h-12 w-12" /> : <FileText className="h-12 w-12" />
+            isSearchMode ? <Search className="h-10 w-10" /> : <FileText className="h-10 w-10" />
           }
         />
       )}
@@ -172,7 +183,7 @@ function ArticlesPageContent() {
       {/* Success State - Articles List */}
       {!isLoading && !error && articles.length > 0 && (
         <>
-          <div className="space-y-4">
+          <div className="border border-console-line-2 bg-console-panel">
             {articles.map((article) => (
               <ArticleCard key={article.id} article={article} />
             ))}
@@ -180,7 +191,7 @@ function ArticlesPageContent() {
 
           {/* Pagination */}
           {pagination.totalPages > 1 && (
-            <div className="mt-8">
+            <div className="mt-3">
               <Pagination
                 currentPage={pagination.page}
                 totalPages={pagination.totalPages}
@@ -210,17 +221,9 @@ export default function ArticlesPage() {
   return (
     <Suspense
       fallback={
-        <div className="container py-8">
-          <PageHeader title="Articles" description="Browse all articles from your sources" />
-          <div className="space-y-4">
-            {Array.from({ length: 10 }).map((_, i) => (
-              <div key={i} className="rounded-lg border bg-card p-6">
-                <Skeleton className="mb-2 h-6 w-3/4" />
-                <Skeleton className="mb-4 h-4 w-full" />
-                <Skeleton className="h-4 w-1/2" />
-              </div>
-            ))}
-          </div>
+        <div className="flex flex-1 flex-col gap-5 max-sm:p-5 sm:max-desk:p-7 desk:px-8 desk:py-7">
+          <PageHeader title="記事" description="— 件" />
+          <LoadingRows />
         </div>
       }
     >

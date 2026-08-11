@@ -6,7 +6,7 @@ describe('StatusBadge', () => {
   describe('Active State', () => {
     it('should render "Active" text when active is true', () => {
       render(<StatusBadge active={true} />);
-      expect(screen.getByText('Active')).toBeInTheDocument();
+      expect(screen.getByText('有効')).toBeInTheDocument();
     });
 
     it('should use success variant when active', () => {
@@ -14,31 +14,31 @@ describe('StatusBadge', () => {
       // The Badge component with success variant (cyber glow theme)
       const badge = container.firstChild as HTMLElement | null;
       // Check for success variant class - uses cyan/aqua colors
-      expect(badge?.className).toMatch(/text-\[#a0ffff\]|bg-\[#a0ffff\]/i);
+      expect(badge?.className).toMatch(/border-console-cyan|text-console-cyan/);
     });
 
     it('should have correct aria-label for active state', () => {
       render(<StatusBadge active={true} />);
-      expect(screen.getByLabelText('Status: Active')).toBeInTheDocument();
+      expect(screen.getByLabelText('状態: 有効')).toBeInTheDocument();
     });
   });
 
   describe('Inactive State', () => {
     it('should render "Inactive" text when active is false', () => {
       render(<StatusBadge active={false} />);
-      expect(screen.getByText('Inactive')).toBeInTheDocument();
+      expect(screen.getByText('無効')).toBeInTheDocument();
     });
 
     it('should use secondary variant when inactive', () => {
       const { container } = render(<StatusBadge active={false} />);
       // The Badge component with secondary variant (gray theme)
       const badge = container.firstChild as HTMLElement | null;
-      expect(badge?.className).toMatch(/text-gray-400|bg-gray-600/i);
+      expect(badge?.className).toMatch(/border-console-line-2|text-console-ink-faint/);
     });
 
     it('should have correct aria-label for inactive state', () => {
       render(<StatusBadge active={false} />);
-      expect(screen.getByLabelText('Status: Inactive')).toBeInTheDocument();
+      expect(screen.getByLabelText('状態: 無効')).toBeInTheDocument();
     });
   });
 
@@ -59,31 +59,31 @@ describe('StatusBadge', () => {
     it('should handle undefined active as falsy (inactive)', () => {
       // TypeScript would complain, but testing runtime behavior
       render(<StatusBadge active={undefined as unknown as boolean} />);
-      expect(screen.getByText('Inactive')).toBeInTheDocument();
+      expect(screen.getByText('無効')).toBeInTheDocument();
     });
 
     it('should handle null active as falsy (inactive)', () => {
       // TypeScript would complain, but testing runtime behavior
       render(<StatusBadge active={null as unknown as boolean} />);
-      expect(screen.getByText('Inactive')).toBeInTheDocument();
+      expect(screen.getByText('無効')).toBeInTheDocument();
     });
   });
 
   describe('Accessibility', () => {
     it('should have aria-label attribute', () => {
       render(<StatusBadge active={true} />);
-      const badge = screen.getByText('Active');
+      const badge = screen.getByText('有効');
       expect(badge).toHaveAttribute('aria-label');
     });
 
     it('should be readable by screen readers with status information', () => {
       render(<StatusBadge active={true} />);
-      expect(screen.getByLabelText('Status: Active')).toBeInTheDocument();
+      expect(screen.getByLabelText('状態: 有効')).toBeInTheDocument();
     });
 
     it('should have visible text for sighted users', () => {
       render(<StatusBadge active={false} />);
-      expect(screen.getByText('Inactive')).toBeVisible();
+      expect(screen.getByText('無効')).toBeVisible();
     });
   });
 });

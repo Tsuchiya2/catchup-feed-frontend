@@ -134,12 +134,12 @@ export function PWAInstallPrompt() {
       aria-labelledby="pwa-install-title"
       aria-describedby="pwa-install-description"
     >
-      <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-lg dark:border-gray-700 dark:bg-gray-800">
+      <div className="relative border border-console-line-3 bg-console-panel p-4">
         {/* Close button */}
         <button
           onClick={handleDismiss}
-          className="absolute right-2 top-2 rounded-md p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-sky-500 dark:hover:bg-gray-700 dark:hover:text-gray-300"
-          aria-label="Dismiss install prompt"
+          className="absolute right-2 top-2 p-1 text-console-ink-weak transition-colors duration-[120ms] ease-out hover:text-console-ink focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-console-cyan"
+          aria-label="インストール案内を閉じる"
           type="button"
         >
           <X className="h-4 w-4" />
@@ -148,27 +148,26 @@ export function PWAInstallPrompt() {
         {/* Content */}
         <div className="pr-6">
           <div className="mb-2 flex items-center gap-2">
-            <Download className="h-5 w-5 text-sky-500" aria-hidden="true" />
-            <h3
-              id="pwa-install-title"
-              className="text-sm font-semibold text-gray-900 dark:text-gray-100"
-            >
-              Install Catchup Feed
+            <Download className="h-4 w-4 text-console-cyan" aria-hidden="true" />
+            <h3 id="pwa-install-title" className="text-[13.5px] font-bold text-console-ink">
+              Catchup Feed をインストール
             </h3>
           </div>
 
-          <p id="pwa-install-description" className="mb-4 text-sm text-gray-600 dark:text-gray-400">
-            Install our app for a better experience. Access your feed offline and get quick access
-            from your home screen.
+          <p
+            id="pwa-install-description"
+            className="mb-4 text-[12.5px] leading-[1.9] text-console-ink-weak"
+          >
+            ホーム画面に追加すると、オフラインでも素早く開けるようになります。
           </p>
 
           {/* Install button */}
           <button
             onClick={handleInstallClick}
-            className="w-full rounded-md bg-sky-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-sky-600 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
+            className="w-full bg-console-sel-bg px-4 py-2 text-[13px] font-bold text-console-sel-ink transition-colors duration-[120ms] ease-out hover:bg-console-sel-hover focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-console-cyan"
             type="button"
           >
-            Install App
+            インストール
           </button>
         </div>
       </div>

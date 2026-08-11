@@ -85,22 +85,22 @@ export function SubscriberForm({
     });
   };
 
-  const submitButtonText = mode === 'create' ? 'Add Friend' : 'Save Changes';
-  const loadingButtonText = mode === 'create' ? 'Adding...' : 'Saving...';
+  const submitButtonText = mode === 'create' ? '追加する' : '保存する';
+  const loadingButtonText = mode === 'create' ? '追加中…' : '保存中…';
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <ErrorAlert error={error} />
 
       {/* Name Field */}
-      <FormField label="Name" required htmlFor="subscriber-name" error={errors.name}>
+      <FormField label="名前" required htmlFor="subscriber-name" error={errors.name}>
         <Input
           id="subscriber-name"
           data-testid={SUBSCRIBER_TEST_IDS.NAME_INPUT}
           value={formData.name}
           onChange={(e) => handleChange('name', e.target.value)}
           onBlur={() => handleBlur('name')}
-          placeholder="e.g., Taro"
+          placeholder="例: 太郎"
           aria-required="true"
           aria-invalid={!!errors.name}
           disabled={isLoading}
@@ -109,7 +109,7 @@ export function SubscriberForm({
       </FormField>
 
       {/* Email Field */}
-      <FormField label="Email" htmlFor="subscriber-email" error={errors.email}>
+      <FormField label="メールアドレス" htmlFor="subscriber-email" error={errors.email}>
         <Input
           id="subscriber-email"
           type="email"
@@ -117,7 +117,7 @@ export function SubscriberForm({
           value={formData.email}
           onChange={(e) => handleChange('email', e.target.value)}
           onBlur={() => handleBlur('email')}
-          placeholder="friend@example.com (optional, for new episode emails)"
+          placeholder="friend@example.com(任意・新着通知用)"
           aria-invalid={!!errors.email}
           disabled={isLoading}
           maxLength={SUBSCRIBER_LIMITS.EMAIL_MAX_LENGTH}
@@ -125,14 +125,14 @@ export function SubscriberForm({
       </FormField>
 
       {/* Note Field */}
-      <FormField label="Note" htmlFor="subscriber-note" error={errors.note}>
+      <FormField label="メモ" htmlFor="subscriber-note" error={errors.note}>
         <Textarea
           id="subscriber-note"
           data-testid={SUBSCRIBER_TEST_IDS.NOTE_INPUT}
           value={formData.note}
           onChange={(e) => handleChange('note', e.target.value)}
           onBlur={() => handleBlur('note')}
-          placeholder="Anything to remember about this friend (optional)"
+          placeholder="この友人についての覚え書き(任意)"
           aria-invalid={!!errors.note}
           disabled={isLoading}
           maxLength={SUBSCRIBER_LIMITS.NOTE_MAX_LENGTH}
@@ -149,7 +149,7 @@ export function SubscriberForm({
           disabled={isLoading}
           data-testid={SUBSCRIBER_TEST_IDS.CANCEL_BUTTON}
         >
-          Cancel
+          キャンセル
         </Button>
         <Button type="submit" disabled={isLoading} data-testid={SUBSCRIBER_TEST_IDS.SAVE_BUTTON}>
           {isLoading ? (

@@ -40,7 +40,7 @@ interface ErrorAlertProps {
  * />
  * ```
  */
-export function ErrorAlert({ error, onDismiss, title = 'Error', className }: ErrorAlertProps) {
+export function ErrorAlert({ error, onDismiss, title = 'エラー', className }: ErrorAlertProps) {
   // Don't render if there's no error
   if (!error) return null;
 
@@ -58,8 +58,8 @@ export function ErrorAlert({ error, onDismiss, title = 'Error', className }: Err
         <button
           type="button"
           onClick={onDismiss}
-          className="absolute right-2 top-2 rounded-md p-1 opacity-70 hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-destructive focus:ring-offset-2"
-          aria-label="Dismiss error"
+          className="absolute right-2 top-2 p-1 opacity-70 hover:opacity-100 focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-console-cyan"
+          aria-label="エラーを閉じる"
         >
           <X className="h-4 w-4" />
         </button>

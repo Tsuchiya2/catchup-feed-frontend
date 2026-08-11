@@ -32,9 +32,9 @@ export function StatusBadge({ active, className }: StatusBadgeProps) {
     <Badge
       variant={active ? 'success' : 'secondary'}
       className={cn('', className)}
-      aria-label={`Status: ${active ? 'Active' : 'Inactive'}`}
+      aria-label={`状態: ${active ? '有効' : '無効'}`}
     >
-      {active ? 'Active' : 'Inactive'}
+      {active ? '有効' : '無効'}
     </Badge>
   );
 }

@@ -19,25 +19,25 @@ describe('getNeglectStatus', () => {
   it('returns ok for a recent access', () => {
     const status = getNeglectStatus(summary({ days_since_last_access: 3 }));
     expect(status.level).toBe('ok');
-    expect(status.label).toBe('3d ago');
+    expect(status.label).toBe('3日前');
   });
 
   it('labels same-day access as Today', () => {
     const status = getNeglectStatus(summary({ days_since_last_access: 0 }));
     expect(status.level).toBe('ok');
-    expect(status.label).toBe('Today');
+    expect(status.label).toBe('今日');
   });
 
   it('warns at 14 days of silence', () => {
     const status = getNeglectStatus(summary({ days_since_last_access: 14 }));
     expect(status.level).toBe('warn');
-    expect(status.label).toContain('14d');
+    expect(status.label).toContain('14日');
   });
 
   it('alerts at 21 days (3 weeks) of silence', () => {
     const status = getNeglectStatus(summary({ days_since_last_access: 21 }));
     expect(status.level).toBe('alert');
-    expect(status.label).toContain('21d');
+    expect(status.label).toContain('21日');
   });
 
   it('flags friends who never accessed the feed', () => {
@@ -45,7 +45,7 @@ describe('getNeglectStatus', () => {
       summary({ last_accessed_at: null, days_since_last_access: null })
     );
     expect(status.level).toBe('never');
-    expect(status.label).toBe('Never accessed');
+    expect(status.label).toBe('未アクセス');
   });
 
   it('excludes deactivated friends from neglect detection', () => {

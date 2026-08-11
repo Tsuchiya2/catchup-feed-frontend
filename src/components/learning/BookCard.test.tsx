@@ -28,7 +28,7 @@ describe('BookCard', () => {
     render(<BookCard book={base} onActivate={onActivate} onDeactivate={vi.fn()} />);
 
     const toggle = screen.getByTestId(LEARNING_TEST_IDS.BOOK_TOGGLE);
-    expect(toggle).toHaveTextContent('Activate');
+    expect(toggle).toHaveTextContent('進行中にする');
     await user.click(toggle);
     expect(onActivate).toHaveBeenCalledWith(base);
   });
@@ -45,7 +45,7 @@ describe('BookCard', () => {
     );
 
     const toggle = screen.getByTestId(LEARNING_TEST_IDS.BOOK_TOGGLE);
-    expect(toggle).toHaveTextContent('Pause');
+    expect(toggle).toHaveTextContent('一時停止');
     await user.click(toggle);
     expect(onDeactivate).toHaveBeenCalled();
   });
@@ -59,7 +59,7 @@ describe('BookCard', () => {
       />
     );
 
-    expect(screen.getByTestId(LEARNING_TEST_IDS.BOOK_TOGGLE)).toHaveTextContent('Re-read');
+    expect(screen.getByTestId(LEARNING_TEST_IDS.BOOK_TOGGLE)).toHaveTextContent('再読する');
     expect(screen.getByText(/180 \/ 180 \(100%\)/)).toBeInTheDocument();
   });
 

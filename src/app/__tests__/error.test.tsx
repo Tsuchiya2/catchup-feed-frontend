@@ -38,10 +38,8 @@ describe('Error Component', () => {
       const error = createError('Test error');
       render(<ErrorPage error={error} reset={mockReset} />);
 
-      expect(screen.getByText('Something went wrong!')).toBeDefined();
-      expect(
-        screen.getByText('We apologize for the inconvenience. An unexpected error occurred.')
-      ).toBeDefined();
+      expect(screen.getByText('問題が発生しました')).toBeDefined();
+      expect(screen.getByText(/予期しないエラーが発生しました/)).toBeDefined();
     });
 
     it('should render error icon', () => {
@@ -56,14 +54,14 @@ describe('Error Component', () => {
       const error = createError('Test error');
       render(<ErrorPage error={error} reset={mockReset} />);
 
-      expect(screen.getByRole('button', { name: /try again/i })).toBeDefined();
+      expect(screen.getByRole('button', { name: '再試行' })).toBeDefined();
     });
 
     it('should render Go Home button', () => {
       const error = createError('Test error');
       render(<ErrorPage error={error} reset={mockReset} />);
 
-      expect(screen.getByRole('button', { name: /go home/i })).toBeDefined();
+      expect(screen.getByRole('button', { name: 'トップへ戻る' })).toBeDefined();
     });
   });
 
@@ -96,7 +94,7 @@ describe('Error Component', () => {
       const error = createError('Test error');
       render(<ErrorPage error={error} reset={mockReset} />);
 
-      const tryAgainButton = screen.getByRole('button', { name: /try again/i });
+      const tryAgainButton = screen.getByRole('button', { name: '再試行' });
       await user.click(tryAgainButton);
 
       expect(mockReset).toHaveBeenCalled();
@@ -107,7 +105,7 @@ describe('Error Component', () => {
       const error = createError('Test error');
       render(<ErrorPage error={error} reset={mockReset} />);
 
-      const goHomeButton = screen.getByRole('button', { name: /go home/i });
+      const goHomeButton = screen.getByRole('button', { name: 'トップへ戻る' });
       await user.click(goHomeButton);
 
       expect(window.location.href).toBe('/');

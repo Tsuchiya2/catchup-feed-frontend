@@ -54,10 +54,9 @@ export function AddViewerDialog({ isOpen, onClose, onSuccess }: AddViewerDialogP
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add Viewer</DialogTitle>
+          <DialogTitle>視聴者を追加</DialogTitle>
           <DialogDescription>
-            Create a read-only account for a friend. They can log in with this email and password to
-            browse the active source list — nothing else. Share the password with them yourself.
+            友人用の読み取り専用アカウントを作ります。このメールアドレスとパスワードでログインし、有効なソース一覧だけを閲覧できます。パスワードは自分で本人に渡してください。
           </DialogDescription>
         </DialogHeader>
 

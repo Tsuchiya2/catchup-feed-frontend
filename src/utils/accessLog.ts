@@ -30,7 +30,7 @@ export interface NeglectStatus {
  */
 export function getNeglectStatus(summary: AccessLogSummary): NeglectStatus {
   if (!summary.active) {
-    return { level: 'deactivated', label: 'Deactivated' };
+    return { level: 'deactivated', label: '無効化済' };
   }
 
   const days = summary.days_since_last_access;
@@ -40,18 +40,18 @@ export function getNeglectStatus(summary: AccessLogSummary): NeglectStatus {
   // versa) is deliberately classified as 'never' — the conservative reading
   // that surfaces the row for attention rather than hiding a data bug.
   if (days === null || summary.last_accessed_at === null) {
-    return { level: 'never', label: 'Never accessed' };
+    return { level: 'never', label: '未アクセス' };
   }
 
   if (days >= ACCESS_LOG_THRESHOLDS.ALERT_DAYS) {
-    return { level: 'alert', label: `${days}d silent` };
+    return { level: 'alert', label: `${days}日 放置` };
   }
 
   if (days >= ACCESS_LOG_THRESHOLDS.WARN_DAYS) {
-    return { level: 'warn', label: `${days}d quiet` };
+    return { level: 'warn', label: `${days}日 なし` };
   }
 
-  return { level: 'ok', label: days === 0 ? 'Today' : `${days}d ago` };
+  return { level: 'ok', label: days === 0 ? '今日' : `${days}日前` };
 }
 
 /**

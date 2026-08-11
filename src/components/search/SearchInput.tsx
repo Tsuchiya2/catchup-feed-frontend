@@ -49,7 +49,7 @@ export interface SearchInputProps {
 export function SearchInput({
   value,
   onChange,
-  placeholder = 'Search...',
+  placeholder = '検索…',
   isLoading = false,
   debounceDelay = 300,
   className,
@@ -104,7 +104,7 @@ export function SearchInput({
 
   return (
     <div className={cn('relative', className)}>
-      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-console-ink-faint">
         {isLoading ? (
           <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
         ) : (
@@ -126,8 +126,8 @@ export function SearchInput({
           variant="ghost"
           size="sm"
           onClick={handleClear}
-          className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0 hover:bg-muted"
-          aria-label="Clear search"
+          className="absolute right-1 top-1/2 h-7 w-7 -translate-y-1/2 p-0"
+          aria-label="検索をクリア"
         >
           <X className="h-4 w-4" />
         </Button>

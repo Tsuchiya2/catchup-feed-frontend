@@ -36,19 +36,19 @@ interface ActiveToggleProps {
 function getErrorMessage(error: unknown): string {
   if (error instanceof ApiError) {
     if (error.status === 403) {
-      return "You don't have permission to perform this action.";
+      return 'この操作を行う権限がありません。';
     }
     if (error.status === 404) {
-      return 'Source not found. Please refresh the page.';
+      return 'ソースが見つかりません。ページを再読み込みしてください。';
     }
     if (error.status >= 500) {
-      return 'Server error. Please try again later.';
+      return 'サーバーエラーです。しばらくしてからやり直してください。';
     }
   }
   if (error instanceof NetworkError) {
-    return 'Network error. Please check your connection.';
+    return 'ネットワークエラーです。接続を確認してください。';
   }
-  return 'Failed to update source status. Please try again.';
+  return 'ソースの状態を更新できませんでした。もう一度お試しください。';
 }
 
 /**
@@ -121,15 +121,18 @@ export const ActiveToggle = React.memo(function ActiveToggle({
           checked={currentActive}
           onCheckedChange={handleToggle}
           disabled={isToggling}
-          aria-label={`Toggle ${sourceName} active status`}
+          aria-label={`${sourceName} の有効状態を切り替え`}
           aria-describedby={error ? `error-${sourceId}` : undefined}
-          className="data-[state=checked]:bg-[#a0ffff] data-[state=checked]:shadow-[0_0_12px_#00ffff,0_0_24px_#00ffff,0_0_36px_#00ffff50] data-[state=unchecked]:bg-gray-600"
         />
-        {isToggling && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
+        {isToggling && <Loader2 className="h-4 w-4 animate-spin text-console-ink-faint" />}
       </div>
 
       {error && (
-        <p id={`error-${sourceId}`} className="mt-1 text-xs text-destructive" role="alert">
+        <p
+          id={`error-${sourceId}`}
+          className="mt-1 font-mono text-[11px] text-destructive"
+          role="alert"
+        >
           {error}
         </p>
       )}

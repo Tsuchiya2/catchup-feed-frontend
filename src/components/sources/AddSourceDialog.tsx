@@ -94,8 +94,8 @@ export function AddSourceDialog({ isOpen, onClose, onSuccess }: AddSourceDialogP
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add New Source</DialogTitle>
-          <DialogDescription>Add a new RSS or Atom feed source to track.</DialogDescription>
+          <DialogTitle>ソースを追加</DialogTitle>
+          <DialogDescription>収集対象の RSS / Atom フィードを追加します。</DialogDescription>
         </DialogHeader>
 
         <SourceForm

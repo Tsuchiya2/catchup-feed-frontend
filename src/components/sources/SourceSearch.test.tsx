@@ -14,39 +14,39 @@ describe('SourceSearch', () => {
     it('should render with title', () => {
       render(<SourceSearch searchState={defaultSearchState} onSearchChange={vi.fn()} />);
 
-      expect(screen.getByText('Search & Filter Sources')).toBeInTheDocument();
+      expect(screen.getByText('検索・絞り込み')).toBeInTheDocument();
     });
 
     it('should render search input', () => {
       render(<SourceSearch searchState={defaultSearchState} onSearchChange={vi.fn()} />);
 
-      expect(screen.getByPlaceholderText('Search by name or URL...')).toBeInTheDocument();
+      expect(screen.getByPlaceholderText('名前・URL で検索…')).toBeInTheDocument();
     });
 
     it('should render category filter', () => {
       render(<SourceSearch searchState={defaultSearchState} onSearchChange={vi.fn()} />);
 
-      expect(screen.getByLabelText('Filter by category')).toBeInTheDocument();
-      expect(screen.getByText('Category')).toBeInTheDocument();
+      expect(screen.getByLabelText('カテゴリで絞り込む')).toBeInTheDocument();
+      expect(screen.getByText('カテゴリ')).toBeInTheDocument();
     });
 
     it('should render active filter', () => {
       render(<SourceSearch searchState={defaultSearchState} onSearchChange={vi.fn()} />);
 
-      expect(screen.getByLabelText('Status')).toBeInTheDocument();
+      expect(screen.getByLabelText('状態')).toBeInTheDocument();
     });
 
     it('should not show Clear All Filters button when no filters active', () => {
       render(<SourceSearch searchState={defaultSearchState} onSearchChange={vi.fn()} />);
 
-      expect(screen.queryByRole('button', { name: 'Clear All Filters' })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: '条件をクリア' })).not.toBeInTheDocument();
     });
 
     it('should show Clear All Filters button when filters are active', () => {
       const searchState = { ...defaultSearchState, keyword: 'test' };
       render(<SourceSearch searchState={searchState} onSearchChange={vi.fn()} />);
 
-      expect(screen.getByRole('button', { name: 'Clear All Filters' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: '条件をクリア' })).toBeInTheDocument();
     });
 
     it('should apply custom className', () => {
@@ -67,28 +67,28 @@ describe('SourceSearch', () => {
       const searchState = { ...defaultSearchState, keyword: 'Blog' };
       render(<SourceSearch searchState={searchState} onSearchChange={vi.fn()} />);
 
-      expect(screen.getByPlaceholderText('Search by name or URL...')).toHaveValue('Blog');
+      expect(screen.getByPlaceholderText('名前・URL で検索…')).toHaveValue('Blog');
     });
 
     it('should display current category selection', () => {
       const searchState = { ...defaultSearchState, category: 'dev' };
       render(<SourceSearch searchState={searchState} onSearchChange={vi.fn()} />);
 
-      expect(screen.getByLabelText('Filter by category')).toHaveValue('dev');
+      expect(screen.getByLabelText('カテゴリで絞り込む')).toHaveValue('dev');
     });
 
     it('should display current active selection (true)', () => {
       const searchState = { ...defaultSearchState, active: true };
       render(<SourceSearch searchState={searchState} onSearchChange={vi.fn()} />);
 
-      expect(screen.getByLabelText('Status')).toHaveValue('true');
+      expect(screen.getByLabelText('状態')).toHaveValue('true');
     });
 
     it('should display current active selection (false)', () => {
       const searchState = { ...defaultSearchState, active: false };
       render(<SourceSearch searchState={searchState} onSearchChange={vi.fn()} />);
 
-      expect(screen.getByLabelText('Status')).toHaveValue('false');
+      expect(screen.getByLabelText('状態')).toHaveValue('false');
     });
   });
 
@@ -98,7 +98,7 @@ describe('SourceSearch', () => {
       const onSearchChange = vi.fn();
       render(<SourceSearch searchState={defaultSearchState} onSearchChange={onSearchChange} />);
 
-      await user.type(screen.getByLabelText('Filter by category'), 'dev');
+      await user.type(screen.getByLabelText('カテゴリで絞り込む'), 'dev');
 
       await waitFor(() => {
         expect(onSearchChange).toHaveBeenCalledWith({
@@ -113,7 +113,7 @@ describe('SourceSearch', () => {
       const onSearchChange = vi.fn();
       render(<SourceSearch searchState={defaultSearchState} onSearchChange={onSearchChange} />);
 
-      await user.selectOptions(screen.getByLabelText('Status'), 'true');
+      await user.selectOptions(screen.getByLabelText('状態'), 'true');
 
       expect(onSearchChange).toHaveBeenCalledWith({
         ...defaultSearchState,
@@ -127,7 +127,7 @@ describe('SourceSearch', () => {
       const searchState = { keyword: 'test', category: 'dev', active: true };
       render(<SourceSearch searchState={searchState} onSearchChange={onSearchChange} />);
 
-      await user.click(screen.getByRole('button', { name: 'Clear All Filters' }));
+      await user.click(screen.getByRole('button', { name: '条件をクリア' }));
 
       expect(onSearchChange).toHaveBeenCalledWith({
         keyword: '',
@@ -144,7 +144,7 @@ describe('SourceSearch', () => {
       );
 
       // The search input should show loading spinner
-      const searchContainer = screen.getByPlaceholderText('Search by name or URL...').parentElement;
+      const searchContainer = screen.getByPlaceholderText('名前・URL で検索…').parentElement;
       expect(searchContainer?.querySelector('.animate-spin')).toBeInTheDocument();
     });
   });
@@ -154,28 +154,28 @@ describe('SourceSearch', () => {
       const searchState = { ...defaultSearchState, keyword: 'test' };
       render(<SourceSearch searchState={searchState} onSearchChange={vi.fn()} />);
 
-      expect(screen.getByRole('button', { name: 'Clear All Filters' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: '条件をクリア' })).toBeInTheDocument();
     });
 
     it('should show Clear All when category is set', () => {
       const searchState = { ...defaultSearchState, category: 'dev' };
       render(<SourceSearch searchState={searchState} onSearchChange={vi.fn()} />);
 
-      expect(screen.getByRole('button', { name: 'Clear All Filters' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: '条件をクリア' })).toBeInTheDocument();
     });
 
     it('should show Clear All when active is true', () => {
       const searchState = { ...defaultSearchState, active: true };
       render(<SourceSearch searchState={searchState} onSearchChange={vi.fn()} />);
 
-      expect(screen.getByRole('button', { name: 'Clear All Filters' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: '条件をクリア' })).toBeInTheDocument();
     });
 
     it('should show Clear All when active is false', () => {
       const searchState = { ...defaultSearchState, active: false };
       render(<SourceSearch searchState={searchState} onSearchChange={vi.fn()} />);
 
-      expect(screen.getByRole('button', { name: 'Clear All Filters' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: '条件をクリア' })).toBeInTheDocument();
     });
   });
 });

@@ -37,9 +37,9 @@ describe('IssuedTokenDialog', () => {
     render(<IssuedTokenDialog issued={issued} subscriberName="Taro" onClose={() => {}} />);
 
     const alert = screen.getByRole('alert');
-    expect(alert).toHaveTextContent(/only once/i);
-    expect(alert).toHaveTextContent(/cannot be displayed again/i);
-    expect(alert).toHaveTextContent(/revoke the token and issue a new one/i);
+    expect(alert).toHaveTextContent(/今回の一度だけ/);
+    expect(alert).toHaveTextContent(/二度と表示できません/);
+    expect(alert).toHaveTextContent(/失効させて再発行/);
   });
 
   it('copies the feed URL to the clipboard', async () => {
@@ -55,7 +55,7 @@ describe('IssuedTokenDialog', () => {
     fireEvent.click(screen.getByTestId(SUBSCRIBER_TEST_IDS.COPY_FEED_URL_BUTTON));
 
     expect(writeText).toHaveBeenCalledWith(issued.feed_url);
-    expect(await screen.findByText('Copied!')).toBeInTheDocument();
+    expect(await screen.findByText('コピーしました')).toBeInTheDocument();
   });
 
   it('does not close on Escape (the one-time URL must not be lost by accident)', async () => {
@@ -76,7 +76,7 @@ describe('IssuedTokenDialog', () => {
 
     render(<IssuedTokenDialog issued={issued} subscriberName="Taro" onClose={onClose} />);
 
-    await user.click(screen.getByRole('button', { name: /I saved the URL/i }));
+    await user.click(screen.getByRole('button', { name: /URL を保存した/ }));
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 });

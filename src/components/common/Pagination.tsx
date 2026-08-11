@@ -89,7 +89,7 @@ export function Pagination({
     const start = (currentPage - 1) * itemsPerPage + 1;
     const end = Math.min(currentPage * itemsPerPage, totalItems);
 
-    return `Showing ${start}-${end} of ${totalItems} items`;
+    return `${start}–${end} ／ ${totalItems} 件`;
   }, [currentPage, totalItems, itemsPerPage]);
 
   if (totalPages <= 1) return null;
@@ -107,11 +107,11 @@ export function Pagination({
           size="sm"
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
-          aria-label="Go to previous page"
+          aria-label="前のページへ"
           className="gap-1"
         >
           <ChevronLeft className="h-4 w-4" />
-          <span className="hidden sm:inline">Previous</span>
+          <span className="hidden sm:inline">前へ</span>
         </Button>
 
         {/* Page number buttons */}
@@ -121,7 +121,7 @@ export function Pagination({
               return (
                 <span
                   key={`ellipsis-${index}`}
-                  className="flex h-9 w-9 items-center justify-center text-sm text-muted-foreground"
+                  className="flex h-9 w-9 items-center justify-center font-mono text-[12px] text-console-ink-faint"
                   aria-hidden="true"
                 >
                   ...
@@ -135,9 +135,9 @@ export function Pagination({
                 variant={currentPage === page ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => onPageChange(page)}
-                aria-label={`Go to page ${page}`}
+                aria-label={`${page} ページへ`}
                 aria-current={currentPage === page ? 'page' : undefined}
-                className="h-9 w-9 p-0"
+                className="h-9 w-9 p-0 font-mono text-[12px]"
               >
                 {page}
               </Button>
@@ -147,8 +147,8 @@ export function Pagination({
 
         {/* Mobile: Current page indicator */}
         <div className="flex items-center gap-2 md:hidden">
-          <span className="text-sm text-muted-foreground">
-            Page {currentPage} of {totalPages}
+          <span className="font-mono text-[11.5px] text-console-ink-weak">
+            {currentPage} / {totalPages}
           </span>
         </div>
 
@@ -158,10 +158,10 @@ export function Pagination({
           size="sm"
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
-          aria-label="Go to next page"
+          aria-label="次のページへ"
           className="gap-1"
         >
-          <span className="hidden sm:inline">Next</span>
+          <span className="hidden sm:inline">次へ</span>
           <ChevronRight className="h-4 w-4" />
         </Button>
       </div>
@@ -170,7 +170,7 @@ export function Pagination({
       <div className="flex flex-col items-center gap-3 sm:flex-row sm:gap-4">
         {/* Items shown text */}
         {itemsShownText && (
-          <p className="text-sm text-muted-foreground" aria-live="polite">
+          <p className="font-mono text-[11px] text-console-ink-weak" aria-live="polite">
             {itemsShownText}
           </p>
         )}
@@ -180,16 +180,16 @@ export function Pagination({
           <div className="flex items-center gap-2">
             <label
               htmlFor="items-per-page"
-              className="text-sm text-muted-foreground whitespace-nowrap"
+              className="whitespace-nowrap font-mono text-[11px] text-console-ink-weak"
             >
-              Items per page:
+              表示件数:
             </label>
             <select
               id="items-per-page"
               value={itemsPerPage.toString()}
               onChange={(e) => onItemsPerPageChange(Number(e.target.value))}
-              className="h-9 w-[70px] rounded-md border border-input bg-background px-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-              aria-label="Select items per page"
+              className="console-field h-9 w-[70px] px-2 font-mono text-[12px]"
+              aria-label="表示件数を選択"
             >
               {availablePageSizes.map((size) => (
                 <option key={size} value={size.toString()}>

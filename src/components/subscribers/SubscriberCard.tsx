@@ -1,20 +1,17 @@
 /**
- * SubscriberCard Component
+ * SubscriberCard Component — one row of the console friend list (放送卓改訂版).
  *
- * Displays a friend (subscriber) in a card format:
- * - Name + active/deactivated badge (deactivation = soft delete)
- * - Email / note (when present)
- * - Added date
- * - Manage link (detail page: tokens + access), Edit and Deactivate actions
+ * List form per design handoff: hairline-divided row inside a 1px-framed
+ * panel. Shows name + email/note, status label (deactivation = soft delete),
+ * added date (mono), and 管理 / 編集 / 無効化 actions.
  */
 import * as React from 'react';
 import Link from 'next/link';
-import { UserRound, Pencil, UserRoundX, KeyRound } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
+import { Pencil, UserRoundX, KeyRound } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { formatRelativeTime } from '@/lib/utils/formatDate';
+import { formatRelativeTimeJa } from '@/lib/utils/relativeTimeJa';
 import { SUBSCRIBER_TEST_IDS } from '@/constants/subscriber';
 import type { Subscriber } from '@/types/api';
 
@@ -30,7 +27,7 @@ interface SubscriberCardProps {
 }
 
 /**
- * SubscriberCard displays a friend in a card format.
+ * SubscriberCard displays a friend as a console list row.
  */
 export const SubscriberCard = React.memo(function SubscriberCard({
   subscriber,
@@ -39,87 +36,87 @@ export const SubscriberCard = React.memo(function SubscriberCard({
   onDeactivate,
 }: SubscriberCardProps) {
   return (
-    <Card
-      className={cn('flex flex-col', !subscriber.active && 'opacity-70', className)}
+    <div
       role="listitem"
-      aria-label={`Friend: ${subscriber.name}`}
+      aria-label={`友人: ${subscriber.name}`}
       data-testid={SUBSCRIBER_TEST_IDS.CARD}
+      className={cn(
+        'flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-console-line-1 px-[18px] py-3.5 last:border-b-0',
+        className
+      )}
     >
-      <CardContent className="flex flex-col gap-4 p-6">
-        {/* Icon, name, status */}
-        <div className="flex items-start gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-primary/30 bg-primary/10">
-            <UserRound className="h-5 w-5 text-primary" aria-hidden="true" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-2">
-              <h3 className="truncate text-lg font-semibold text-foreground">{subscriber.name}</h3>
-              {subscriber.active ? (
-                <Badge variant="success">Active</Badge>
-              ) : (
-                <Badge variant="secondary">
-                  Deactivated
-                  {subscriber.deactivated_at
-                    ? ` ${formatRelativeTime(subscriber.deactivated_at)}`
-                    : ''}
-                </Badge>
-              )}
-            </div>
-            {subscriber.email && (
-              <p className="mt-1 truncate text-xs text-muted-foreground" title={subscriber.email}>
-                {subscriber.email}
-              </p>
+      <div className="min-w-0 flex-1 basis-[220px]">
+        <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
+          <h3
+            className={cn(
+              'truncate text-[13.5px]',
+              subscriber.active ? 'text-console-ink' : 'text-console-ink-faint'
             )}
-          </div>
-        </div>
-
-        {/* Note */}
-        {subscriber.note && (
-          <p className="line-clamp-2 text-sm text-muted-foreground">{subscriber.note}</p>
-        )}
-
-        {/* Footer: added date + actions */}
-        <div className="flex flex-wrap items-center justify-between gap-2 pt-2">
-          <time
-            className="text-xs text-muted-foreground"
-            dateTime={subscriber.created_at || undefined}
           >
-            Added {formatRelativeTime(subscriber.created_at)}
-          </time>
-          <div className="flex items-center gap-1">
-            <Button asChild variant="outline" size="sm">
-              <Link href={`/subscribers/${subscriber.id}`} aria-label={`Manage ${subscriber.name}`}>
-                <KeyRound className="mr-1 h-4 w-4" />
-                Manage
-              </Link>
-            </Button>
-            {onEdit && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8"
-                onClick={() => onEdit(subscriber)}
-                data-testid={SUBSCRIBER_TEST_IDS.EDIT_BUTTON}
-                aria-label={`Edit friend: ${subscriber.name}`}
-              >
-                <Pencil className="h-4 w-4" />
-              </Button>
-            )}
-            {onDeactivate && subscriber.active && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 text-destructive hover:text-destructive"
-                onClick={() => onDeactivate(subscriber)}
-                data-testid={SUBSCRIBER_TEST_IDS.DEACTIVATE_BUTTON}
-                aria-label={`Deactivate friend: ${subscriber.name}`}
-              >
-                <UserRoundX className="h-4 w-4" />
-              </Button>
-            )}
-          </div>
+            {subscriber.name}
+          </h3>
+          {subscriber.active ? (
+            <Badge variant="success">有効</Badge>
+          ) : (
+            <Badge variant="secondary">
+              無効化済
+              {subscriber.deactivated_at
+                ? ` ${formatRelativeTimeJa(subscriber.deactivated_at)}`
+                : ''}
+            </Badge>
+          )}
         </div>
-      </CardContent>
-    </Card>
+        {(subscriber.email || subscriber.note) && (
+          <p
+            className="mt-0.5 truncate font-mono text-[10.5px] text-console-ink-weak"
+            title={subscriber.email || subscriber.note || undefined}
+          >
+            {subscriber.email}
+            {subscriber.email && subscriber.note && ' ／ '}
+            {subscriber.note}
+          </p>
+        )}
+      </div>
+
+      <time
+        className="hidden shrink-0 font-mono text-[10.5px] text-console-ink-ghost lg:block"
+        dateTime={subscriber.created_at || undefined}
+      >
+        {formatRelativeTimeJa(subscriber.created_at)}
+      </time>
+
+      <div className="flex shrink-0 items-center gap-1">
+        <Button asChild variant="outline" size="sm">
+          <Link href={`/subscribers/${subscriber.id}`} aria-label={`${subscriber.name} を管理`}>
+            <KeyRound className="mr-1 h-4 w-4" />
+            管理
+          </Link>
+        </Button>
+        {onEdit && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-9 w-9"
+            onClick={() => onEdit(subscriber)}
+            data-testid={SUBSCRIBER_TEST_IDS.EDIT_BUTTON}
+            aria-label={`友人を編集: ${subscriber.name}`}
+          >
+            <Pencil className="h-4 w-4" />
+          </Button>
+        )}
+        {onDeactivate && subscriber.active && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-9 w-9 text-console-ink-weak hover:text-destructive"
+            onClick={() => onDeactivate(subscriber)}
+            data-testid={SUBSCRIBER_TEST_IDS.DEACTIVATE_BUTTON}
+            aria-label={`友人を無効化: ${subscriber.name}`}
+          >
+            <UserRoundX className="h-4 w-4" />
+          </Button>
+        )}
+      </div>
+    </div>
   );
 });

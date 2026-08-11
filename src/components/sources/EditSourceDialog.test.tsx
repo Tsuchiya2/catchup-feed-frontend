@@ -64,21 +64,21 @@ describe('EditSourceDialog', () => {
     it('renders dialog title "Edit Source"', () => {
       render(<EditSourceDialog {...defaultProps} />);
 
-      expect(screen.getByText('Edit Source')).toBeInTheDocument();
+      expect(screen.getByText('ソースを編集')).toBeInTheDocument();
     });
 
     it('renders dialog description', () => {
       render(<EditSourceDialog {...defaultProps} />);
 
-      expect(screen.getByText('Edit the source details below.')).toBeInTheDocument();
+      expect(screen.getByText('ソースの内容を編集します。')).toBeInTheDocument();
     });
 
     it('renders the SourceForm with pre-populated values', () => {
       render(<EditSourceDialog {...defaultProps} />);
 
       // Check that form fields exist
-      const nameInput = screen.getByLabelText(/name/i) as HTMLInputElement;
-      const urlInput = screen.getByLabelText(/feed url/i) as HTMLInputElement;
+      const nameInput = screen.getByLabelText('ソース名') as HTMLInputElement;
+      const urlInput = screen.getByLabelText('フィード URL') as HTMLInputElement;
 
       expect(nameInput).toBeInTheDocument();
       expect(urlInput).toBeInTheDocument();
@@ -91,8 +91,8 @@ describe('EditSourceDialog', () => {
     it('renders save and cancel buttons', () => {
       render(<EditSourceDialog {...defaultProps} />);
 
-      expect(screen.getByRole('button', { name: /save changes/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: '保存する' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: '編集をキャンセル' })).toBeInTheDocument();
     });
   });
 
@@ -103,13 +103,13 @@ describe('EditSourceDialog', () => {
 
       render(<EditSourceDialog {...defaultProps} />);
 
-      const nameInput = screen.getByLabelText(/name/i);
+      const nameInput = screen.getByLabelText('ソース名');
 
       // Clear existing value and type new name
       await user.clear(nameInput);
       await user.type(nameInput, 'Updated Tech Blog');
 
-      await user.click(screen.getByRole('button', { name: /save changes/i }));
+      await user.click(screen.getByRole('button', { name: '保存する' }));
 
       await waitFor(() => {
         expect(mockMutateAsync).toHaveBeenCalledWith({
@@ -132,13 +132,13 @@ describe('EditSourceDialog', () => {
 
       render(<EditSourceDialog {...defaultProps} />);
 
-      const urlInput = screen.getByLabelText(/feed url/i);
+      const urlInput = screen.getByLabelText('フィード URL');
 
       // Clear existing value and type new URL
       await user.clear(urlInput);
       await user.type(urlInput, 'https://newsite.com/feed.xml');
 
-      await user.click(screen.getByRole('button', { name: /save changes/i }));
+      await user.click(screen.getByRole('button', { name: '保存する' }));
 
       await waitFor(() => {
         expect(mockMutateAsync).toHaveBeenCalledWith({
@@ -161,8 +161,8 @@ describe('EditSourceDialog', () => {
 
       render(<EditSourceDialog {...defaultProps} />);
 
-      const nameInput = screen.getByLabelText(/name/i);
-      const urlInput = screen.getByLabelText(/feed url/i);
+      const nameInput = screen.getByLabelText('ソース名');
+      const urlInput = screen.getByLabelText('フィード URL');
 
       // Change both values
       await user.clear(nameInput);
@@ -170,7 +170,7 @@ describe('EditSourceDialog', () => {
       await user.clear(urlInput);
       await user.type(urlInput, 'https://newurl.com/feed.xml');
 
-      await user.click(screen.getByRole('button', { name: /save changes/i }));
+      await user.click(screen.getByRole('button', { name: '保存する' }));
 
       await waitFor(() => {
         expect(mockMutateAsync).toHaveBeenCalledWith({
@@ -193,10 +193,10 @@ describe('EditSourceDialog', () => {
 
       render(<EditSourceDialog {...defaultProps} />);
 
-      const nameInput = screen.getByLabelText(/name/i);
+      const nameInput = screen.getByLabelText('ソース名');
       await user.clear(nameInput);
       await user.type(nameInput, 'Updated Name');
-      await user.click(screen.getByRole('button', { name: /save changes/i }));
+      await user.click(screen.getByRole('button', { name: '保存する' }));
 
       await waitFor(() => {
         expect(mockReset).toHaveBeenCalled();
@@ -210,10 +210,10 @@ describe('EditSourceDialog', () => {
 
       render(<EditSourceDialog {...defaultProps} onSuccess={onSuccess} />);
 
-      const nameInput = screen.getByLabelText(/name/i);
+      const nameInput = screen.getByLabelText('ソース名');
       await user.clear(nameInput);
       await user.type(nameInput, 'Updated Name');
-      await user.click(screen.getByRole('button', { name: /save changes/i }));
+      await user.click(screen.getByRole('button', { name: '保存する' }));
 
       await waitFor(() => {
         expect(onSuccess).toHaveBeenCalledTimes(1);
@@ -227,10 +227,10 @@ describe('EditSourceDialog', () => {
 
       render(<EditSourceDialog {...defaultProps} onClose={onClose} />);
 
-      const nameInput = screen.getByLabelText(/name/i);
+      const nameInput = screen.getByLabelText('ソース名');
       await user.clear(nameInput);
       await user.type(nameInput, 'Updated Name');
-      await user.click(screen.getByRole('button', { name: /save changes/i }));
+      await user.click(screen.getByRole('button', { name: '保存する' }));
 
       await waitFor(() => {
         expect(onClose).toHaveBeenCalledTimes(1);
@@ -243,13 +243,13 @@ describe('EditSourceDialog', () => {
 
       render(<EditSourceDialog isOpen={true} onClose={vi.fn()} source={mockSource} />);
 
-      const nameInput = screen.getByLabelText(/name/i);
+      const nameInput = screen.getByLabelText('ソース名');
       await user.clear(nameInput);
       await user.type(nameInput, 'Updated Name');
 
       // Should not throw when onSuccess is not provided
       await expect(
-        user.click(screen.getByRole('button', { name: /save changes/i }))
+        user.click(screen.getByRole('button', { name: '保存する' }))
       ).resolves.not.toThrow();
     });
   });
@@ -260,7 +260,7 @@ describe('EditSourceDialog', () => {
 
       render(<EditSourceDialog {...defaultProps} />);
 
-      const nameInput = screen.getByLabelText(/name/i);
+      const nameInput = screen.getByLabelText('ソース名');
 
       // Clear the name field
       await user.clear(nameInput);
@@ -279,7 +279,7 @@ describe('EditSourceDialog', () => {
 
       render(<EditSourceDialog {...defaultProps} />);
 
-      const urlInput = screen.getByLabelText(/feed url/i);
+      const urlInput = screen.getByLabelText('フィード URL');
 
       // Clear the URL field
       await user.clear(urlInput);
@@ -299,13 +299,13 @@ describe('EditSourceDialog', () => {
 
       render(<EditSourceDialog {...defaultProps} onClose={onClose} />);
 
-      const nameInput = screen.getByLabelText(/name/i);
+      const nameInput = screen.getByLabelText('ソース名');
 
       // Clear the name to trigger validation error
       await user.clear(nameInput);
 
       // Try to submit
-      await user.click(screen.getByRole('button', { name: /save changes/i }));
+      await user.click(screen.getByRole('button', { name: '保存する' }));
 
       // Dialog should remain open - onClose should not be called
       await waitFor(() => {
@@ -321,13 +321,13 @@ describe('EditSourceDialog', () => {
 
       render(<EditSourceDialog {...defaultProps} />);
 
-      const nameInput = screen.getByLabelText(/name/i);
+      const nameInput = screen.getByLabelText('ソース名');
 
       // Clear the name to trigger validation error
       await user.clear(nameInput);
 
       // Try to submit
-      await user.click(screen.getByRole('button', { name: /save changes/i }));
+      await user.click(screen.getByRole('button', { name: '保存する' }));
 
       // API should not be called
       await waitFor(() => {
@@ -341,15 +341,15 @@ describe('EditSourceDialog', () => {
 
       render(<EditSourceDialog {...defaultProps} onClose={onClose} />);
 
-      const nameInput = screen.getByLabelText(/name/i);
-      const urlInput = screen.getByLabelText(/feed url/i);
+      const nameInput = screen.getByLabelText('ソース名');
+      const urlInput = screen.getByLabelText('フィード URL');
 
       // Clear both fields
       await user.clear(nameInput);
       await user.clear(urlInput);
 
       // Try to submit
-      await user.click(screen.getByRole('button', { name: /save changes/i }));
+      await user.click(screen.getByRole('button', { name: '保存する' }));
 
       // Should show both errors
       await waitFor(() => {
@@ -390,10 +390,10 @@ describe('EditSourceDialog', () => {
 
       render(<EditSourceDialog {...defaultProps} onClose={onClose} />);
 
-      const nameInput = screen.getByLabelText(/name/i);
+      const nameInput = screen.getByLabelText('ソース名');
       await user.clear(nameInput);
       await user.type(nameInput, 'Updated Name');
-      await user.click(screen.getByRole('button', { name: /save changes/i }));
+      await user.click(screen.getByRole('button', { name: '保存する' }));
 
       // Wait and verify onClose was not called when submission fails
       await waitFor(() => {
@@ -413,10 +413,10 @@ describe('EditSourceDialog', () => {
 
       render(<EditSourceDialog {...defaultProps} onSuccess={onSuccess} />);
 
-      const nameInput = screen.getByLabelText(/name/i);
+      const nameInput = screen.getByLabelText('ソース名');
       await user.clear(nameInput);
       await user.type(nameInput, 'Updated Name');
-      await user.click(screen.getByRole('button', { name: /save changes/i }));
+      await user.click(screen.getByRole('button', { name: '保存する' }));
 
       await waitFor(() => {
         expect(mockMutateAsync).toHaveBeenCalled();
@@ -434,10 +434,10 @@ describe('EditSourceDialog', () => {
 
       render(<EditSourceDialog {...defaultProps} />);
 
-      const nameInput = screen.getByLabelText(/name/i);
+      const nameInput = screen.getByLabelText('ソース名');
       await user.clear(nameInput);
       await user.type(nameInput, 'Updated Name');
-      await user.click(screen.getByRole('button', { name: /save changes/i }));
+      await user.click(screen.getByRole('button', { name: '保存する' }));
 
       await waitFor(() => {
         expect(mockMutateAsync).toHaveBeenCalled();
@@ -466,7 +466,7 @@ describe('EditSourceDialog', () => {
 
       render(<EditSourceDialog {...defaultProps} />);
 
-      await user.click(screen.getByRole('button', { name: /cancel/i }));
+      await user.click(screen.getByRole('button', { name: '編集をキャンセル' }));
 
       expect(mockReset).toHaveBeenCalledTimes(1);
     });
@@ -477,7 +477,7 @@ describe('EditSourceDialog', () => {
 
       render(<EditSourceDialog {...defaultProps} onClose={onClose} />);
 
-      await user.click(screen.getByRole('button', { name: /cancel/i }));
+      await user.click(screen.getByRole('button', { name: '編集をキャンセル' }));
 
       expect(onClose).toHaveBeenCalledTimes(1);
     });
@@ -487,12 +487,12 @@ describe('EditSourceDialog', () => {
 
       render(<EditSourceDialog {...defaultProps} />);
 
-      const nameInput = screen.getByLabelText(/name/i);
+      const nameInput = screen.getByLabelText('ソース名');
       await user.clear(nameInput);
       await user.type(nameInput, 'Updated Name');
 
       // Click cancel instead of save
-      await user.click(screen.getByRole('button', { name: /cancel/i }));
+      await user.click(screen.getByRole('button', { name: '編集をキャンセル' }));
 
       // API should not be called
       expect(mockMutateAsync).not.toHaveBeenCalled();
@@ -504,7 +504,7 @@ describe('EditSourceDialog', () => {
 
       render(<EditSourceDialog {...defaultProps} onSuccess={onSuccess} />);
 
-      await user.click(screen.getByRole('button', { name: /cancel/i }));
+      await user.click(screen.getByRole('button', { name: '編集をキャンセル' }));
 
       expect(onSuccess).not.toHaveBeenCalled();
     });
@@ -541,7 +541,7 @@ describe('EditSourceDialog', () => {
 
       render(<EditSourceDialog {...defaultProps} />);
 
-      const nameInput = screen.getByLabelText(/name/i);
+      const nameInput = screen.getByLabelText('ソース名');
       await user.clear(nameInput);
       await user.type(nameInput, 'Updated Name');
 
@@ -571,9 +571,9 @@ describe('EditSourceDialog', () => {
       render(<EditSourceDialog {...defaultProps} />);
 
       // Check that submit button is disabled and shows loading state
-      const submitButton = screen.getByRole('button', { name: /save changes/i });
+      const submitButton = screen.getByRole('button', { name: /保存/ });
       expect(submitButton).toBeDisabled();
-      expect(submitButton).toHaveTextContent('Saving...');
+      expect(submitButton).toHaveTextContent('保存中…');
     });
 
     it('disables all inputs when isPending is true', () => {
@@ -588,9 +588,9 @@ describe('EditSourceDialog', () => {
 
       render(<EditSourceDialog {...defaultProps} />);
 
-      const nameInput = screen.getByLabelText(/name/i);
-      const urlInput = screen.getByLabelText(/feed url/i);
-      const cancelButton = screen.getByRole('button', { name: /cancel/i });
+      const nameInput = screen.getByLabelText('ソース名');
+      const urlInput = screen.getByLabelText('フィード URL');
+      const cancelButton = screen.getByRole('button', { name: '編集をキャンセル' });
 
       expect(nameInput).toBeDisabled();
       expect(urlInput).toBeDisabled();
@@ -607,7 +607,7 @@ describe('EditSourceDialog', () => {
 
       render(<EditSourceDialog {...defaultProps} source={inactiveSource} />);
 
-      const nameInput = screen.getByLabelText(/name/i) as HTMLInputElement;
+      const nameInput = screen.getByLabelText('ソース名') as HTMLInputElement;
       expect(nameInput.value).toBe('Tech Blog');
     });
 
@@ -619,7 +619,7 @@ describe('EditSourceDialog', () => {
 
       render(<EditSourceDialog {...defaultProps} source={specialSource} />);
 
-      const nameInput = screen.getByLabelText(/name/i) as HTMLInputElement;
+      const nameInput = screen.getByLabelText('ソース名') as HTMLInputElement;
       expect(nameInput.value).toBe("Tech & Dev's Blog");
     });
 
@@ -631,7 +631,7 @@ describe('EditSourceDialog', () => {
 
       render(<EditSourceDialog {...defaultProps} source={longUrlSource} />);
 
-      const urlInput = screen.getByLabelText(/feed url/i) as HTMLInputElement;
+      const urlInput = screen.getByLabelText('フィード URL') as HTMLInputElement;
       expect(urlInput.value).toBe(
         'https://example.com/very/long/path/to/feed.xml?param1=value1&param2=value2'
       );

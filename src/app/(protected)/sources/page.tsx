@@ -9,7 +9,6 @@ import { PageHeader } from '@/components/common/PageHeader';
 import { SourceCard } from '@/components/sources/SourceCard';
 import { ErrorMessage } from '@/components/common/ErrorMessage';
 import { EmptyState } from '@/components/common/EmptyState';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { AddSourceDialog } from '@/components/sources/AddSourceDialog';
 import { EditSourceDialog } from '@/components/sources/EditSourceDialog';
@@ -189,18 +188,20 @@ function SourcesPageContent() {
   }, []);
 
   return (
-    <div className="container py-8">
+    <div className="flex flex-1 flex-col gap-5 max-sm:p-5 sm:max-desk:p-7 desk:px-8 desk:py-7">
       {/* Page Header with Add Button (admin only) */}
-      <div className="mb-6 flex items-start justify-between gap-4">
-        <PageHeader title="Sources" description="RSS/Atom feeds being tracked" />
-
-        {isAdmin && (
-          <Button onClick={() => setIsAddDialogOpen(true)}>
-            <Plus className="mr-2 h-4 w-4" />
-            Add Source
-          </Button>
-        )}
-      </div>
+      <PageHeader
+        title="ソース"
+        description={isLoading ? '— 件' : `全 ${sources.length} 件`}
+        action={
+          isAdmin ? (
+            <Button variant="outline" size="sm" onClick={() => setIsAddDialogOpen(true)}>
+              <Plus className="mr-1 h-4 w-4" />
+              ソースを追加
+            </Button>
+          ) : undefined
+        }
+      />
 
       {/* Search and Filter Panel (admin only — search is 403 for viewers) */}
       {isAdmin && (
@@ -212,28 +213,20 @@ function SourcesPageContent() {
       )}
 
       {/* Error State */}
-      {error && (
-        <div className="mb-6">
-          <ErrorMessage error={error} onRetry={refetch} />
-        </div>
-      )}
+      {error && <ErrorMessage error={error} onRetry={refetch} />}
 
       {/* Loading State */}
       {isLoading && (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="border border-console-line-2 bg-console-panel" aria-hidden>
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="rounded-lg border bg-card p-6">
-              <div className="mb-4 flex items-start gap-3">
-                <Skeleton className="h-10 w-10 rounded" />
-                <div className="flex-1">
-                  <Skeleton className="mb-2 h-5 w-3/4" />
-                  <Skeleton className="h-3 w-full" />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-20" />
-                <Skeleton className="h-3 w-32" />
-              </div>
+            <div
+              key={i}
+              className="flex items-center gap-4 border-b border-console-line-1 px-[18px] py-3.5 last:border-b-0"
+            >
+              <span className="w-[44px] shrink-0 font-mono text-[10.5px] text-console-ink-ghost">
+                —
+              </span>
+              <span className="min-h-[34px] flex-1" />
             </div>
           ))}
         </div>
@@ -242,42 +235,35 @@ function SourcesPageContent() {
       {/* Empty State */}
       {!isLoading && !error && sources.length === 0 && (
         <EmptyState
-          title={isSearchMode ? 'No sources found' : 'No sources configured'}
+          title={isSearchMode ? '該当するソースがありません' : 'ソースはまだありません'}
           description={
             isSearchMode
-              ? 'Try adjusting your search keywords or filters.'
-              : 'Feed sources will appear here once they are added by the administrator.'
+              ? 'キーワードや絞り込み条件を変えてみてください。'
+              : '管理者がソースを追加すると、ここに並びます。'
           }
-          icon={isSearchMode ? <Search className="h-12 w-12" /> : <Rss className="h-12 w-12" />}
+          icon={isSearchMode ? <Search className="h-10 w-10" /> : <Rss className="h-10 w-10" />}
         />
       )}
 
       {/* Success State - Sources Grid */}
       {!isLoading && !error && sources.length > 0 && (
-        <>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {sources.map((source) =>
-              isAdmin ? (
-                <SourceCard
-                  key={source.id}
-                  source={source}
-                  onUpdateActive={handleUpdateActive}
-                  onEdit={handleEditSource}
-                  onDelete={handleDeleteSource}
-                />
-              ) : (
-                // Viewer (D-27): no handlers → SourceCard renders its
-                // read-only variant (StatusBadge, no edit/delete/toggle)
-                <SourceCard key={source.id} source={source} />
-              )
-            )}
-          </div>
-
-          {/* Total Count */}
-          <div className="mt-6 text-center text-sm text-muted-foreground">
-            Total: {sources.length} source{sources.length !== 1 ? 's' : ''}
-          </div>
-        </>
+        <div className="border border-console-line-2 bg-console-panel" role="list">
+          {sources.map((source) =>
+            isAdmin ? (
+              <SourceCard
+                key={source.id}
+                source={source}
+                onUpdateActive={handleUpdateActive}
+                onEdit={handleEditSource}
+                onDelete={handleDeleteSource}
+              />
+            ) : (
+              // Viewer (D-27): no handlers → SourceCard renders its
+              // read-only variant (StatusBadge, no edit/delete/toggle)
+              <SourceCard key={source.id} source={source} />
+            )
+          )}
+        </div>
       )}
 
       {/* Add Source Dialog */}
@@ -325,22 +311,18 @@ export default function SourcesPage() {
   return (
     <Suspense
       fallback={
-        <div className="container py-8">
-          <PageHeader title="Sources" description="RSS/Atom feeds being tracked" />
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="flex flex-1 flex-col gap-5 max-sm:p-5 sm:max-desk:p-7 desk:px-8 desk:py-7">
+          <PageHeader title="ソース" description="— 件" />
+          <div className="border border-console-line-2 bg-console-panel" aria-hidden>
             {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="rounded-lg border bg-card p-6">
-                <div className="mb-4 flex items-start gap-3">
-                  <Skeleton className="h-10 w-10 rounded" />
-                  <div className="flex-1">
-                    <Skeleton className="mb-2 h-5 w-3/4" />
-                    <Skeleton className="h-3 w-full" />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Skeleton className="h-4 w-20" />
-                  <Skeleton className="h-3 w-32" />
-                </div>
+              <div
+                key={i}
+                className="flex items-center gap-4 border-b border-console-line-1 px-[18px] py-3.5 last:border-b-0"
+              >
+                <span className="w-[44px] shrink-0 font-mono text-[10.5px] text-console-ink-ghost">
+                  —
+                </span>
+                <span className="min-h-[34px] flex-1" />
               </div>
             ))}
           </div>

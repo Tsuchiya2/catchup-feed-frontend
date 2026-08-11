@@ -64,16 +64,19 @@ export function CategoryFilter({
 
   return (
     <div className={cn('space-y-1.5', className)}>
-      <Label htmlFor="category-filter" className="text-sm font-medium">
-        Category
+      <Label
+        htmlFor="category-filter"
+        className="font-mono text-[11px] tracking-[.18em] text-console-ink-weak"
+      >
+        カテゴリ
       </Label>
       <Input
         id="category-filter"
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
-        placeholder="e.g., dev"
+        placeholder="例: dev"
         disabled={disabled}
-        aria-label="Filter by category"
+        aria-label="カテゴリで絞り込む"
       />
     </div>
   );

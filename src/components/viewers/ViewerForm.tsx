@@ -83,22 +83,22 @@ export function ViewerForm({
     });
   };
 
-  const submitButtonText = mode === 'create' ? 'Add Viewer' : 'Save Changes';
-  const loadingButtonText = mode === 'create' ? 'Adding...' : 'Saving...';
+  const submitButtonText = mode === 'create' ? '追加する' : '保存する';
+  const loadingButtonText = mode === 'create' ? '追加中…' : '保存中…';
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <ErrorAlert error={error} />
 
       {/* Name Field */}
-      <FormField label="Name" required htmlFor="viewer-name" error={errors.name}>
+      <FormField label="名前" required htmlFor="viewer-name" error={errors.name}>
         <Input
           id="viewer-name"
           data-testid={VIEWER_TEST_IDS.NAME_INPUT}
           value={formData.name}
           onChange={(e) => handleChange('name', e.target.value)}
           onBlur={() => handleBlur('name')}
-          placeholder="e.g., Alice"
+          placeholder="例: 花子"
           aria-required="true"
           aria-invalid={!!errors.name}
           disabled={isLoading}
@@ -107,7 +107,7 @@ export function ViewerForm({
       </FormField>
 
       {/* Email Field */}
-      <FormField label="Email" required htmlFor="viewer-email" error={errors.email}>
+      <FormField label="メールアドレス" required htmlFor="viewer-email" error={errors.email}>
         <Input
           id="viewer-email"
           type="email"
@@ -115,7 +115,7 @@ export function ViewerForm({
           value={formData.email}
           onChange={(e) => handleChange('email', e.target.value)}
           onBlur={() => handleBlur('email')}
-          placeholder="friend@example.com (used to log in)"
+          placeholder="friend@example.com(ログインに使用)"
           aria-required="true"
           aria-invalid={!!errors.email}
           disabled={isLoading}
@@ -125,7 +125,7 @@ export function ViewerForm({
 
       {/* Password Field */}
       <FormField
-        label={mode === 'create' ? 'Password' : 'New Password'}
+        label={mode === 'create' ? 'パスワード' : '新しいパスワード'}
         required={mode === 'create'}
         htmlFor="viewer-password"
         error={errors.password}
@@ -140,8 +140,8 @@ export function ViewerForm({
           onBlur={() => handleBlur('password')}
           placeholder={
             mode === 'create'
-              ? '8-72 bytes; share it with your friend yourself'
-              : 'Leave blank to keep the current password'
+              ? '8〜72 バイト。本人には自分で渡してください'
+              : '空のままなら現在のパスワードを維持'
           }
           aria-required={mode === 'create'}
           aria-invalid={!!errors.password}
@@ -158,7 +158,7 @@ export function ViewerForm({
           disabled={isLoading}
           data-testid={VIEWER_TEST_IDS.CANCEL_BUTTON}
         >
-          Cancel
+          キャンセル
         </Button>
         <Button type="submit" disabled={isLoading} data-testid={VIEWER_TEST_IDS.SAVE_BUTTON}>
           {isLoading ? (

@@ -51,10 +51,9 @@ export function AddSubscriberDialog({ isOpen, onClose, onSuccess }: AddSubscribe
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add Friend</DialogTitle>
+          <DialogTitle>友人を追加</DialogTitle>
           <DialogDescription>
-            Register a friend who will subscribe to the radio feed. You can issue their subscription
-            token afterwards from the Manage screen.
+            ラジオを購読する友人を登録します。購読トークンは登録後、管理画面から発行できます。
           </DialogDescription>
         </DialogHeader>
 

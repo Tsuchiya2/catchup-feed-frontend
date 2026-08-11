@@ -51,21 +51,21 @@ describe('AddSourceDialog', () => {
     it('renders dialog title', () => {
       render(<AddSourceDialog {...defaultProps} />);
 
-      expect(screen.getByText('Add New Source')).toBeInTheDocument();
+      expect(screen.getByText('ソースを追加')).toBeInTheDocument();
     });
 
     it('renders dialog description', () => {
       render(<AddSourceDialog {...defaultProps} />);
 
-      expect(screen.getByText('Add a new RSS or Atom feed source to track.')).toBeInTheDocument();
+      expect(screen.getByText('収集対象の RSS / Atom フィードを追加します。')).toBeInTheDocument();
     });
 
     it('renders the SourceForm', () => {
       render(<AddSourceDialog {...defaultProps} />);
 
-      expect(screen.getByLabelText(/name/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/feed url/i)).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /add source/i })).toBeInTheDocument();
+      expect(screen.getByLabelText('ソース名')).toBeInTheDocument();
+      expect(screen.getByLabelText('フィード URL')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: '追加する' })).toBeInTheDocument();
     });
   });
 
@@ -76,10 +76,10 @@ describe('AddSourceDialog', () => {
 
       render(<AddSourceDialog {...defaultProps} />);
 
-      await user.type(screen.getByLabelText(/name/i), 'Tech Blog');
-      await user.type(screen.getByLabelText(/feed url/i), 'https://example.com/feed.xml');
-      await user.type(screen.getByLabelText('Category'), 'dev');
-      await user.click(screen.getByRole('button', { name: /add source/i }));
+      await user.type(screen.getByLabelText('ソース名'), 'Tech Blog');
+      await user.type(screen.getByLabelText('フィード URL'), 'https://example.com/feed.xml');
+      await user.type(screen.getByLabelText('カテゴリ'), 'dev');
+      await user.click(screen.getByRole('button', { name: '追加する' }));
 
       await waitFor(() => {
         expect(mockMutateAsync).toHaveBeenCalledWith({
@@ -98,10 +98,10 @@ describe('AddSourceDialog', () => {
 
       render(<AddSourceDialog {...defaultProps} />);
 
-      await user.type(screen.getByLabelText(/name/i), 'Tech Blog');
-      await user.type(screen.getByLabelText(/feed url/i), 'https://example.com/feed.xml');
-      await user.type(screen.getByLabelText('Category'), 'dev');
-      await user.click(screen.getByRole('button', { name: /add source/i }));
+      await user.type(screen.getByLabelText('ソース名'), 'Tech Blog');
+      await user.type(screen.getByLabelText('フィード URL'), 'https://example.com/feed.xml');
+      await user.type(screen.getByLabelText('カテゴリ'), 'dev');
+      await user.click(screen.getByRole('button', { name: '追加する' }));
 
       await waitFor(() => {
         expect(mockReset).toHaveBeenCalled();
@@ -115,10 +115,10 @@ describe('AddSourceDialog', () => {
 
       render(<AddSourceDialog {...defaultProps} onSuccess={onSuccess} />);
 
-      await user.type(screen.getByLabelText(/name/i), 'Tech Blog');
-      await user.type(screen.getByLabelText(/feed url/i), 'https://example.com/feed.xml');
-      await user.type(screen.getByLabelText('Category'), 'dev');
-      await user.click(screen.getByRole('button', { name: /add source/i }));
+      await user.type(screen.getByLabelText('ソース名'), 'Tech Blog');
+      await user.type(screen.getByLabelText('フィード URL'), 'https://example.com/feed.xml');
+      await user.type(screen.getByLabelText('カテゴリ'), 'dev');
+      await user.click(screen.getByRole('button', { name: '追加する' }));
 
       await waitFor(() => {
         expect(onSuccess).toHaveBeenCalledTimes(1);
@@ -132,10 +132,10 @@ describe('AddSourceDialog', () => {
 
       render(<AddSourceDialog {...defaultProps} onClose={onClose} />);
 
-      await user.type(screen.getByLabelText(/name/i), 'Tech Blog');
-      await user.type(screen.getByLabelText(/feed url/i), 'https://example.com/feed.xml');
-      await user.type(screen.getByLabelText('Category'), 'dev');
-      await user.click(screen.getByRole('button', { name: /add source/i }));
+      await user.type(screen.getByLabelText('ソース名'), 'Tech Blog');
+      await user.type(screen.getByLabelText('フィード URL'), 'https://example.com/feed.xml');
+      await user.type(screen.getByLabelText('カテゴリ'), 'dev');
+      await user.click(screen.getByRole('button', { name: '追加する' }));
 
       await waitFor(() => {
         expect(onClose).toHaveBeenCalledTimes(1);
@@ -148,13 +148,13 @@ describe('AddSourceDialog', () => {
 
       render(<AddSourceDialog isOpen={true} onClose={vi.fn()} />);
 
-      await user.type(screen.getByLabelText(/name/i), 'Tech Blog');
-      await user.type(screen.getByLabelText(/feed url/i), 'https://example.com/feed.xml');
-      await user.type(screen.getByLabelText('Category'), 'dev');
+      await user.type(screen.getByLabelText('ソース名'), 'Tech Blog');
+      await user.type(screen.getByLabelText('フィード URL'), 'https://example.com/feed.xml');
+      await user.type(screen.getByLabelText('カテゴリ'), 'dev');
 
       // Should not throw when onSuccess is not provided
       await expect(
-        user.click(screen.getByRole('button', { name: /add source/i }))
+        user.click(screen.getByRole('button', { name: '追加する' }))
       ).resolves.not.toThrow();
     });
   });
@@ -165,7 +165,7 @@ describe('AddSourceDialog', () => {
 
       render(<AddSourceDialog {...defaultProps} />);
 
-      await user.click(screen.getByRole('button', { name: /cancel/i }));
+      await user.click(screen.getByRole('button', { name: '編集をキャンセル' }));
 
       expect(mockReset).toHaveBeenCalledTimes(1);
     });
@@ -176,7 +176,7 @@ describe('AddSourceDialog', () => {
 
       render(<AddSourceDialog {...defaultProps} onClose={onClose} />);
 
-      await user.click(screen.getByRole('button', { name: /cancel/i }));
+      await user.click(screen.getByRole('button', { name: '編集をキャンセル' }));
 
       expect(onClose).toHaveBeenCalledTimes(1);
     });
@@ -223,9 +223,9 @@ describe('AddSourceDialog', () => {
       render(<AddSourceDialog {...defaultProps} />);
 
       // Check that submit button is disabled and shows loading state
-      const submitButton = screen.getByRole('button', { name: /add source/i });
+      const submitButton = screen.getByRole('button', { name: /追加/ });
       expect(submitButton).toBeDisabled();
-      expect(submitButton).toHaveTextContent('Adding...');
+      expect(submitButton).toHaveTextContent('追加中…');
     });
   });
 
@@ -253,10 +253,10 @@ describe('AddSourceDialog', () => {
 
       render(<AddSourceDialog {...defaultProps} onClose={onClose} />);
 
-      await user.type(screen.getByLabelText(/name/i), 'Tech Blog');
-      await user.type(screen.getByLabelText(/feed url/i), 'https://example.com/feed.xml');
-      await user.type(screen.getByLabelText('Category'), 'dev');
-      await user.click(screen.getByRole('button', { name: /add source/i }));
+      await user.type(screen.getByLabelText('ソース名'), 'Tech Blog');
+      await user.type(screen.getByLabelText('フィード URL'), 'https://example.com/feed.xml');
+      await user.type(screen.getByLabelText('カテゴリ'), 'dev');
+      await user.click(screen.getByRole('button', { name: '追加する' }));
 
       // Wait and verify onClose was not called when submission fails
       await waitFor(() => {

@@ -11,7 +11,7 @@ import { GradingDeck } from '@/components/learning/GradingDeck';
 import { usePendingReviews, useGradeReview } from '@/hooks/useLearning';
 
 /**
- * Learning — grading page (mobile-first, the primary flow)
+ * Learning — grading page (mobile-first, the primary flow) — 放送卓(改訂版)
  *
  * Shows one pending review at a time: concept + question, tap to reveal the
  * answer, then ○ △ × to grade. Grading is optimistic so a batch of reviews
@@ -25,34 +25,33 @@ export default function LearningPage() {
   const { grade } = useGradeReview();
 
   return (
-    <div className="container py-8">
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <PageHeader title="Review" description="番組で出題された内容をふりかえる" />
-        <div className="flex flex-shrink-0 gap-2">
-          <Button asChild variant="outline" size="sm">
-            <Link href="/learning/items">
-              <ListChecks className="mr-1 h-4 w-4" />
-              Tracker
-            </Link>
-          </Button>
-          <Button asChild variant="outline" size="sm">
-            <Link href="/learning/books">
-              <BookOpen className="mr-1 h-4 w-4" />
-              Books
-            </Link>
-          </Button>
-        </div>
-      </div>
+    <div className="flex flex-1 flex-col gap-5 max-sm:p-5 sm:max-desk:p-7 desk:px-8 desk:py-7">
+      <PageHeader
+        title="復習"
+        description="番組で出題された内容をふりかえる"
+        action={
+          <div className="flex flex-shrink-0 gap-1.5">
+            <Button asChild variant="outline" size="sm">
+              <Link href="/learning/items">
+                <ListChecks className="mr-1 h-4 w-4" />
+                トラッカー
+              </Link>
+            </Button>
+            <Button asChild variant="outline" size="sm">
+              <Link href="/learning/books">
+                <BookOpen className="mr-1 h-4 w-4" />
+                書籍
+              </Link>
+            </Button>
+          </div>
+        }
+      />
 
-      {error && (
-        <div className="mb-6">
-          <ErrorMessage error={error} onRetry={refetch} />
-        </div>
-      )}
+      {error && <ErrorMessage error={error} onRetry={refetch} />}
 
       {isLoading && (
         <div className="mx-auto w-full max-w-xl">
-          <Skeleton className="h-64 w-full rounded-lg" />
+          <Skeleton className="h-64 w-full" />
         </div>
       )}
 

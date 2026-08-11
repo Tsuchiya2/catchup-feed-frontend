@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ErrorAlert } from '@/components/common/ErrorAlert';
-import { formatRelativeTime } from '@/lib/utils/formatDate';
+import { formatRelativeTimeJa } from '@/lib/utils/relativeTimeJa';
 import { useSubscriberTokens, useIssueToken, useRevokeToken } from '@/hooks/useSubscribers';
 import { IssuedTokenDialog } from './IssuedTokenDialog';
 import { RevokeTokenDialog } from './RevokeTokenDialog';
@@ -57,9 +57,9 @@ export function TokenSection({ subscriber }: TokenSectionProps) {
   return (
     <Card>
       <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2 space-y-0 pb-4">
-        <CardTitle className="flex items-center gap-2 text-lg">
-          <KeyRound className="h-5 w-5 text-primary" aria-hidden="true" />
-          Feed Tokens
+        <CardTitle className="flex items-center gap-2">
+          <KeyRound className="h-4 w-4" aria-hidden="true" />
+          フィードトークン
         </CardTitle>
         <Button
           size="sm"
@@ -68,19 +68,20 @@ export function TokenSection({ subscriber }: TokenSectionProps) {
           data-testid={SUBSCRIBER_TEST_IDS.ISSUE_TOKEN_BUTTON}
         >
           <Plus className="mr-1 h-4 w-4" />
-          {issueMutation.isPending ? 'Issuing...' : 'Issue Token'}
+          {issueMutation.isPending ? '発行中…' : 'トークンを発行'}
         </Button>
       </CardHeader>
       <CardContent className="space-y-3">
         {/* Notes on token semantics */}
-        <p className="text-xs text-muted-foreground">
-          The subscription URL is shown only once at issue time and can never be displayed again
-          (tokens are stored hashed). If a URL is lost, revoke the token and issue a new one.
+        <p className="text-[12px] leading-[1.9] text-console-ink-weak">
+          購読 URL
+          が表示されるのは発行時の一度だけです(トークンはハッシュ化して保存されるため、再表示はできません)。URL
+          を失くした場合は、失効させて再発行してください。
         </p>
 
         {!subscriber.active && (
-          <p className="text-xs text-muted-foreground">
-            This friend is deactivated; new tokens cannot be issued.
+          <p className="text-[12px] text-console-ink-weak">
+            この友人は無効化されているため、新しいトークンは発行できません。
           </p>
         )}
 
@@ -96,41 +97,42 @@ export function TokenSection({ subscriber }: TokenSectionProps) {
 
         {/* Empty */}
         {!isLoading && !error && tokens.length === 0 && (
-          <p className="py-4 text-center text-sm text-muted-foreground">
-            No tokens yet. Issue one to let {subscriber.name} subscribe.
+          <p className="py-4 text-center text-[12.5px] text-console-ink-weak">
+            トークンはまだありません。発行すると {subscriber.name} が購読できるようになります。
           </p>
         )}
 
         {/* Token list */}
         {!isLoading && tokens.length > 0 && (
-          <ul className="divide-y divide-border/50" aria-label="Feed tokens">
+          <ul className="divide-y divide-console-line-1" aria-label="フィードトークン">
             {tokens.map((token) => (
               <li key={token.id} className="flex flex-wrap items-center justify-between gap-2 py-3">
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-sm font-medium">Token #{token.id}</span>
+                    <span className="font-mono text-[12.5px] text-console-ink">
+                      TOKEN #{token.id}
+                    </span>
                     {token.active ? (
-                      <Badge variant="success">Active</Badge>
+                      <Badge variant="success">有効</Badge>
                     ) : (
-                      <Badge variant="destructive">Revoked</Badge>
+                      <Badge variant="secondary">失効済</Badge>
                     )}
                   </div>
-                  <p className="mt-0.5 text-xs text-muted-foreground">
-                    Issued {formatRelativeTime(token.created_at)}
-                    {token.revoked_at && <> · Revoked {formatRelativeTime(token.revoked_at)}</>}
+                  <p className="mt-0.5 font-mono text-[10.5px] text-console-ink-faint">
+                    発行 {formatRelativeTimeJa(token.created_at)}
+                    {token.revoked_at && <> ／ 失効 {formatRelativeTimeJa(token.revoked_at)}</>}
                   </p>
                 </div>
                 {token.active && (
                   <Button
                     variant="outline"
                     size="sm"
-                    className="text-destructive hover:text-destructive"
                     onClick={() => setTokenToRevoke(token)}
                     data-testid={SUBSCRIBER_TEST_IDS.REVOKE_TOKEN_BUTTON}
-                    aria-label={`Revoke token #${token.id}`}
+                    aria-label={`トークン #${token.id} を失効`}
                   >
                     <ShieldOff className="mr-1 h-4 w-4" />
-                    Revoke
+                    失効
                   </Button>
                 )}
               </li>

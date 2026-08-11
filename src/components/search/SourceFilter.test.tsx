@@ -44,13 +44,13 @@ describe('SourceFilter', () => {
     it('should render with label', () => {
       render(<SourceFilter value={null} onChange={vi.fn()} />);
 
-      expect(screen.getByLabelText('Source')).toBeInTheDocument();
+      expect(screen.getByLabelText('ソース')).toBeInTheDocument();
     });
 
     it('should render All Sources option', () => {
       render(<SourceFilter value={null} onChange={vi.fn()} />);
 
-      expect(screen.getByRole('option', { name: 'All Sources' })).toBeInTheDocument();
+      expect(screen.getByRole('option', { name: 'すべてのソース' })).toBeInTheDocument();
     });
 
     it('should render source options from API', () => {
@@ -64,13 +64,13 @@ describe('SourceFilter', () => {
     it('should show selected source value', () => {
       render(<SourceFilter value={2} onChange={vi.fn()} />);
 
-      expect(screen.getByLabelText('Source')).toHaveValue('2');
+      expect(screen.getByLabelText('ソース')).toHaveValue('2');
     });
 
     it('should show All Sources when value is null', () => {
       render(<SourceFilter value={null} onChange={vi.fn()} />);
 
-      expect(screen.getByLabelText('Source')).toHaveValue('');
+      expect(screen.getByLabelText('ソース')).toHaveValue('');
     });
 
     it('should apply custom className', () => {
@@ -93,7 +93,7 @@ describe('SourceFilter', () => {
 
       render(<SourceFilter value={null} onChange={vi.fn()} />);
 
-      expect(screen.getByLabelText('Source')).toBeDisabled();
+      expect(screen.getByLabelText('ソース')).toBeDisabled();
     });
 
     it('should show only All Sources option when loading', () => {
@@ -108,7 +108,7 @@ describe('SourceFilter', () => {
 
       const options = screen.getAllByRole('option');
       expect(options).toHaveLength(1);
-      expect(options[0]).toHaveTextContent('All Sources');
+      expect(options[0]).toHaveTextContent('すべてのソース');
     });
   });
 
@@ -118,7 +118,7 @@ describe('SourceFilter', () => {
       const onChange = vi.fn();
       render(<SourceFilter value={null} onChange={onChange} />);
 
-      await user.selectOptions(screen.getByLabelText('Source'), '1');
+      await user.selectOptions(screen.getByLabelText('ソース'), '1');
 
       expect(onChange).toHaveBeenCalledWith(1);
     });
@@ -128,7 +128,7 @@ describe('SourceFilter', () => {
       const onChange = vi.fn();
       render(<SourceFilter value={1} onChange={onChange} />);
 
-      await user.selectOptions(screen.getByLabelText('Source'), '');
+      await user.selectOptions(screen.getByLabelText('ソース'), '');
 
       expect(onChange).toHaveBeenCalledWith(null);
     });
@@ -138,7 +138,7 @@ describe('SourceFilter', () => {
       const onChange = vi.fn();
       render(<SourceFilter value={1} onChange={onChange} />);
 
-      await user.selectOptions(screen.getByLabelText('Source'), '2');
+      await user.selectOptions(screen.getByLabelText('ソース'), '2');
 
       expect(onChange).toHaveBeenCalledWith(2);
     });
@@ -148,7 +148,7 @@ describe('SourceFilter', () => {
       const onChange = vi.fn();
       render(<SourceFilter value={null} onChange={onChange} />);
 
-      await user.selectOptions(screen.getByLabelText('Source'), '3');
+      await user.selectOptions(screen.getByLabelText('ソース'), '3');
 
       expect(onChange).toHaveBeenCalledWith(3);
       expect(typeof onChange.mock.calls[0]![0]).toBe('number');
@@ -159,7 +159,7 @@ describe('SourceFilter', () => {
     it('should disable select when disabled prop is true', () => {
       render(<SourceFilter value={null} onChange={vi.fn()} disabled={true} />);
 
-      expect(screen.getByLabelText('Source')).toBeDisabled();
+      expect(screen.getByLabelText('ソース')).toBeDisabled();
     });
 
     it('should disable select when both disabled and loading', () => {
@@ -172,13 +172,13 @@ describe('SourceFilter', () => {
 
       render(<SourceFilter value={null} onChange={vi.fn()} disabled={true} />);
 
-      expect(screen.getByLabelText('Source')).toBeDisabled();
+      expect(screen.getByLabelText('ソース')).toBeDisabled();
     });
 
     it('should not disable select by default', () => {
       render(<SourceFilter value={null} onChange={vi.fn()} />);
 
-      expect(screen.getByLabelText('Source')).not.toBeDisabled();
+      expect(screen.getByLabelText('ソース')).not.toBeDisabled();
     });
   });
 
@@ -195,7 +195,7 @@ describe('SourceFilter', () => {
 
       const options = screen.getAllByRole('option');
       expect(options).toHaveLength(1);
-      expect(options[0]).toHaveTextContent('All Sources');
+      expect(options[0]).toHaveTextContent('すべてのソース');
     });
   });
 
@@ -203,13 +203,13 @@ describe('SourceFilter', () => {
     it('should have aria-label', () => {
       render(<SourceFilter value={null} onChange={vi.fn()} />);
 
-      expect(screen.getByRole('combobox', { name: 'Filter by source' })).toBeInTheDocument();
+      expect(screen.getByRole('combobox', { name: 'ソースで絞り込む' })).toBeInTheDocument();
     });
 
     it('should have associated label', () => {
       render(<SourceFilter value={null} onChange={vi.fn()} />);
 
-      const select = screen.getByLabelText('Source');
+      const select = screen.getByLabelText('ソース');
       expect(select).toHaveAttribute('id', 'source-filter');
     });
   });
@@ -232,7 +232,7 @@ describe('SourceFilter', () => {
       render(<SourceFilter value={null} onChange={vi.fn()} />);
 
       // Should show "All Sources" option
-      expect(screen.getByRole('option', { name: 'All Sources' })).toBeInTheDocument();
+      expect(screen.getByRole('option', { name: 'すべてのソース' })).toBeInTheDocument();
 
       // Should show only active sources
       expect(screen.getByRole('option', { name: 'Active Source 1' })).toBeInTheDocument();
@@ -264,7 +264,7 @@ describe('SourceFilter', () => {
       // Should show only "All Sources" option
       const options = screen.getAllByRole('option');
       expect(options).toHaveLength(1);
-      expect(options[0]).toHaveTextContent('All Sources');
+      expect(options[0]).toHaveTextContent('すべてのソース');
 
       // Should NOT show any inactive sources
       expect(screen.queryByRole('option', { name: 'Inactive Source 1' })).not.toBeInTheDocument();

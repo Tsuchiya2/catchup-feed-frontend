@@ -148,7 +148,6 @@ try {
         matcher: ({ url }) =>
           url.pathname.startsWith('/api/') &&
           !url.pathname.startsWith('/api/health') &&
-          !url.pathname.startsWith('/api/metrics') &&
           !url.pathname.startsWith('/api/readiness') &&
           !isSensitiveApiPath(url.pathname),
         handler: new NetworkFirst({

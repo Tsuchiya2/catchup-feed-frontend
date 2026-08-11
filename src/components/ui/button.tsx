@@ -4,25 +4,30 @@ import { cva, type VariantProps } from 'class-variance-authority';
 
 import { cn } from '@/lib/utils';
 
+/**
+ * Console button (放送卓改訂版): square corners, no shadows/glow, 1px
+ * hairline borders. Hover moves the background one step only; transitions
+ * are limited to background/border color (README Interactions & Behavior).
+ */
 const buttonVariants = cva(
-  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
+  'inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors duration-[120ms] ease-out focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-console-cyan disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
   {
     variants: {
       variant: {
-        default:
-          'bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-glow-sm active:shadow-glow',
-        destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
+        /* Filled selection color: cyan on dark, near-black on light */
+        default: 'bg-console-sel-bg font-bold text-console-sel-ink hover:bg-console-sel-hover',
+        destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive-hover',
         outline:
-          'border border-input bg-background hover:bg-accent hover:text-accent-foreground hover:border-primary/50 hover:shadow-glow-sm',
-        secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
-        ghost: 'hover:bg-accent hover:text-accent-foreground',
-        link: 'text-primary underline-offset-4 hover:underline',
-        glow: 'bg-primary text-primary-foreground shadow-glow hover:shadow-glow-lg animate-glow-pulse',
+          'border border-console-line-3 bg-transparent text-console-ink-sub hover:bg-console-hover',
+        secondary:
+          'border border-console-line-2 bg-console-panel text-console-ink-sub hover:bg-console-hover',
+        ghost: 'text-console-ink-sub hover:bg-console-hover',
+        link: 'text-console-cyan underline-offset-4 hover:underline',
       },
       size: {
         default: 'h-10 px-4 py-2',
-        sm: 'h-9 rounded-md px-3',
-        lg: 'h-11 rounded-md px-8',
+        sm: 'h-9 px-3',
+        lg: 'h-11 px-8',
         icon: 'h-10 w-10',
       },
     },

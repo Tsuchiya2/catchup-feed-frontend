@@ -57,7 +57,7 @@ describe('PWAInstallPrompt', () => {
   describe('event handling', () => {
     it('should not show prompt initially', () => {
       render(<PWAInstallPrompt />);
-      expect(screen.queryByText('Install Catchup Feed')).not.toBeInTheDocument();
+      expect(screen.queryByText('Catchup Feed をインストール')).not.toBeInTheDocument();
     });
 
     it('should show prompt when beforeinstallprompt event fires', async () => {
@@ -71,7 +71,7 @@ describe('PWAInstallPrompt', () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText('Install Catchup Feed')).toBeInTheDocument();
+        expect(screen.getByText('Catchup Feed をインストール')).toBeInTheDocument();
       });
     });
 
@@ -98,7 +98,7 @@ describe('PWAInstallPrompt', () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText('Install Catchup Feed')).toBeInTheDocument();
+        expect(screen.getByText('Catchup Feed をインストール')).toBeInTheDocument();
       });
 
       // Trigger app installed
@@ -108,7 +108,7 @@ describe('PWAInstallPrompt', () => {
       });
 
       await waitFor(() => {
-        expect(screen.queryByText('Install Catchup Feed')).not.toBeInTheDocument();
+        expect(screen.queryByText('Catchup Feed をインストール')).not.toBeInTheDocument();
       });
     });
   });
@@ -126,10 +126,10 @@ describe('PWAInstallPrompt', () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText('Install App')).toBeInTheDocument();
+        expect(screen.getByText('インストール')).toBeInTheDocument();
       });
 
-      const installButton = screen.getByText('Install App');
+      const installButton = screen.getByText('インストール');
       await user.click(installButton);
 
       expect(mockPromptEvent.prompt).toHaveBeenCalled();
@@ -147,14 +147,14 @@ describe('PWAInstallPrompt', () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText('Install App')).toBeInTheDocument();
+        expect(screen.getByText('インストール')).toBeInTheDocument();
       });
 
-      const installButton = screen.getByText('Install App');
+      const installButton = screen.getByText('インストール');
       await user.click(installButton);
 
       await waitFor(() => {
-        expect(screen.queryByText('Install Catchup Feed')).not.toBeInTheDocument();
+        expect(screen.queryByText('Catchup Feed をインストール')).not.toBeInTheDocument();
       });
     });
 
@@ -172,14 +172,14 @@ describe('PWAInstallPrompt', () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText('Install App')).toBeInTheDocument();
+        expect(screen.getByText('インストール')).toBeInTheDocument();
       });
 
-      const installButton = screen.getByText('Install App');
+      const installButton = screen.getByText('インストール');
       await user.click(installButton);
 
       await waitFor(() => {
-        expect(screen.queryByText('Install Catchup Feed')).not.toBeInTheDocument();
+        expect(screen.queryByText('Catchup Feed をインストール')).not.toBeInTheDocument();
       });
     });
   });
@@ -197,14 +197,14 @@ describe('PWAInstallPrompt', () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByLabelText('Dismiss install prompt')).toBeInTheDocument();
+        expect(screen.getByLabelText('インストール案内を閉じる')).toBeInTheDocument();
       });
 
-      const closeButton = screen.getByLabelText('Dismiss install prompt');
+      const closeButton = screen.getByLabelText('インストール案内を閉じる');
       await user.click(closeButton);
 
       await waitFor(() => {
-        expect(screen.queryByText('Install Catchup Feed')).not.toBeInTheDocument();
+        expect(screen.queryByText('Catchup Feed をインストール')).not.toBeInTheDocument();
       });
     });
 
@@ -220,10 +220,10 @@ describe('PWAInstallPrompt', () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByLabelText('Dismiss install prompt')).toBeInTheDocument();
+        expect(screen.getByLabelText('インストール案内を閉じる')).toBeInTheDocument();
       });
 
-      const closeButton = screen.getByLabelText('Dismiss install prompt');
+      const closeButton = screen.getByLabelText('インストール案内を閉じる');
       await user.click(closeButton);
 
       expect(localStorage.setItem).toHaveBeenCalledWith(
@@ -247,7 +247,7 @@ describe('PWAInstallPrompt', () => {
       });
 
       // Prompt should not appear
-      expect(screen.queryByText('Install Catchup Feed')).not.toBeInTheDocument();
+      expect(screen.queryByText('Catchup Feed をインストール')).not.toBeInTheDocument();
     });
 
     it('should show prompt if dismissal expired (>7 days)', async () => {
@@ -265,7 +265,7 @@ describe('PWAInstallPrompt', () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText('Install Catchup Feed')).toBeInTheDocument();
+        expect(screen.getByText('Catchup Feed をインストール')).toBeInTheDocument();
       });
     });
   });
@@ -300,10 +300,10 @@ describe('PWAInstallPrompt', () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText('Install App')).toBeInTheDocument();
+        expect(screen.getByText('インストール')).toBeInTheDocument();
       });
 
-      const installButton = screen.getByText('Install App');
+      const installButton = screen.getByText('インストール');
       installButton.focus();
       await user.keyboard('{Enter}');
 
@@ -322,15 +322,15 @@ describe('PWAInstallPrompt', () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByLabelText('Dismiss install prompt')).toBeInTheDocument();
+        expect(screen.getByLabelText('インストール案内を閉じる')).toBeInTheDocument();
       });
 
-      const closeButton = screen.getByLabelText('Dismiss install prompt');
+      const closeButton = screen.getByLabelText('インストール案内を閉じる');
       closeButton.focus();
       await user.keyboard('{Enter}');
 
       await waitFor(() => {
-        expect(screen.queryByText('Install Catchup Feed')).not.toBeInTheDocument();
+        expect(screen.queryByText('Catchup Feed をインストール')).not.toBeInTheDocument();
       });
     });
   });

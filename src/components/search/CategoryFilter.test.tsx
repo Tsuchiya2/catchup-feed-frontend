@@ -16,7 +16,7 @@ describe('CategoryFilter', () => {
     it('should render with label', () => {
       render(<CategoryFilter value={null} onChange={vi.fn()} />);
 
-      expect(screen.getByText('Category')).toBeInTheDocument();
+      expect(screen.getByText('カテゴリ')).toBeInTheDocument();
       expect(screen.getByRole('textbox')).toBeInTheDocument();
     });
 
@@ -35,7 +35,7 @@ describe('CategoryFilter', () => {
     it('should render with placeholder', () => {
       render(<CategoryFilter value={null} onChange={vi.fn()} />);
 
-      expect(screen.getByPlaceholderText('e.g., dev')).toBeInTheDocument();
+      expect(screen.getByPlaceholderText('例: dev')).toBeInTheDocument();
     });
 
     it('should apply custom className', () => {
@@ -218,7 +218,7 @@ describe('CategoryFilter', () => {
     it('should have aria-label', () => {
       render(<CategoryFilter value={null} onChange={vi.fn()} />);
 
-      expect(screen.getByRole('textbox', { name: 'Filter by category' })).toBeInTheDocument();
+      expect(screen.getByRole('textbox', { name: 'カテゴリで絞り込む' })).toBeInTheDocument();
     });
 
     it('should have associated label', () => {

@@ -4,12 +4,15 @@ import { cn } from '@/lib/utils';
 
 export type TextareaProps = React.TextareaHTMLAttributes<HTMLTextAreaElement>;
 
+/**
+ * Console textarea: same hairline/cyan-focus treatment as Input.
+ */
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ className, ...props }, ref) => {
     return (
       <textarea
         className={cn(
-          'flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background transition-all duration-200 placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:border-primary/50 focus-visible:shadow-glow-sm disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+          'flex min-h-[80px] w-full border border-console-line-3 bg-console-panel px-3 py-2 text-base text-console-ink transition-colors duration-[120ms] ease-out placeholder:text-console-ink-faint focus:border-console-cyan focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-console-cyan disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
           className
         )}
         ref={ref}

@@ -108,9 +108,9 @@ export function DeleteSourceDialog({
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent data-testid={SOURCE_TEST_IDS.DELETE_DIALOG}>
         <DialogHeader>
-          <DialogTitle>Delete Source</DialogTitle>
+          <DialogTitle>ソースを削除</DialogTitle>
           <DialogDescription>
-            Are you sure you want to delete &apos;{source.name}&apos;? This action cannot be undone.
+            「{source.name}」を削除しますか? この操作は取り消せません。
           </DialogDescription>
         </DialogHeader>
 
@@ -118,9 +118,9 @@ export function DeleteSourceDialog({
           <div
             role="alert"
             data-testid={SOURCE_TEST_IDS.DELETE_ERROR}
-            className="rounded-md bg-destructive/15 p-3 text-sm text-destructive"
+            className="border border-destructive p-3 text-sm text-destructive"
           >
-            {error.message || 'Failed to delete source. Please try again.'}
+            {error.message || 'ソースを削除できませんでした。もう一度お試しください。'}
           </div>
         )}
 
@@ -133,7 +133,7 @@ export function DeleteSourceDialog({
             data-testid={SOURCE_TEST_IDS.DELETE_CANCEL_BUTTON}
             aria-label={SOURCE_ARIA_LABELS.DELETE_CANCEL_BUTTON}
           >
-            Cancel
+            キャンセル
           </Button>
           <Button
             type="button"
@@ -143,7 +143,7 @@ export function DeleteSourceDialog({
             data-testid={SOURCE_TEST_IDS.DELETE_CONFIRM_BUTTON}
             aria-label={SOURCE_ARIA_LABELS.DELETE_CONFIRM_BUTTON(source.name)}
           >
-            {isPending ? 'Deleting...' : 'Delete'}
+            {isPending ? '削除中…' : '削除する'}
           </Button>
         </DialogFooter>
       </DialogContent>

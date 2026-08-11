@@ -71,17 +71,17 @@ export function DeleteViewerDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Trash2 className="h-5 w-5 text-destructive" aria-hidden="true" />
-            Delete {viewer.name}?
+            {viewer.name} を削除しますか?
           </DialogTitle>
           <DialogDescription asChild>
             <div className="space-y-2">
-              <p>
-                This PERMANENTLY deletes {viewer.name}&apos;s viewer account ({viewer.email}). They
-                will no longer be able to log in, and the account cannot be recovered.
+              <p className="font-medium text-destructive">
+                {viewer.name} の視聴者アカウント({viewer.email}
+                )を完全に削除します。ログインできなくなり、アカウントは復元できません。
               </p>
-              <p className="text-xs text-muted-foreground">
-                To block access temporarily instead, use Deactivate — it can be reversed at any
-                time.
+              <p className="text-xs text-console-ink-faint">
+                一時的にアクセスを止めたいだけなら「無効化」を使ってください —
+                いつでも元に戻せます。
               </p>
             </div>
           </DialogDescription>
@@ -91,7 +91,7 @@ export function DeleteViewerDialog({
 
         <DialogFooter className="gap-2">
           <Button type="button" variant="outline" onClick={handleClose} disabled={isPending}>
-            Cancel
+            キャンセル
           </Button>
           <Button
             type="button"
@@ -103,10 +103,10 @@ export function DeleteViewerDialog({
             {isPending ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Deleting...
+                削除中…
               </>
             ) : (
-              'Delete Permanently'
+              '完全に削除する'
             )}
           </Button>
         </DialogFooter>

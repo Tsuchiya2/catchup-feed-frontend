@@ -1,9 +1,10 @@
 /**
- * BookCard Component
+ * BookCard Component (learning rotation, D-20) — console list row.
  *
- * One ingested book in the book manager (D-20). Shows the title, review
- * status, and progress (review_cursor / total_chunks), with a single
- * activate / deactivate toggle.
+ * One ingested book in the book manager: title, review status label, and
+ * progress (review_cursor / total_chunks) as a squared violet bar
+ * (復習 = バイオレット, README 原則5), with a single activate / deactivate
+ * toggle.
  *
  * At most one book is active at a time; activating another book is an
  * implicit swap handled by the backend. Activating a finished book restarts
@@ -12,8 +13,7 @@
 'use client';
 
 import * as React from 'react';
-import { BookOpen, Play, Pause } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
+import { Play, Pause } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -45,7 +45,7 @@ function progressPercent(cursor: number, total: number): number {
 }
 
 /**
- * BookCard — title, progress bar, and an activate/deactivate toggle.
+ * BookCard — one hairline-divided row: title, progress, toggle.
  */
 export const BookCard = React.memo(function BookCard({
   book,
@@ -58,78 +58,68 @@ export const BookCard = React.memo(function BookCard({
   const percent = progressPercent(book.review_cursor, book.total_chunks);
 
   return (
-    <Card
-      className={cn('flex flex-col', isActive && 'border-primary/40')}
-      data-testid={LEARNING_TEST_IDS.BOOK}
+    <div
       role="listitem"
-      aria-label={`Book: ${book.title}`}
+      aria-label={`書籍: ${book.title}`}
+      data-testid={LEARNING_TEST_IDS.BOOK}
+      className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-console-line-1 px-[18px] py-3.5 last:border-b-0"
     >
-      <CardContent className="flex flex-col gap-4 p-5">
-        {/* Title + status */}
-        <div className="flex items-start gap-3">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-primary/30 bg-primary/10">
-            <BookOpen className="h-4 w-4 text-primary" aria-hidden="true" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <h3 className="text-base font-semibold leading-snug text-foreground">{book.title}</h3>
-            <Badge variant={STATUS_VARIANT[status]} className="mt-1">
-              {BOOK_STATUS_LABELS[status] ?? status}
-            </Badge>
-          </div>
+      <div className="min-w-0 flex-1 basis-[240px]">
+        <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
+          <h3
+            className={cn(
+              'text-[13.5px] leading-[1.7]',
+              isActive ? 'text-console-ink' : 'text-console-ink-sub'
+            )}
+          >
+            {book.title}
+          </h3>
+          <Badge variant={STATUS_VARIANT[status]}>{BOOK_STATUS_LABELS[status] ?? status}</Badge>
         </div>
-
-        {/* Progress */}
-        <div>
-          <div className="mb-1 flex items-center justify-between text-xs text-muted-foreground">
-            <span>Progress</span>
-            <span>
-              {book.review_cursor} / {book.total_chunks} ({percent}%)
-            </span>
-          </div>
+        {/* Progress: 3px squared track, violet fill */}
+        <div className="mt-2 flex items-center gap-3">
           <div
-            className="h-2 w-full overflow-hidden rounded-full bg-muted"
+            className="h-[3px] max-w-[240px] flex-1 bg-console-line-2"
             role="progressbar"
             aria-valuenow={percent}
             aria-valuemin={0}
             aria-valuemax={100}
-            aria-label={`${book.title} progress`}
+            aria-label={`${book.title} の進捗`}
           >
-            <div
-              className="h-full rounded-full bg-primary transition-all duration-300"
-              style={{ width: `${percent}%` }}
-            />
+            <div className="h-full bg-console-violet" style={{ width: `${percent}%` }} />
           </div>
+          <span className="shrink-0 font-mono text-[10.5px] text-console-ink-weak">
+            {book.review_cursor} / {book.total_chunks} ({percent}%)
+          </span>
         </div>
+      </div>
 
-        {/* Toggle */}
-        <div className="flex justify-end">
-          {isActive ? (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onDeactivate(book)}
-              disabled={disabled}
-              data-testid={LEARNING_TEST_IDS.BOOK_TOGGLE}
-              aria-label={`Pause ${book.title}`}
-            >
-              <Pause className="mr-1 h-4 w-4" />
-              Pause
-            </Button>
-          ) : (
-            <Button
-              variant="default"
-              size="sm"
-              onClick={() => onActivate(book)}
-              disabled={disabled}
-              data-testid={LEARNING_TEST_IDS.BOOK_TOGGLE}
-              aria-label={`Activate ${book.title}`}
-            >
-              <Play className="mr-1 h-4 w-4" />
-              {status === 'finished' ? 'Re-read' : 'Activate'}
-            </Button>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+      {/* Toggle */}
+      {isActive ? (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => onDeactivate(book)}
+          disabled={disabled}
+          data-testid={LEARNING_TEST_IDS.BOOK_TOGGLE}
+          aria-label={`${book.title} を一時停止`}
+        >
+          <Pause className="mr-1 h-4 w-4" />
+          一時停止
+        </Button>
+      ) : (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => onActivate(book)}
+          disabled={disabled}
+          data-testid={LEARNING_TEST_IDS.BOOK_TOGGLE}
+          aria-label={`${book.title} を進行中にする`}
+        >
+          <Play className="mr-1 h-4 w-4" />
+          {status === 'finished' ? '再読する' : '進行中にする'}
+        </Button>
+      )}
+    </div>
   );
 });

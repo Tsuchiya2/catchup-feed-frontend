@@ -5,7 +5,6 @@ import { Plus, UsersRound } from 'lucide-react';
 import { PageHeader } from '@/components/common/PageHeader';
 import { ErrorMessage } from '@/components/common/ErrorMessage';
 import { EmptyState } from '@/components/common/EmptyState';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { SubscriberCard } from '@/components/subscribers/SubscriberCard';
 import { AddSubscriberDialog } from '@/components/subscribers/AddSubscriberDialog';
@@ -15,11 +14,11 @@ import { useSubscribers } from '@/hooks/useSubscribers';
 import type { Subscriber } from '@/types/api';
 
 /**
- * Friends (subscribers) list page
+ * Friends (subscribers) list page — 放送卓(改訂版)
  *
- * CRUD for the friends receiving the radio feed. Deletion is a soft
- * delete (deactivation) — deactivated friends stay in the list, greyed
- * out, so their history remains visible.
+ * CRUD for the friends receiving the radio feed, as a console row list.
+ * Deletion is a soft delete (deactivation) — deactivated friends stay in
+ * the list, dimmed, so their history remains visible.
  */
 export default function SubscribersPage() {
   const { subscribers, isLoading, error, refetch } = useSubscribers();
@@ -34,43 +33,35 @@ export default function SubscribersPage() {
   const inactiveCount = subscribers.length - activeCount;
 
   return (
-    <div className="container py-8">
+    <div className="flex flex-1 flex-col gap-5 max-sm:p-5 sm:max-desk:p-7 desk:px-8 desk:py-7">
       {/* Page Header with Add button */}
-      <div className="mb-6 flex items-start justify-between gap-4">
-        <PageHeader
-          title="Friends"
-          description={
-            subscribers.length > 0
-              ? `${activeCount} active${inactiveCount > 0 ? `, ${inactiveCount} deactivated` : ''}`
-              : 'Friends subscribing to the radio feed'
-          }
-        />
-        <Button onClick={() => setIsAddOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Friend
-        </Button>
-      </div>
+      <PageHeader
+        title="友人"
+        description={
+          isLoading
+            ? '— 名'
+            : `有効 ${activeCount} 名${inactiveCount > 0 ? ` ／ 無効化 ${inactiveCount} 名` : ''}`
+        }
+        action={
+          <Button variant="outline" size="sm" onClick={() => setIsAddOpen(true)}>
+            <Plus className="mr-1 h-4 w-4" />
+            友人を追加
+          </Button>
+        }
+      />
 
       {/* Error State */}
-      {error && (
-        <div className="mb-6">
-          <ErrorMessage error={error} onRetry={refetch} />
-        </div>
-      )}
+      {error && <ErrorMessage error={error} onRetry={refetch} />}
 
       {/* Loading State */}
       {isLoading && (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="border border-console-line-2 bg-console-panel" aria-hidden>
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="rounded-lg border bg-card p-6">
-              <div className="mb-4 flex items-start gap-3">
-                <Skeleton className="h-10 w-10 rounded" />
-                <div className="flex-1">
-                  <Skeleton className="mb-2 h-5 w-3/4" />
-                  <Skeleton className="h-3 w-full" />
-                </div>
-              </div>
-              <Skeleton className="h-8 w-full" />
+            <div
+              key={i}
+              className="flex items-center gap-4 border-b border-console-line-1 px-[18px] py-3.5 last:border-b-0"
+            >
+              <span className="min-h-[34px] flex-1" />
             </div>
           ))}
         </div>
@@ -79,21 +70,21 @@ export default function SubscribersPage() {
       {/* Empty State */}
       {!isLoading && !error && subscribers.length === 0 && (
         <EmptyState
-          title="No friends yet"
-          description="Add a friend, then issue their subscription token from the Manage screen."
-          icon={<UsersRound className="h-12 w-12" />}
+          title="友人はまだいません"
+          description="友人を追加してから、管理画面で購読トークンを発行してください。"
+          icon={<UsersRound className="h-10 w-10" />}
           action={
-            <Button onClick={() => setIsAddOpen(true)}>
-              <Plus className="mr-2 h-4 w-4" />
-              Add Friend
+            <Button variant="outline" size="sm" onClick={() => setIsAddOpen(true)}>
+              <Plus className="mr-1 h-4 w-4" />
+              友人を追加
             </Button>
           }
         />
       )}
 
-      {/* Friends grid */}
+      {/* Friends list */}
       {!isLoading && !error && subscribers.length > 0 && (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3" role="list">
+        <div className="border border-console-line-2 bg-console-panel" role="list">
           {subscribers.map((subscriber) => (
             <SubscriberCard
               key={subscriber.id}

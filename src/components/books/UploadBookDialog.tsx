@@ -172,7 +172,7 @@ export function UploadBookDialog({ isOpen, onClose, onSuccess }: UploadBookDialo
               id="book-upload-error"
               role="alert"
               data-testid={BOOK_TEST_IDS.UPLOAD_ERROR}
-              className="rounded-md bg-destructive/15 p-3 text-sm text-destructive"
+              className="border border-destructive p-3 text-sm text-destructive"
             >
               {errorMessage}
             </div>
@@ -180,7 +180,7 @@ export function UploadBookDialog({ isOpen, onClose, onSuccess }: UploadBookDialo
 
           {isPending && (
             <div
-              className="flex items-center gap-2 rounded-md bg-muted p-3 text-sm text-muted-foreground"
+              className="flex items-center gap-2 border border-console-line-2 p-3 text-sm text-console-ink-weak"
               role="status"
             >
               <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />

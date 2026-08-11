@@ -10,11 +10,10 @@ import { Mail, Loader2 } from 'lucide-react';
  * Built with Radix UI and class-variance-authority for consistent styling.
  *
  * Features:
- * - Multiple variants (default, destructive, outline, secondary, ghost, link, glow)
+ * - Multiple variants (default, destructive, outline, secondary, ghost, link)
  * - Multiple sizes (default, sm, lg, icon)
  * - Loading and disabled states
  * - Icon support
- * - Cyber/glow theme effects
  */
 const meta = {
   title: 'UI/Button',
@@ -26,7 +25,7 @@ const meta = {
   argTypes: {
     variant: {
       control: 'select',
-      options: ['default', 'destructive', 'outline', 'secondary', 'ghost', 'link', 'glow'],
+      options: ['default', 'destructive', 'outline', 'secondary', 'ghost', 'link'],
       description: 'The visual style variant of the button',
     },
     size: {
@@ -108,16 +107,6 @@ export const Link: Story = {
   args: {
     children: 'Link',
     variant: 'link',
-  },
-};
-
-/**
- * Glow button with animated cyber effects
- */
-export const Glow: Story = {
-  args: {
-    children: 'Glow',
-    variant: 'glow',
   },
 };
 
@@ -205,7 +194,6 @@ export const AllVariants: Story = {
       <div className="flex gap-2">
         <Button variant="ghost">Ghost</Button>
         <Button variant="link">Link</Button>
-        <Button variant="glow">Glow</Button>
       </div>
     </div>
   ),

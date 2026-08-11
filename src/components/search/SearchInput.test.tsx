@@ -30,7 +30,7 @@ describe('SearchInput', () => {
     it('should render with default placeholder', () => {
       render(<SearchInput value="" onChange={vi.fn()} />);
 
-      expect(screen.getByPlaceholderText('Search...')).toBeInTheDocument();
+      expect(screen.getByPlaceholderText('検索…')).toBeInTheDocument();
     });
 
     it('should render with initial value', () => {
@@ -60,7 +60,7 @@ describe('SearchInput', () => {
     it('should not show clear button when loading', () => {
       render(<SearchInput value="test" onChange={vi.fn()} isLoading={true} />);
 
-      expect(screen.queryByRole('button', { name: /clear/i })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: '検索をクリア' })).not.toBeInTheDocument();
     });
   });
 
@@ -72,13 +72,13 @@ describe('SearchInput', () => {
       const input = screen.getByRole('textbox');
       await user.type(input, 'test');
 
-      expect(screen.getByRole('button', { name: /clear/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: '検索をクリア' })).toBeInTheDocument();
     });
 
     it('should not show clear button when value is empty', () => {
       render(<SearchInput value="" onChange={vi.fn()} />);
 
-      expect(screen.queryByRole('button', { name: /clear/i })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: '検索をクリア' })).not.toBeInTheDocument();
     });
 
     it('should clear input and call onChange when clear button is clicked', async () => {
@@ -86,7 +86,7 @@ describe('SearchInput', () => {
       const onChange = vi.fn();
       render(<SearchInput value="test" onChange={onChange} />);
 
-      const clearButton = screen.getByRole('button', { name: /clear/i });
+      const clearButton = screen.getByRole('button', { name: '検索をクリア' });
       await user.click(clearButton);
 
       expect(screen.getByRole('textbox')).toHaveValue('');
@@ -257,7 +257,7 @@ describe('SearchInput', () => {
       const input = screen.getByRole('textbox');
       await user.type(input, 'test');
 
-      expect(screen.getByRole('button', { name: 'Clear search' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: '検索をクリア' })).toBeInTheDocument();
     });
   });
 });

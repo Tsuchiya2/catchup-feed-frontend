@@ -28,11 +28,11 @@ describe('LearningItemCard', () => {
     render(<LearningItemCard item={activeItem} onRetire={vi.fn()} />);
 
     expect(screen.getByText('goroutine リーク検出')).toBeInTheDocument();
-    expect(screen.getByText('Stage 1')).toBeInTheDocument();
-    expect(screen.getByText('2026-07-14')).toBeInTheDocument();
-    expect(screen.getByText('2×')).toBeInTheDocument();
-    expect(screen.getByText('○ わかった')).toBeInTheDocument();
-    expect(screen.getByText('Article')).toBeInTheDocument();
+    expect(screen.getByText(/STAGE 1/)).toBeInTheDocument();
+    expect(screen.getByText(/2026-07-14/)).toBeInTheDocument();
+    expect(screen.getByText(/出題 2回/)).toBeInTheDocument();
+    expect(screen.getByText(/○ わかった/)).toBeInTheDocument();
+    expect(screen.getByText('ART')).toBeInTheDocument();
   });
 
   it('calls onRetire when the retire button is tapped', async () => {
@@ -64,6 +64,6 @@ describe('LearningItemCard', () => {
       />
     );
 
-    expect(screen.getByText('Book')).toBeInTheDocument();
+    expect(screen.getByText('BOOK')).toBeInTheDocument();
   });
 });

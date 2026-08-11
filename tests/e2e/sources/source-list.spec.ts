@@ -7,11 +7,11 @@ test.describe('Source List', () => {
   test('should display sources with metadata', async ({ page }) => {
     await page.goto('/sources');
 
-    await expect(page.getByRole('heading', { name: 'Sources' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'ソース' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Go Blog' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Hacker News' })).toBeVisible();
     await expect(
-      page.getByRole('link', { name: 'Visit feed: https://go.dev/blog/feed.atom' })
+      page.getByRole('link', { name: 'フィードを開く: https://go.dev/blog/feed.atom' })
     ).toBeVisible();
   });
 
@@ -19,7 +19,7 @@ test.describe('Source List', () => {
     api.sources = [];
     await page.goto('/sources');
 
-    await expect(page.getByText('No sources configured')).toBeVisible();
+    await expect(page.getByText('ソースはまだありません')).toBeVisible();
   });
 
   test('should show an error message when the API fails', async ({ page }) => {
@@ -32,7 +32,7 @@ test.describe('Source List', () => {
   test('should open the Add Source dialog', async ({ page }) => {
     await page.goto('/sources');
 
-    await page.getByRole('button', { name: 'Add Source' }).click();
+    await page.getByRole('button', { name: 'ソースを追加' }).click();
 
     await expect(page.getByRole('dialog')).toBeVisible();
     await expect(page.getByTestId('source-name-input')).toBeVisible();
@@ -41,7 +41,7 @@ test.describe('Source List', () => {
 
   test('should create a new source', async ({ page }) => {
     await page.goto('/sources');
-    await page.getByRole('button', { name: 'Add Source' }).click();
+    await page.getByRole('button', { name: 'ソースを追加' }).click();
 
     await page.getByTestId('source-name-input').fill('New Feed');
     await page.getByTestId('source-url-input').fill('https://new.example.test/rss');

@@ -123,12 +123,12 @@ export function PWAUpdateNotification() {
       aria-labelledby="pwa-update-title"
       aria-describedby="pwa-update-description"
     >
-      <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 shadow-lg dark:border-blue-800 dark:bg-blue-900/20">
+      <div className="relative border border-console-line-3 bg-console-panel p-4">
         {/* Close button */}
         <button
           onClick={handleDismiss}
-          className="absolute right-2 top-2 rounded-md p-1 text-blue-400 transition-colors hover:bg-blue-100 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:hover:bg-blue-800 dark:hover:text-blue-300"
-          aria-label="Dismiss update notification"
+          className="absolute right-2 top-2 p-1 text-console-ink-weak transition-colors duration-[120ms] ease-out hover:text-console-ink focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-console-cyan"
+          aria-label="更新通知を閉じる"
           type="button"
         >
           <X className="h-4 w-4" />
@@ -137,27 +137,26 @@ export function PWAUpdateNotification() {
         {/* Content */}
         <div className="pr-6">
           <div className="mb-2 flex items-center gap-2">
-            <RefreshCw className="h-5 w-5 text-blue-500" aria-hidden="true" />
-            <h3
-              id="pwa-update-title"
-              className="text-sm font-semibold text-blue-900 dark:text-blue-100"
-            >
-              Update Available
+            <RefreshCw className="h-4 w-4 text-console-cyan" aria-hidden="true" />
+            <h3 id="pwa-update-title" className="text-[13.5px] font-bold text-console-ink">
+              更新があります
             </h3>
           </div>
 
-          <p id="pwa-update-description" className="mb-4 text-sm text-blue-700 dark:text-blue-300">
-            A new version of Catchup Feed is available. Reload to get the latest features and
-            improvements.
+          <p
+            id="pwa-update-description"
+            className="mb-4 text-[12.5px] leading-[1.9] text-console-ink-weak"
+          >
+            Catchup Feed の新しいバージョンがあります。再読み込みすると最新の状態になります。
           </p>
 
           {/* Update button */}
           <button
             onClick={handleUpdate}
-            className="w-full rounded-md bg-blue-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
+            className="w-full bg-console-sel-bg px-4 py-2 text-[13px] font-bold text-console-sel-ink transition-colors duration-[120ms] ease-out hover:bg-console-sel-hover focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-console-cyan"
             type="button"
           >
-            Reload Now
+            再読み込み
           </button>
         </div>
       </div>

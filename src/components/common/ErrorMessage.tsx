@@ -20,7 +20,7 @@ export function ErrorMessage({ error, onRetry, className }: ErrorMessageProps) {
         <span>{errorMessage}</span>
         {onRetry && (
           <Button variant="outline" size="sm" onClick={onRetry} className="ml-4">
-            Retry
+            再試行
           </Button>
         )}
       </AlertDescription>

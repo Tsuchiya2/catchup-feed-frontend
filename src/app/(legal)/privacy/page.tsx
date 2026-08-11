@@ -29,7 +29,7 @@ const SECTIONS: ReadonlyArray<{ heading: string; body: React.ReactNode }> = [
     body: (
       <ul className="list-disc space-y-2 pl-6">
         <li>ログイン用のメールアドレスとパスワード(パスワードはハッシュ化して保存)</li>
-        <li>招待した友人の名前・メールアドレス・メモ(管理者が登録したもの)</li>
+        <li>友人の名前・メールアドレス・メモ(管理者が登録したもの)</li>
         <li>
           フィードへのアクセス記録(いつ・どの購読トークンで・何を取得したか、および User-Agent)
         </li>

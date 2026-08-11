@@ -94,11 +94,7 @@ export default function SubscriberDetailPage() {
                   編集
                 </Button>
                 {subscriber.active && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setIsDeactivateOpen(true)}
-                  >
+                  <Button variant="outline" size="sm" onClick={() => setIsDeactivateOpen(true)}>
                     <UserRoundX className="mr-1 h-4 w-4" />
                     無効化
                   </Button>

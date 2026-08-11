@@ -23,10 +23,10 @@ describe('LoginForm Integration Tests', () => {
       render(<LoginForm />);
 
       // Assert
-      expect(screen.getAllByText('Login').length).toBeGreaterThan(0);
-      expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /^login$/i })).toBeInTheDocument();
+      expect(screen.getAllByText('ログイン').length).toBeGreaterThan(0);
+      expect(screen.getByLabelText(/メールアドレス/)).toBeInTheDocument();
+      expect(screen.getByLabelText(/パスワード/)).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'ログイン' })).toBeInTheDocument();
     });
 
     it('should have proper accessibility attributes', () => {
@@ -34,8 +34,8 @@ describe('LoginForm Integration Tests', () => {
       render(<LoginForm />);
 
       // Assert
-      const emailInput = screen.getByLabelText(/email/i);
-      const passwordInput = screen.getByLabelText(/password/i);
+      const emailInput = screen.getByLabelText(/メールアドレス/);
+      const passwordInput = screen.getByLabelText(/パスワード/);
 
       expect(emailInput).toHaveAttribute('type', 'email');
       expect(emailInput).toHaveAttribute('autocomplete', 'email');
@@ -60,12 +60,12 @@ describe('LoginForm Integration Tests', () => {
       render(<LoginForm />);
 
       // Act
-      const submitButton = screen.getByRole('button', { name: /login/i });
+      const submitButton = screen.getByRole('button', { name: /ログイン/ });
       await user.click(submitButton);
 
       // Assert
       await waitFor(() => {
-        expect(screen.getByText(/email is required/i)).toBeInTheDocument();
+        expect(screen.getByText(/メールアドレスを入力してください/)).toBeInTheDocument();
       });
     });
 
@@ -81,12 +81,12 @@ describe('LoginForm Integration Tests', () => {
       render(<LoginForm />);
 
       // Act
-      const submitButton = screen.getByRole('button', { name: /login/i });
+      const submitButton = screen.getByRole('button', { name: /ログイン/ });
       await user.click(submitButton);
 
       // Assert
       await waitFor(() => {
-        expect(screen.getByText(/password is required/i)).toBeInTheDocument();
+        expect(screen.getByText(/パスワードを入力してください/)).toBeInTheDocument();
       });
     });
 
@@ -97,7 +97,7 @@ describe('LoginForm Integration Tests', () => {
       render(<LoginForm onLogin={mockOnLogin} />);
 
       // Act
-      const submitButton = screen.getByRole('button', { name: /login/i });
+      const submitButton = screen.getByRole('button', { name: /ログイン/ });
       await user.click(submitButton);
 
       // Assert
@@ -113,9 +113,9 @@ describe('LoginForm Integration Tests', () => {
       render(<LoginForm onLogin={mockOnLogin} />);
 
       // Act
-      const emailInput = screen.getByLabelText(/email/i);
-      const passwordInput = screen.getByLabelText(/password/i);
-      const submitButton = screen.getByRole('button', { name: /login/i });
+      const emailInput = screen.getByLabelText(/メールアドレス/);
+      const passwordInput = screen.getByLabelText(/パスワード/);
+      const submitButton = screen.getByRole('button', { name: /ログイン/ });
 
       await user.type(emailInput, 'test@example.com');
       await user.type(passwordInput, 'password123');
@@ -136,21 +136,21 @@ describe('LoginForm Integration Tests', () => {
       render(<LoginForm onLogin={mockOnLogin} />);
 
       // Act
-      const emailInput = screen.getByLabelText(/email/i);
-      const passwordInput = screen.getByLabelText(/password/i);
-      const submitButton = screen.getByRole('button', { name: /login/i });
+      const emailInput = screen.getByLabelText(/メールアドレス/);
+      const passwordInput = screen.getByLabelText(/パスワード/);
+      const submitButton = screen.getByRole('button', { name: /ログイン/ });
 
       await user.type(emailInput, 'test@example.com');
       await user.type(passwordInput, 'password123');
       await user.click(submitButton);
 
       // Assert - Loading state
-      expect(screen.getByText(/logging in/i)).toBeInTheDocument();
+      expect(screen.getByText(/ログイン中/)).toBeInTheDocument();
       expect(submitButton).toBeDisabled();
 
       // Wait for submission to complete
       await waitFor(() => {
-        expect(screen.queryByText(/logging in/i)).not.toBeInTheDocument();
+        expect(screen.queryByText(/ログイン中/)).not.toBeInTheDocument();
       });
     });
 
@@ -161,9 +161,9 @@ describe('LoginForm Integration Tests', () => {
       render(<LoginForm onLogin={mockOnLogin} />);
 
       // Act
-      const emailInput = screen.getByLabelText(/email/i);
-      const passwordInput = screen.getByLabelText(/password/i);
-      const submitButton = screen.getByRole('button', { name: /login/i });
+      const emailInput = screen.getByLabelText(/メールアドレス/);
+      const passwordInput = screen.getByLabelText(/パスワード/);
+      const submitButton = screen.getByRole('button', { name: /ログイン/ });
 
       await user.type(emailInput, 'test@example.com');
       await user.type(passwordInput, 'password123');
@@ -186,9 +186,9 @@ describe('LoginForm Integration Tests', () => {
       render(<LoginForm onLogin={mockOnLogin} />);
 
       // Act - First attempt (fail)
-      const emailInput = screen.getByLabelText(/email/i);
-      const passwordInput = screen.getByLabelText(/password/i);
-      const submitButton = screen.getByRole('button', { name: /login/i });
+      const emailInput = screen.getByLabelText(/メールアドレス/);
+      const passwordInput = screen.getByLabelText(/パスワード/);
+      const submitButton = screen.getByRole('button', { name: /ログイン/ });
 
       await user.type(emailInput, 'wrong@example.com');
       await user.type(passwordInput, 'wrongpassword');
@@ -221,9 +221,9 @@ describe('LoginForm Integration Tests', () => {
       render(<LoginForm onLogin={mockOnLogin} />);
 
       // Act
-      const emailInput = screen.getByLabelText(/email/i);
-      const passwordInput = screen.getByLabelText(/password/i);
-      const submitButton = screen.getByRole('button', { name: /login/i });
+      const emailInput = screen.getByLabelText(/メールアドレス/);
+      const passwordInput = screen.getByLabelText(/パスワード/);
+      const submitButton = screen.getByRole('button', { name: /ログイン/ });
 
       await user.type(emailInput, 'test@example.com');
       await user.type(passwordInput, 'wrongpassword');
@@ -242,9 +242,9 @@ describe('LoginForm Integration Tests', () => {
       render(<LoginForm onLogin={mockOnLogin} />);
 
       // Act
-      const emailInput = screen.getByLabelText(/email/i);
-      const passwordInput = screen.getByLabelText(/password/i);
-      const submitButton = screen.getByRole('button', { name: /login/i });
+      const emailInput = screen.getByLabelText(/メールアドレス/);
+      const passwordInput = screen.getByLabelText(/パスワード/);
+      const submitButton = screen.getByRole('button', { name: /ログイン/ });
 
       await user.type(emailInput, 'test@example.com');
       await user.type(passwordInput, 'password123');
@@ -252,7 +252,9 @@ describe('LoginForm Integration Tests', () => {
 
       // Assert
       await waitFor(() => {
-        expect(screen.getByText(/login failed. please try again/i)).toBeInTheDocument();
+        expect(
+          screen.getByText(/ログインに失敗しました。もう一度お試しください/)
+        ).toBeInTheDocument();
       });
     });
 
@@ -263,9 +265,9 @@ describe('LoginForm Integration Tests', () => {
       render(<LoginForm onLogin={mockOnLogin} />);
 
       // Act
-      const emailInput = screen.getByLabelText(/email/i);
-      const passwordInput = screen.getByLabelText(/password/i);
-      const submitButton = screen.getByRole('button', { name: /login/i });
+      const emailInput = screen.getByLabelText(/メールアドレス/);
+      const passwordInput = screen.getByLabelText(/パスワード/);
+      const submitButton = screen.getByRole('button', { name: /ログイン/ });
 
       await user.type(emailInput, 'test@example.com');
       await user.type(passwordInput, 'password123');
@@ -286,9 +288,9 @@ describe('LoginForm Integration Tests', () => {
       render(<LoginForm onLogin={mockOnLogin} />);
 
       // Act
-      const emailInput = screen.getByLabelText(/email/i);
-      const passwordInput = screen.getByLabelText(/password/i);
-      const submitButton = screen.getByRole('button', { name: /login/i });
+      const emailInput = screen.getByLabelText(/メールアドレス/);
+      const passwordInput = screen.getByLabelText(/パスワード/);
+      const submitButton = screen.getByRole('button', { name: /ログイン/ });
 
       await user.type(emailInput, 'test@example.com');
       await user.type(passwordInput, 'password123');
@@ -308,12 +310,12 @@ describe('LoginForm Integration Tests', () => {
       render(<LoginForm />);
 
       // Act
-      const submitButton = screen.getByRole('button', { name: /login/i });
+      const submitButton = screen.getByRole('button', { name: /ログイン/ });
       await user.click(submitButton);
 
       // Assert
       await waitFor(() => {
-        const emailError = screen.getByText(/email is required/i);
+        const emailError = screen.getByText(/メールアドレスを入力してください/);
         expect(emailError).toHaveAttribute('role', 'alert');
       });
     });
@@ -324,12 +326,12 @@ describe('LoginForm Integration Tests', () => {
       render(<LoginForm />);
 
       // Act
-      const submitButton = screen.getByRole('button', { name: /login/i });
+      const submitButton = screen.getByRole('button', { name: /ログイン/ });
       await user.click(submitButton);
 
       // Assert
       await waitFor(() => {
-        const emailInput = screen.getByLabelText(/email/i);
+        const emailInput = screen.getByLabelText(/メールアドレス/);
         expect(emailInput).toHaveAttribute('aria-invalid', 'true');
       });
     });
@@ -341,9 +343,9 @@ describe('LoginForm Integration Tests', () => {
       render(<LoginForm onLogin={mockOnLogin} />);
 
       // Act
-      const emailInput = screen.getByLabelText(/email/i);
-      const passwordInput = screen.getByLabelText(/password/i);
-      const submitButton = screen.getByRole('button', { name: /login/i });
+      const emailInput = screen.getByLabelText(/メールアドレス/);
+      const passwordInput = screen.getByLabelText(/パスワード/);
+      const submitButton = screen.getByRole('button', { name: /ログイン/ });
 
       await user.type(emailInput, 'test@example.com');
       await user.type(passwordInput, 'password123');
@@ -367,9 +369,9 @@ describe('LoginForm Integration Tests', () => {
       render(<LoginForm onLogin={mockOnLogin} />);
 
       // Act
-      const emailInput = screen.getByLabelText(/email/i);
-      const passwordInput = screen.getByLabelText(/password/i);
-      const submitButton = screen.getByRole('button', { name: /login/i });
+      const emailInput = screen.getByLabelText(/メールアドレス/);
+      const passwordInput = screen.getByLabelText(/パスワード/);
+      const submitButton = screen.getByRole('button', { name: /ログイン/ });
 
       await user.type(emailInput, 'test@example.com');
       await user.type(passwordInput, 'password123');
@@ -392,9 +394,9 @@ describe('LoginForm Integration Tests', () => {
       render(<LoginForm onLogin={mockOnLogin} />);
 
       // Act
-      const emailInput = screen.getByLabelText(/email/i);
-      const passwordInput = screen.getByLabelText(/password/i);
-      const submitButton = screen.getByRole('button', { name: /login/i });
+      const emailInput = screen.getByLabelText(/メールアドレス/);
+      const passwordInput = screen.getByLabelText(/パスワード/);
+      const submitButton = screen.getByRole('button', { name: /ログイン/ });
 
       await user.type(emailInput, '  test@example.com  ');
       await user.type(passwordInput, 'password123');

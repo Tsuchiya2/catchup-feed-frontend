@@ -1,249 +1,268 @@
 @import 'tailwindcss';
 
-/* Theme configuration using @theme inline for CSS variable references */
+/* Theme configuration using @theme inline for CSS variable references.
+   shadcn/ui semantic colors are remapped onto the broadcast-console palette
+   (design_handoff README Design Tokens) so legacy components inherit the
+   console look without per-file edits. */
 @theme inline {
-  /* shadcn/ui colors - referencing CSS variables */
-  --color-border: hsl(var(--border));
-  --color-input: hsl(var(--input));
-  --color-ring: hsl(var(--ring));
-  --color-background: hsl(var(--background));
-  --color-foreground: hsl(var(--foreground));
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
 
-  --color-primary: hsl(var(--primary));
-  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
 
-  --color-secondary: hsl(var(--secondary));
-  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
 
-  --color-destructive: hsl(var(--destructive));
-  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
 
-  --color-muted: hsl(var(--muted));
-  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
 
-  --color-accent: hsl(var(--accent));
-  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
 
-  --color-popover: hsl(var(--popover));
-  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
 
-  --color-card: hsl(var(--card));
-  --color-card-foreground: hsl(var(--card-foreground));
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+}
 
-  /* Glow colors */
-  --color-glow-primary: hsl(var(--glow-primary));
-  --color-glow-secondary: hsl(var(--glow-secondary));
+/* Broadcast console tokens — referencing theme-switched CSS variables */
+@theme inline {
+  --color-console-bg: var(--console-bg);
+  --color-console-panel: var(--console-panel);
+  --color-console-rail: var(--console-rail);
+  --color-console-band: var(--console-band);
+  --color-console-line-1: var(--console-line-1);
+  --color-console-line-2: var(--console-line-2);
+  --color-console-line-3: var(--console-line-3);
+  --color-console-line-4: var(--console-line-4);
+  --color-console-ink: var(--console-ink);
+  --color-console-ink-sub: var(--console-ink-sub);
+  --color-console-ink-weak: var(--console-ink-weak);
+  --color-console-ink-faint: var(--console-ink-faint);
+  --color-console-ink-ghost: var(--console-ink-ghost);
+  --color-console-cyan: var(--console-cyan);
+  --color-console-violet: var(--console-violet);
+  --color-console-hover: var(--console-hover);
+  --color-console-sel-bg: var(--console-sel-bg);
+  --color-console-sel-ink: var(--console-sel-ink);
+  --color-console-sel-hover: var(--console-sel-hover);
+  --color-destructive-hover: var(--destructive-hover);
 }
 
 /* Direct color values (no CSS variable reference needed) */
 @theme {
-  /* Cyber theme colors */
-  --color-cyber-blue: #00d4ff;
-  --color-cyber-blue-dark: #0099cc;
-  --color-cyber-blue-light: #66e5ff;
-  --color-cyber-glow: #a0ffff;
-  --color-cyber-glow-base: #00ffff;
+  /* Broadcast console — theme-independent values */
+  --color-console-warn: #c98a45;
+  --color-console-off: #2f3639;
+  --color-console-logo: #010306;
+  --color-console-on-accent: #0d0f10;
 
   /* Font family */
-  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-sans:
+    var(--font-noto-sans-jp), 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Yu Gothic', system-ui,
+    sans-serif;
+  --font-mono: var(--font-ibm-plex-mono), ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
-  /* Border radius */
-  --radius-lg: var(--radius);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-sm: calc(var(--radius) - 4px);
+  /* Console breakpoint: rail layout at >= 900px (README responsive spec) */
+  --breakpoint-desk: 900px;
+
+  /* Border radius: 0 everywhere — circles are the only exception
+     (README 余白・形). rounded-full stays available for dots/buttons. */
+  --radius-lg: 0px;
+  --radius-md: 0px;
+  --radius-sm: 0px;
 }
 
 @layer base {
   :root {
-    /* Light mode - clean with cyan accent */
-    --background: 210 20% 98%;
-    --foreground: 220 30% 10%;
-    --card: 0 0% 100%;
-    --card-foreground: 220 30% 10%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 220 30% 10%;
-    --primary: 190 100% 50%;
-    --primary-foreground: 220 30% 5%;
-    --secondary: 210 25% 93%;
-    --secondary-foreground: 220 30% 15%;
-    --muted: 210 20% 94%;
-    --muted-foreground: 215 15% 45%;
-    --accent: 190 90% 92%;
-    --accent-foreground: 190 95% 25%;
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 214 25% 88%;
-    --input: 214 25% 88%;
-    --ring: 190 100% 50%;
-    --radius: 0.5rem;
+    /* Light mode — console light palette (README Design Tokens) */
+    --background: #edecea;
+    --foreground: #1a1d1f;
+    --card: #f4f3f1;
+    --card-foreground: #1a1d1f;
+    --popover: #f4f3f1;
+    --popover-foreground: #1a1d1f;
+    --primary: #1f8b98;
+    --primary-foreground: #f4f3f1;
+    --secondary: #e9e7e4;
+    --secondary-foreground: #45494c;
+    --muted: #e9e7e4;
+    --muted-foreground: #74797c;
+    --accent: #eceae7;
+    --accent-foreground: #1a1d1f;
+    --destructive: #b0453a;
+    --destructive-hover: #9d3d33;
+    --destructive-foreground: #f4f3f1;
+    --border: #d5d3cf;
+    --input: #c9c6c1;
+    --ring: #1f8b98;
 
-    /* Glow colors for effects */
-    --glow-primary: 190 100% 50%;
-    --glow-secondary: 200 100% 60%;
+    /* Broadcast console — light values (README Design Tokens) */
+    --console-bg: #edecea;
+    --console-panel: #f4f3f1;
+    --console-rail: #e5e3df;
+    --console-band: #e9e7e4;
+    --console-line-1: #e2e0dc;
+    --console-line-2: #d5d3cf;
+    --console-line-3: #c9c6c1;
+    --console-line-4: #c9c6c1;
+    --console-ink: #1a1d1f;
+    --console-ink-sub: #45494c;
+    --console-ink-weak: #74797c;
+    --console-ink-faint: #8a8f92;
+    --console-ink-ghost: #8a8f92;
+    --console-cyan: #1f8b98;
+    --console-violet: #6455b8;
+    --console-hover: #eceae7;
+    --console-sel-bg: #1a1d1f;
+    --console-sel-ink: #edecea;
+    --console-sel-hover: #2e3134;
   }
 
-  .dark {
-    /* Dark mode - Cyber/Tech theme matching logo */
-    --background: 220 50% 4%;
-    --foreground: 200 20% 95%;
-    --card: 220 45% 7%;
-    --card-foreground: 200 20% 95%;
-    --popover: 220 45% 7%;
-    --popover-foreground: 200 20% 95%;
-    --primary: 190 100% 50%;
-    --primary-foreground: 220 50% 4%;
-    --secondary: 220 40% 12%;
-    --secondary-foreground: 200 20% 95%;
-    --muted: 220 40% 10%;
-    --muted-foreground: 215 20% 55%;
-    --accent: 190 90% 12%;
-    --accent-foreground: 190 100% 70%;
-    --destructive: 0 70% 45%;
-    --destructive-foreground: 200 20% 95%;
-    --border: 220 40% 15%;
-    --input: 220 40% 12%;
-    --ring: 190 100% 50%;
+  /* Broadcast console — dark values. `.console-dark` pins a subtree to dark
+     regardless of the next-themes class (landing / login are always dark). */
+  .dark,
+  .console-dark {
+    --console-bg: #0d0f10;
+    --console-panel: #101314;
+    --console-rail: #101314;
+    --console-band: #101314;
+    --console-line-1: #1c2124;
+    --console-line-2: #23282c;
+    --console-line-3: #2a3033;
+    --console-line-4: #3a4145;
+    --console-ink: #e6e4e0;
+    --console-ink-sub: #c3c7c9;
+    --console-ink-weak: #9aa0a4;
+    --console-ink-faint: #6d7276;
+    --console-ink-ghost: #5c6266;
+    --console-cyan: #36c8d6;
+    --console-violet: #8b7ae6;
+    --console-hover: #151a1c;
+    --console-sel-bg: #36c8d6;
+    --console-sel-ink: #0d0f10;
+    --console-sel-hover: #4fd2de;
+  }
 
-    /* Glow colors for effects */
-    --glow-primary: 190 100% 50%;
-    --glow-secondary: 200 100% 60%;
+  .dark,
+  .console-dark {
+    /* Dark mode — console dark palette */
+    --background: #0d0f10;
+    --foreground: #e6e4e0;
+    --card: #101314;
+    --card-foreground: #e6e4e0;
+    --popover: #101314;
+    --popover-foreground: #e6e4e0;
+    --primary: #36c8d6;
+    --primary-foreground: #0d0f10;
+    --secondary: #151a1c;
+    --secondary-foreground: #c3c7c9;
+    --muted: #151a1c;
+    --muted-foreground: #9aa0a4;
+    --accent: #151a1c;
+    --accent-foreground: #e6e4e0;
+    --destructive: #d0453a;
+    --destructive-hover: #d75c50;
+    --destructive-foreground: #e6e4e0;
+    --border: #23282c;
+    --input: #2a3033;
+    --ring: #36c8d6;
   }
 
   * {
-    border-color: hsl(var(--border));
+    border-color: var(--border);
   }
 
   body {
-    background-color: hsl(var(--background));
-    color: hsl(var(--foreground));
+    background-color: var(--background);
+    color: var(--foreground);
   }
 }
 
-@layer utilities {
-  /* Container utility - Tailwind v4 doesn't support container config in CSS yet */
-  .container {
-    width: 100%;
-    margin-left: auto;
-    margin-right: auto;
-    padding-left: 2rem;
-    padding-right: 2rem;
-  }
-
-  @media (min-width: 1536px) {
-    .container {
-      max-width: 1400px;
-    }
-  }
-
-  /* Glow effects inspired by the logo */
-  .glow-sm {
-    box-shadow:
-      0 0 10px hsl(var(--glow-primary) / 0.3),
-      0 0 20px hsl(var(--glow-primary) / 0.1);
-  }
-
-  .glow-md {
-    box-shadow:
-      0 0 15px hsl(var(--glow-primary) / 0.4),
-      0 0 30px hsl(var(--glow-primary) / 0.2),
-      0 0 45px hsl(var(--glow-primary) / 0.1);
-  }
-
-  .glow-lg {
-    box-shadow:
-      0 0 20px hsl(var(--glow-primary) / 0.5),
-      0 0 40px hsl(var(--glow-primary) / 0.3),
-      0 0 60px hsl(var(--glow-primary) / 0.2);
-  }
-
-  /* Text glow */
-  .text-glow {
-    text-shadow:
-      0 0 10px hsl(var(--glow-primary) / 0.5),
-      0 0 20px hsl(var(--glow-primary) / 0.3),
-      0 0 30px hsl(var(--glow-primary) / 0.2);
-  }
-
-  .text-glow-sm {
-    text-shadow:
-      0 0 5px hsl(var(--glow-primary) / 0.4),
-      0 0 10px hsl(var(--glow-primary) / 0.2);
-  }
-
-  /* Border glow */
-  .border-glow {
-    box-shadow:
-      0 0 0 1px hsl(var(--glow-primary) / 0.3),
-      0 0 15px hsl(var(--glow-primary) / 0.2),
-      inset 0 0 15px hsl(var(--glow-primary) / 0.05);
-  }
-
-  /* Gradient backgrounds */
-  .bg-cyber-gradient {
+@layer components {
+  /* Broadcast console player seek track (3px hairline, violet progress).
+     Round thumb is an allowed circle exception (README 余白・形). */
+  .console-range {
+    appearance: none;
+    height: 3px;
     background: linear-gradient(
-      135deg,
-      hsl(220 50% 4%) 0%,
-      hsl(220 45% 8%) 50%,
-      hsl(220 50% 4%) 100%
+      to right,
+      var(--console-violet) var(--console-range-pct, 0%),
+      var(--console-line-2) var(--console-range-pct, 0%)
     );
+    cursor: pointer;
   }
 
-  .bg-cyber-radial {
-    background: radial-gradient(ellipse at center, hsl(220 45% 10%) 0%, hsl(220 50% 4%) 70%);
+  .console-range:disabled {
+    cursor: default;
   }
 
-  /* Animated pulse glow */
-  .glow-pulse {
-    animation: glow-pulse 2s ease-in-out infinite;
+  .console-range:focus-visible {
+    outline: 1px solid var(--console-cyan);
+    outline-offset: 2px;
   }
 
-  @keyframes glow-pulse {
-    0%,
-    100% {
-      box-shadow:
-        0 0 10px hsl(var(--glow-primary) / 0.3),
-        0 0 20px hsl(var(--glow-primary) / 0.1);
-    }
-    50% {
-      box-shadow:
-        0 0 20px hsl(var(--glow-primary) / 0.5),
-        0 0 40px hsl(var(--glow-primary) / 0.3),
-        0 0 60px hsl(var(--glow-primary) / 0.1);
-    }
+  .console-range::-webkit-slider-thumb {
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 9999px;
+    border: 0;
+    background: var(--console-violet);
   }
 
-  /* Cyber line effect */
-  .cyber-line {
-    position: relative;
+  .console-range::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    border-radius: 9999px;
+    border: 0;
+    background: var(--console-violet);
   }
 
-  .cyber-line::after {
-    content: '';
-    position: absolute;
-    bottom: -2px;
-    left: 0;
+  .console-range:disabled::-webkit-slider-thumb {
+    background: var(--console-line-3);
+  }
+
+  .console-range:disabled::-moz-range-thumb {
+    background: var(--console-line-3);
+  }
+
+  /* Console form control: hairline border, cyan focus (README フォーカス). */
+  .console-field {
     width: 100%;
-    height: 2px;
-    background: linear-gradient(
-      90deg,
-      transparent 0%,
-      hsl(var(--glow-primary)) 50%,
-      transparent 100%
-    );
-    box-shadow: 0 0 10px hsl(var(--glow-primary) / 0.5);
-  }
-
-  /* Subtle card hover effect */
-  .card-hover-glow {
+    border: 1px solid var(--console-line-3);
+    background-color: var(--console-panel);
+    padding: 10px 12px;
+    font-size: 14px;
+    color: var(--console-ink);
     transition:
-      box-shadow 0.3s ease,
-      border-color 0.3s ease;
+      background-color 120ms ease-out,
+      border-color 120ms ease-out;
   }
 
-  .card-hover-glow:hover {
-    box-shadow:
-      0 0 20px hsl(var(--glow-primary) / 0.15),
-      0 0 40px hsl(var(--glow-primary) / 0.05);
-    border-color: hsl(var(--glow-primary) / 0.3);
+  .console-field::placeholder {
+    color: var(--console-ink-faint);
+  }
+
+  .console-field:focus {
+    border-color: var(--console-cyan);
+  }
+
+  .console-field:focus-visible {
+    outline: 1px solid var(--console-cyan);
+    outline-offset: 2px;
+  }
+
+  .console-field:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
   }
 }

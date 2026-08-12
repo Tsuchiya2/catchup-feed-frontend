@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.13.3](https://github.com/Tsuchiya2/catchup-feed-frontend/compare/catchup-feed-frontend-v1.13.2...catchup-feed-frontend-v1.13.3) (2026-08-12)
+
+
+### Bug Fixes
+
+* パンくずリンクのタップ領域を幅方向にも確保 ([9379924](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/9379924cf18da3fc9dc9495bbddb8eb01fdd3289))
+* 左レールからホスト状態表示を削除 ([f045d1b](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/f045d1b092344cbd7cb49701ceabcd8be410c74d))
+* 記事詳細から API 未提供のプレースホルダ領域を削除 ([cf5e219](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/cf5e21920503804a6d9e128b3ca88fc64ebceffa))
+* 記事詳細と左レールから API 未提供のプレースホルダ領域を削除 ([644cc9f](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/644cc9f2ef90d6a95f1bdeb4a440c9d3dbe3fb5f))
+
 ## [1.13.2](https://github.com/Tsuchiya2/catchup-feed-frontend/compare/catchup-feed-frontend-v1.13.1...catchup-feed-frontend-v1.13.2) (2026-08-12)
 
 

@@ -18,16 +18,14 @@ import { safeExternalHref } from '@/lib/utils/safeExternalHref';
  * - 読み上げ台本 / 同じ回 / breadcrumb episode slot ("EP 218 に収録済"): no API
  *   links an article to an episode or its segments (the generated types expose
  *   no `/episodes` path), and adding a backend endpoint just for this screen is
- *   not right-sized. The breadcrumb slot outlived the other two by a day and
- *   was dropped 2026-08-13 to keep the class consistent — the breadcrumb is now
- *   the 記事 link alone.
+ *   not right-sized. The breadcrumb is now the 記事 link alone.
  * - 前後記事: no adjacency API. Faking it with the list's pagination endpoint
  *   would drag the list's filter and sort state into this page — complexity
  *   out of proportion to the value.
  * - 出題: this one was implementable — `GET /learning/items` already returns
  *   `article_id` / `question` / `stage` / `due_on`. It was dropped by product
- *   decision (2026-08-12), not for lack of an API: quizzes belong to
- *   `/learning`, and this page stays a place to read the summary.
+ *   decision, not for lack of an API: quizzes belong to `/learning`, and this
+ *   page stays a place to read the summary.
  *
  * One placeholder is left on purpose: `本文抽出 —` in the footer. The article
  * DTO carries no extracted-body length, but the rest of that line is live data
@@ -71,7 +69,7 @@ export default function ArticleDetailPage() {
       <div className="flex h-[58px] shrink-0 items-center justify-between border-b border-console-line-2 bg-console-band px-5 sm:px-8">
         <Link
           href="/articles"
-          className="flex h-full items-center font-mono text-[11.5px] text-console-ink-weak transition-colors duration-[120ms] ease-out hover:text-console-ink hover:underline"
+          className="flex h-full min-w-[44px] items-center font-mono text-[11.5px] text-console-ink-weak transition-colors duration-[120ms] ease-out hover:text-console-ink hover:underline"
         >
           <span className="sm:hidden">← 記事</span>
           <span className="hidden sm:inline">記事</span>

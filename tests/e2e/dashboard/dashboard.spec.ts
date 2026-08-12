@@ -8,9 +8,8 @@ test.describe('Dashboard', () => {
   });
 
   test('should display statistics from the API', async ({ page }) => {
-    await expect(page.getByRole('heading', { name: '今朝の構成' })).toBeVisible();
-
     // 明朝の候補 links to the full article list with the total count
+    await expect(page.getByRole('heading', { name: '明朝の候補' })).toBeVisible();
     await expect(
       page.getByRole('link', { name: `${ARTICLE_COUNT} 件すべて見る` })
     ).toBeVisible();

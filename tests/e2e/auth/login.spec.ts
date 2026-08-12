@@ -46,7 +46,7 @@ test.describe('Login Flow', () => {
     await page.getByRole('button', { name: 'ログイン' }).click();
 
     await expect(page).toHaveURL(/\/dashboard/);
-    await expect(page.getByRole('heading', { name: '今朝の構成' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: '明朝の候補' })).toBeVisible();
   });
 
   test('should stay unauthenticated on invalid credentials', async ({ page }) => {

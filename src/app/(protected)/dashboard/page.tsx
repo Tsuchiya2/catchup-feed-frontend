@@ -14,10 +14,12 @@ import type { SourceKind } from '@/types/api';
 /**
  * Dashboard (概況) — 放送卓(改訂版) §3
  *
- * Did this morning's episode go out, and is there enough material for
- * tomorrow? Episode / batch / retention data has no backend API yet, so those
- * panels degrade to hairline frames with `—` (README ローディング spec) —
- * no fabricated values.
+ * Is there enough material for tomorrow's episode, and are the friends still
+ * listening? Only the panels backed by a real API are rendered: 明朝の候補
+ * (latest crawled articles) and 受信状況 (per-friend last access, C-8). The
+ * episode / batch / retention panels were removed rather than kept as hairline
+ * frames full of `—` — no fabricated values, and no frames that never fill in.
+ * The metric tiles keep `—` for the fields whose API is still pending.
  */
 
 const KIND_LABELS: Record<SourceKind, string> = {
@@ -85,13 +87,8 @@ export default function DashboardPage() {
 
   return (
     <div className="flex flex-1 flex-col">
-      {/* Status band — episode state needs a backend API; degrade to `—` */}
-      <div className="flex h-[58px] shrink-0 items-center justify-between border-b border-console-line-2 bg-console-band px-5 sm:px-8">
-        <div className="flex items-center gap-3 font-mono text-[11.5px]">
-          <span aria-hidden className="h-2 w-2 rounded-full bg-console-off" />
-          <span className="tracking-[.2em] text-console-ink-weak">—</span>
-          <span className="text-console-ink-weak">第—号 ／ — JST ／ —</span>
-        </div>
+      {/* Status band — clock + logout only; episode state has no backend API */}
+      <div className="flex h-[58px] shrink-0 items-center justify-end border-b border-console-line-2 bg-console-band px-5 sm:px-8">
         <div className="hidden items-center gap-4 desk:flex">
           <ConsoleClock className="text-[11.5px] text-console-ink-weak" />
           <button
@@ -116,30 +113,6 @@ export default function DashboardPage() {
         <div className="grid flex-1 grid-cols-1 gap-[26px] sm:max-desk:grid-cols-[1.4fr_1fr] desk:grid-cols-[1.55fr_1fr]">
           {/* Left column */}
           <div className="flex min-w-0 flex-col gap-5">
-            {/* 今朝の構成 — episode segments API not available yet */}
-            <section className="border border-console-line-2 bg-console-panel">
-              <header className="flex items-center justify-between border-b border-console-line-1 px-[18px] py-3">
-                <PanelHeading>今朝の構成</PanelHeading>
-                <span className="font-mono text-[11px] text-console-cyan">
-                  — 記事 ／ — 書籍 ／ — 問
-                </span>
-              </header>
-              {[0, 1, 2].map((i) => (
-                <div
-                  key={i}
-                  className={cn(
-                    'flex items-center gap-4 px-[18px] py-3',
-                    i < 2 && 'border-b border-console-line-1'
-                  )}
-                >
-                  <span className="w-[46px] shrink-0 font-mono text-[12px] text-console-cyan">
-                    —
-                  </span>
-                  <span className="min-h-[20px] flex-1" />
-                </div>
-              ))}
-            </section>
-
             {/* 明朝の候補 — latest crawled articles */}
             <section>
               <header className="flex items-center justify-between pb-2">
@@ -193,19 +166,6 @@ export default function DashboardPage() {
 
           {/* Right column */}
           <div className="flex min-w-0 flex-col gap-[18px]">
-            {/* 夜間バッチ — jobs API not available yet */}
-            <section className="border border-console-line-2 bg-console-panel px-[18px] py-4">
-              <PanelHeading>夜間バッチ</PanelHeading>
-              <div className="mt-3 flex flex-col gap-2.5 font-mono text-[12px]">
-                {['書籍取り込み', '文字起こし', '番組生成', '要約系統'].map((label) => (
-                  <div key={label} className="flex items-center justify-between gap-4">
-                    <span className="text-console-ink-sub">{label}</span>
-                    <span className="text-console-cyan">—</span>
-                  </div>
-                ))}
-              </div>
-            </section>
-
             {/* 受信状況 — per-friend last access (real data) */}
             <section className="border border-console-line-2 bg-console-panel px-[18px] py-4">
               <PanelHeading>受信状況</PanelHeading>
@@ -249,21 +209,6 @@ export default function DashboardPage() {
                 </div>
               )}
             </section>
-
-            {/* 定着 30日 — retention API not available yet */}
-            <section className="border border-console-line-2 bg-console-panel px-[18px] py-4">
-              <PanelHeading>定着 30日</PanelHeading>
-              <div className="mt-3 h-[54px]" />
-              <div className="mt-2 flex items-center justify-between font-mono text-[11px]">
-                <span className="text-console-ink-sub">正答率</span>
-                <span className="text-console-ink-weak">— → —</span>
-              </div>
-            </section>
-
-            <div className="mt-auto font-mono text-[11px] leading-[2] text-console-ink-faint">
-              <p>クイズ在庫 — ／ 飽和閾値 —</p>
-              <p>episodes/ — ／ 保持 —</p>
-            </div>
           </div>
         </div>
       </div>

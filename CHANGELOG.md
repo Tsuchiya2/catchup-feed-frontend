@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.13.2](https://github.com/Tsuchiya2/catchup-feed-frontend/compare/catchup-feed-frontend-v1.13.1...catchup-feed-frontend-v1.13.2) (2026-08-12)
+
+
+### Bug Fixes
+
+* 記事詳細の再生できない音声プレイヤーを削除 ([fd136f9](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/fd136f9d8930958bf094e18bbb4ba813e2d3c159))
+* 記事詳細の再生できない音声プレイヤーを削除 ([1fccc1b](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/1fccc1b02631deb09b2300ea0c6357263d7a4b5f))
+
 ## [1.13.1](https://github.com/Tsuchiya2/catchup-feed-frontend/compare/catchup-feed-frontend-v1.13.0...catchup-feed-frontend-v1.13.1) (2026-08-12)
 
 

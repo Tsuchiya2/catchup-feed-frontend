@@ -188,53 +188,6 @@
 }
 
 @layer components {
-  /* Broadcast console player seek track (3px hairline, violet progress).
-     Round thumb is an allowed circle exception (README 余白・形). */
-  .console-range {
-    appearance: none;
-    height: 3px;
-    background: linear-gradient(
-      to right,
-      var(--console-violet) var(--console-range-pct, 0%),
-      var(--console-line-2) var(--console-range-pct, 0%)
-    );
-    cursor: pointer;
-  }
-
-  .console-range:disabled {
-    cursor: default;
-  }
-
-  .console-range:focus-visible {
-    outline: 1px solid var(--console-cyan);
-    outline-offset: 2px;
-  }
-
-  .console-range::-webkit-slider-thumb {
-    appearance: none;
-    width: 12px;
-    height: 12px;
-    border-radius: 9999px;
-    border: 0;
-    background: var(--console-violet);
-  }
-
-  .console-range::-moz-range-thumb {
-    width: 12px;
-    height: 12px;
-    border-radius: 9999px;
-    border: 0;
-    background: var(--console-violet);
-  }
-
-  .console-range:disabled::-webkit-slider-thumb {
-    background: var(--console-line-3);
-  }
-
-  .console-range:disabled::-moz-range-thumb {
-    background: var(--console-line-3);
-  }
-
   /* Console form control: hairline border, cyan focus (README フォーカス). */
   .console-field {
     width: 100%;

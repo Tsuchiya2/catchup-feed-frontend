@@ -87,8 +87,9 @@ export default function DashboardPage() {
 
   return (
     <div className="flex flex-1 flex-col">
-      {/* Status band — clock + logout only; episode state has no backend API */}
-      <div className="flex h-[58px] shrink-0 items-center justify-end border-b border-console-line-2 bg-console-band px-5 sm:px-8">
+      {/* Status band — desk only: clock + logout. Below desk ConsoleShell's own
+          header already carries both, so the band would be an empty strip. */}
+      <div className="hidden h-[58px] shrink-0 items-center justify-end border-b border-console-line-2 bg-console-band px-5 sm:px-8 desk:flex">
         <div className="hidden items-center gap-4 desk:flex">
           <ConsoleClock className="text-[11.5px] text-console-ink-weak" />
           <button

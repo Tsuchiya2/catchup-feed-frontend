@@ -8,6 +8,12 @@ test.describe('Article Detail', () => {
 
     await expect(page.getByRole('heading', { name: 'Go 1.25 Released', level: 1 })).toBeVisible();
     await expect(page.getByText(/AI summary for article 25/)).toBeVisible();
+
+    // Regions removed for good by D-38: the episode sidebar panels and the
+    // prev/next navigation. Guards against the `—` stubs creeping back in.
+    await expect(page.getByText(/次の記事/)).toHaveCount(0);
+    await expect(page.getByText('読み上げ台本')).toHaveCount(0);
+    await expect(page.getByText('同じ回')).toHaveCount(0);
   });
 
   test('should link to the original article', async ({ page }) => {
@@ -24,12 +30,12 @@ test.describe('Article Detail', () => {
     await page.getByRole('link', { name: /記事: Go 1\.25 Released/ }).click();
     await expect(page).toHaveURL(/\/articles\/25/);
 
-    // Status-band breadcrumb links back to the list
-    await page
-      .locator('a[href="/articles"]')
-      .filter({ hasText: '記事' })
-      .first()
-      .click();
+    // Status-band breadcrumb links back to the list. Scoped to <main>: the
+    // ConsoleShell rail (<aside>, earlier in the DOM) also links to /articles,
+    // so an unscoped locator would test the rail instead of the breadcrumb.
+    const breadcrumb = page.locator('main a[href="/articles"]');
+    await expect(breadcrumb).toHaveCount(1);
+    await breadcrumb.click();
     await expect(page).toHaveURL(/\/articles(\?|$)/);
   });
 

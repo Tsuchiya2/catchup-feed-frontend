@@ -10,9 +10,29 @@ import { safeExternalHref } from '@/lib/utils/safeExternalHref';
 /**
  * Article Detail — 放送卓(改訂版) §4
  *
- * One article's summary, where it airs in the episode, and when it will be
- * re-asked. Episode / segment / script / quiz data has no backend API yet:
- * those regions render hairline frames with `—` (README ローディング spec).
+ * One article's title, source and AI summary, as a single reading column.
+ * The design's right sidebar (読み上げ台本 / 出題 / 同じ回), the status band's
+ * `← 前の記事` / `次の記事 →`, and the breadcrumb's episode slot are
+ * permanently removed (D-38). Each region had its own reason:
+ *
+ * - 読み上げ台本 / 同じ回 / breadcrumb episode slot ("EP 218 に収録済"): no API
+ *   links an article to an episode or its segments (the generated types expose
+ *   no `/episodes` path), and adding a backend endpoint just for this screen is
+ *   not right-sized. The breadcrumb slot outlived the other two by a day and
+ *   was dropped 2026-08-13 to keep the class consistent — the breadcrumb is now
+ *   the 記事 link alone.
+ * - 前後記事: no adjacency API. Faking it with the list's pagination endpoint
+ *   would drag the list's filter and sort state into this page — complexity
+ *   out of proportion to the value.
+ * - 出題: this one was implementable — `GET /learning/items` already returns
+ *   `article_id` / `question` / `stage` / `due_on`. It was dropped by product
+ *   decision (2026-08-12), not for lack of an API: quizzes belong to
+ *   `/learning`, and this page stays a place to read the summary.
+ *
+ * One placeholder is left on purpose: `本文抽出 —` in the footer. The article
+ * DTO carries no extracted-body length, but the rest of that line is live data
+ * (要約字数 / 取得時刻), so the line stays whole with one field degraded rather
+ * than being dropped (D-38).
  *
  * No audio player here (D-35): per-article audio files are never generated,
  * and episode audio is delivered by the podcast app, not this dashboard.
@@ -46,39 +66,16 @@ export default function ArticleDetailPage() {
 
   return (
     <div className="flex flex-1 flex-col">
-      {/* Status band: breadcrumb + prev/next (episode linkage API pending) */}
+      {/* Status band (58px): breadcrumb only. README §4 was revised with D-38
+          to put nothing on the right — this matches the design, not a drift. */}
       <div className="flex h-[58px] shrink-0 items-center justify-between border-b border-console-line-2 bg-console-band px-5 sm:px-8">
-        <div className="flex min-w-0 items-center gap-2 font-mono text-[11.5px]">
-          <Link
-            href="/articles"
-            className="shrink-0 text-console-ink-weak transition-colors duration-[120ms] ease-out hover:text-console-ink hover:underline"
-          >
-            <span className="sm:hidden">← 記事</span>
-            <span className="hidden sm:inline">記事</span>
-          </Link>
-          <span aria-hidden className="text-console-ink-faint">
-            ／
-          </span>
-          <span className="truncate text-console-cyan">—</span>
-        </div>
-        <div className="hidden shrink-0 gap-2 sm:flex">
-          <button
-            type="button"
-            disabled
-            title="番組 API 未接続のため使用できません"
-            className="border border-console-line-3 px-3 py-1.5 font-mono text-[11px] text-console-ink-weak disabled:opacity-60"
-          >
-            ← 前の記事
-          </button>
-          <button
-            type="button"
-            disabled
-            title="番組 API 未接続のため使用できません"
-            className="border border-console-line-3 px-3 py-1.5 font-mono text-[11px] text-console-ink-weak disabled:opacity-60"
-          >
-            次の記事 →
-          </button>
-        </div>
+        <Link
+          href="/articles"
+          className="flex h-full items-center font-mono text-[11.5px] text-console-ink-weak transition-colors duration-[120ms] ease-out hover:text-console-ink hover:underline"
+        >
+          <span className="sm:hidden">← 記事</span>
+          <span className="hidden sm:inline">記事</span>
+        </Link>
       </div>
 
       {/* Error / not-found states, kept quiet (縮退許容 — no alarm red) */}
@@ -106,84 +103,57 @@ export default function ArticleDetailPage() {
         </div>
       )}
 
+      {/* Single reading column: capped at 720px so long summaries keep a
+          readable measure, left-aligned on the status band's padding.
+          `flex-1` is desk-only so the footer's `mt-auto` pins the stats line
+          to the viewport bottom at >= 900px and leaves it directly under the
+          summary below that (README §4 states the same width rule). */}
       {!error && (isLoading || article) && (
-        <div className="flex flex-1 flex-col desk:grid desk:grid-cols-[1fr_300px]">
-          {/* Main column */}
-          <article className="flex min-w-0 flex-col gap-5 max-sm:p-5 sm:max-desk:p-8 desk:border-r desk:border-console-line-2 desk:pb-8 desk:pl-9 desk:pr-10 desk:pt-10">
-            <h1 className="text-[22px] font-bold leading-[1.5] sm:text-[36px]">
-              {article ? article.title : '—'}
-            </h1>
+        <article className="flex min-w-0 max-w-[720px] flex-col gap-5 max-sm:p-5 sm:max-desk:p-8 desk:flex-1 desk:px-8 desk:pb-8 desk:pt-10">
+          <h1 className="text-[22px] font-bold leading-[1.5] sm:text-[36px]">
+            {article ? article.title : '—'}
+          </h1>
 
-            <div className="flex flex-wrap items-center gap-[18px] font-mono text-[11.5px]">
-              <span className="border border-console-line-4 px-[9px] py-1 uppercase tracking-[.08em] text-console-cyan">
-                {article ? article.source_name : '—'}
-              </span>
-              <span className="text-console-ink-weak">
-                {formatRelativeTimeJa(article?.published_at)}
-              </span>
-              {originalHref && (
-                <a
-                  href={originalHref}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-console-ink-sub underline decoration-console-line-4 underline-offset-4 transition-colors duration-[120ms] ease-out hover:decoration-console-ink-sub"
+          <div className="flex flex-wrap items-center gap-[18px] font-mono text-[11.5px]">
+            <span className="border border-console-line-4 px-[9px] py-1 uppercase tracking-[.08em] text-console-cyan">
+              {article ? article.source_name : '—'}
+            </span>
+            <span className="text-console-ink-weak">
+              {formatRelativeTimeJa(article?.published_at)}
+            </span>
+            {originalHref && (
+              <a
+                href={originalHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-console-ink-sub underline decoration-console-line-4 underline-offset-4 transition-colors duration-[120ms] ease-out hover:decoration-console-ink-sub"
+              >
+                原文
+              </a>
+            )}
+          </div>
+
+          <section className="flex flex-col gap-4">
+            <SectionLabel>要約</SectionLabel>
+            {summaryParagraphs.length > 0 ? (
+              summaryParagraphs.map((paragraph, i) => (
+                <p
+                  key={i}
+                  className="text-[15px] leading-[2.1] text-console-ink-sub [text-wrap:pretty]"
                 >
-                  原文
-                </a>
-              )}
-            </div>
-
-            <section className="flex flex-col gap-4">
-              <SectionLabel>要約</SectionLabel>
-              {summaryParagraphs.length > 0 ? (
-                summaryParagraphs.map((paragraph, i) => (
-                  <p
-                    key={i}
-                    className="text-[15px] leading-[2.1] text-console-ink-sub [text-wrap:pretty]"
-                  >
-                    {paragraph}
-                  </p>
-                ))
-              ) : (
-                <p className="font-mono text-[12px] text-console-ink-faint">—</p>
-              )}
-            </section>
-
-            <footer className="mt-auto border-t border-console-line-1 pt-3 font-mono text-[11px] text-console-ink-ghost">
-              本文抽出 — ／ 要約 {article ? article.summary.length : '—'} 字 ／ 取得{' '}
-              {formatClockTime(article?.crawled_at)}
-            </footer>
-          </article>
-
-          {/* Sidebar — script / quiz / same-episode APIs pending */}
-          <aside className="flex flex-col gap-6 border-t border-console-line-2 bg-console-panel max-sm:p-5 sm:max-desk:p-8 desk:border-t-0 desk:px-7 desk:py-10">
-            <section className="flex flex-col gap-3">
-              <SectionLabel>読み上げ台本</SectionLabel>
+                  {paragraph}
+                </p>
+              ))
+            ) : (
               <p className="font-mono text-[12px] text-console-ink-faint">—</p>
-            </section>
+            )}
+          </section>
 
-            <div aria-hidden className="h-px bg-console-line-2" />
-
-            <section className="flex flex-col gap-3">
-              <SectionLabel>出題</SectionLabel>
-              <p className="text-[13.5px] leading-[1.9] text-console-ink-sub">—</p>
-              <div className="flex items-center gap-1.5">
-                {[0, 1, 2].map((i) => (
-                  <span key={i} aria-hidden className="h-[5px] w-6 bg-console-line-3" />
-                ))}
-                <span className="ml-2 font-mono text-[11.5px] text-console-ink-faint">— / —</span>
-              </div>
-              <p className="font-mono text-[11.5px] text-console-violet">— 再出題</p>
-            </section>
-
-            <div aria-hidden className="h-px bg-console-line-2" />
-
-            <section className="flex flex-col gap-3">
-              <SectionLabel>同じ回</SectionLabel>
-              <p className="font-mono text-[12px] text-console-ink-faint">—</p>
-            </section>
-          </aside>
-        </div>
+          <footer className="mt-auto border-t border-console-line-1 pt-3 font-mono text-[11px] text-console-ink-ghost">
+            本文抽出 — ／ 要約 {article ? article.summary.length : '—'} 字 ／ 取得{' '}
+            {formatClockTime(article?.crawled_at)}
+          </footer>
+        </article>
       )}
     </div>
   );

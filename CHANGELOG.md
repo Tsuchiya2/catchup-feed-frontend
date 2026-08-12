@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.13.1](https://github.com/Tsuchiya2/catchup-feed-frontend/compare/catchup-feed-frontend-v1.13.0...catchup-feed-frontend-v1.13.1) (2026-08-12)
+
+
+### Bug Fixes
+
+* スマホ幅ボトムタブの「入力」をソース一覧に変更 ([e911226](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/e9112264f12cd7dc3db35ff15f7f5537b484a6f8))
+* 利用規約・プライバシーポリシーの記述を修正 ([dece8df](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/dece8dff1891f09b40b6d46e1bb37b480f4b6f72))
+* 利用規約・プライバシーポリシーの記述修正とスマホ幅ナビの導線変更 ([a266ff6](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/a266ff6e50df2eb51635dc04e06ed6497261458c))
+
+
+### Miscellaneous
+
+* 参照されていないスクリーンショットを削除 ([3707cb8](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/3707cb8dc17cca2f611a06e5c4c55b63e0c2a474))
+
 ## [1.13.0](https://github.com/Tsuchiya2/catchup-feed-frontend/compare/catchup-feed-frontend-v1.12.0...catchup-feed-frontend-v1.13.0) (2026-08-11)
 
 

@@ -142,15 +142,16 @@ export function ConsoleShell({ children }: { children: React.ReactNode }) {
             </React.Fragment>
           ))}
         </nav>
-        {/* Rail footer: host stats need a backend API — degrade to `—` */}
-        <div className="mt-auto border-t border-console-line-2 px-3 pt-3 font-mono text-[10.5px] leading-[2] text-console-ink-weak">
-          <p>PI 5 —</p>
-          <p>MAC —</p>
-          <p>DISK —</p>
+        {/* Rail footer: logout only (the rail's sole sign-out affordance).
+            Host status (PI 5 / MAC / DISK) was removed with D-38 — no host
+            stats API exists, and building one means either a monitoring stack
+            (banned) or a bespoke collector on the Pi. Host liveness is
+            absorbed by 縮退許容, not by a permanent panel here. */}
+        <div className="mt-auto border-t border-console-line-2 px-3 pt-2 font-mono text-[10.5px] leading-[2] text-console-ink-weak">
           <button
             type="button"
             onClick={logout}
-            className="mt-2 flex min-h-[44px] items-center tracking-[.2em] text-console-ink-weak transition-colors duration-[120ms] ease-out hover:text-console-ink"
+            className="flex min-h-[44px] items-center tracking-[.2em] text-console-ink-weak transition-colors duration-[120ms] ease-out hover:text-console-ink"
           >
             ログアウト
           </button>

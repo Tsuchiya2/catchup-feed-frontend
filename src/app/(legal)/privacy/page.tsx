@@ -10,8 +10,7 @@ export const metadata: Metadata = {
  *
  * Describes only what this self-hosted system actually collects: the
  * admin/viewer login credentials, feed tokens (stored hashed), and feed
- * access logs kept per friend to notice when someone quietly stops
- * listening. No analytics, no ad tracking, no third-party sharing.
+ * access logs. No analytics, no ad tracking, no third-party sharing.
  */
 
 const SECTIONS: ReadonlyArray<{ heading: string; body: React.ReactNode }> = [
@@ -29,7 +28,7 @@ const SECTIONS: ReadonlyArray<{ heading: string; body: React.ReactNode }> = [
     body: (
       <ul className="list-disc space-y-2 pl-6">
         <li>ログイン用のメールアドレスとパスワード(パスワードはハッシュ化して保存)</li>
-        <li>友人の名前・メールアドレス・メモ(管理者が登録したもの)</li>
+        <li>名前・メールアドレス・メモ(管理者が登録したもの)</li>
         <li>
           フィードへのアクセス記録(いつ・どの購読トークンで・何を取得したか、および User-Agent)
         </li>
@@ -40,7 +39,7 @@ const SECTIONS: ReadonlyArray<{ heading: string; body: React.ReactNode }> = [
     heading: '3. 利用目的',
     body: (
       <p>
-        取得した情報は、認証、番組の配信、そして「誰がまだ聴いていて、誰が離れてしまったか」を管理者が把握して番組を改善するためだけに使います。アクセス記録は配信の改善以外の目的には使用しません。
+        取得した情報は、認証、番組の配信、そして配信の状況を管理者が把握して番組を改善するためだけに使います。アクセス記録は配信の改善以外の目的には使用しません。
       </p>
     ),
   },
@@ -66,7 +65,7 @@ const SECTIONS: ReadonlyArray<{ heading: string; body: React.ReactNode }> = [
     heading: '6. 削除の求め',
     body: (
       <p>
-        友人として登録された方は、自分の登録情報やアクセス記録の削除をいつでも管理者に直接依頼できます。配信の停止(購読トークンの失効)もあわせて対応します。
+        登録情報やアクセス記録の削除をいつでも管理者に直接依頼できます。配信の停止(購読トークンの失効)もあわせて対応します。
       </p>
     ),
   },
@@ -88,7 +87,7 @@ export default function PrivacyPage() {
           プライバシーポリシー
         </h1>
         <p className="mt-3 font-mono text-[11px] tracking-[.18em] text-[#6d7276]">
-          最終更新 2026.08.11
+          最終更新 2026.08.12
         </p>
       </header>
 

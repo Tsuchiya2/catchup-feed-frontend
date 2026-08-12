@@ -9,8 +9,8 @@ export const metadata: Metadata = {
  * Terms of service — 放送卓(改訂版)
  *
  * Written for what this service actually is: a self-hosted, personal-use
- * radio feed shared with a handful of invited friends. No signup flows, no
- * commercial claims. Body text follows the console reading style
+ * radio feed. No signup flows, no commercial claims. Body text follows the
+ * console reading style
  * (Noto Sans JP 15px / line-height 2.1 / text-wrap: pretty).
  */
 
@@ -20,8 +20,7 @@ const SECTIONS: ReadonlyArray<{ heading: string; body: React.ReactNode }> = [
     body: (
       <p>
         Catchup
-        Feed(以下「本サービス」)は、管理者が個人利用の範囲で運用する自家ホスティングのシステムです。公開されている記事・動画・音声を収集し、要約して毎朝の音声番組として、管理者本人と、管理者から購読
-        URL を直接受け取った友人に配信します。一般向けの受付・登録は行っていません。
+        Feed(以下「本サービス」)は、管理者が個人利用の範囲で運用する自家ホスティングのシステムです。公開されている記事・動画・音声を収集し、要約して毎朝の音声番組として、管理者本人に配信します。一般向けの受付・登録は行っていません。
       </p>
     ),
   },
@@ -29,8 +28,7 @@ const SECTIONS: ReadonlyArray<{ heading: string; body: React.ReactNode }> = [
     heading: '2. 利用できる人',
     body: (
       <p>
-        本サービスを利用できるのは、管理者と、管理者から購読 URL
-        またはアカウントを直接受け取った友人のみです。受け取った購読 URL
+        本サービスを利用できるのは、管理者のみです。購読 URL
         は本人限りのものとして扱い、第三者へ再配布しないでください。
       </p>
     ),
@@ -77,7 +75,7 @@ export default function TermsPage() {
       <header className="mb-10">
         <h1 className="text-[26px] font-bold leading-[1.5] tracking-[.01em]">利用規約</h1>
         <p className="mt-3 font-mono text-[11px] tracking-[.18em] text-[#6d7276]">
-          最終更新 2026.08.11
+          最終更新 2026.08.12
         </p>
       </header>
 

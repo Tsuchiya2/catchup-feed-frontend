@@ -15,15 +15,20 @@ import type { SourceKind } from '@/types/api';
  * Dashboard (概況) — 放送卓(改訂版) §3
  *
  * Is there enough material for tomorrow's episode, and are the friends still
- * listening? Both panels are backed by a real API: 明朝の候補 (latest crawled
- * articles) and 受信状況 (per-friend last access, C-8).
+ * listening? D-39(2) dropped the older "did this morning's episode go out"
+ * half of that question — the podcast app and the Discord notification answer
+ * it. Both remaining panels are backed by a real API: 明朝の候補 (latest
+ * crawled articles) and 受信状況 (per-friend last access, C-8).
  *
- * The episode / batch / retention panels used to sit here as hairline frames
- * full of permanent `—`, and were removed — a whole panel that never fills in
- * costs a screenful of attention for nothing. That call was scoped to panels
- * only: the metric tiles above still show `—` for their pending fields, kept
- * by explicit instruction because they are one line each and the row already
- * carries a real value (記事).
+ * D-39(1) removed five regions that had displayed a permanent `—` ever since
+ * they were built, none of them having an API behind it: the status band's
+ * left cluster, the 今朝の構成 / 夜間バッチ / 定着 30日 panels, and the bottom
+ * `クイズ在庫 ／ 飽和閾値` `episodes/ ／ 保持` footer.
+ *
+ * The metric tiles below 900px are the one survivor of that sweep. D-39(4)
+ * kept them only because the user's removal list did not name them, and says
+ * so explicitly: EPISODE / 尺 / 要約待ち are the same permanent `—` (記事 is
+ * the sole tile with real data) and are to be reconsidered next cycle.
  */
 
 const KIND_LABELS: Record<SourceKind, string> = {

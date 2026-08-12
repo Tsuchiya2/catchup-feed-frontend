@@ -86,8 +86,8 @@ export function ConsoleShell({ children }: { children: React.ReactNode }) {
           { top: '卓', sub: '概況', href: '/dashboard', paths: ['/dashboard'] },
           {
             top: '入力',
-            sub: '記事',
-            href: '/articles',
+            sub: 'ソース',
+            href: '/sources',
             paths: ['/articles', '/sources', '/books'],
           },
           {

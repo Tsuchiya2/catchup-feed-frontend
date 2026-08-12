@@ -4,7 +4,6 @@ import * as React from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useArticle } from '@/hooks/useArticle';
-import { ConsolePlayer } from '@/components/console/ConsolePlayer';
 import { formatRelativeTimeJa } from '@/lib/utils/relativeTimeJa';
 import { safeExternalHref } from '@/lib/utils/safeExternalHref';
 
@@ -14,8 +13,9 @@ import { safeExternalHref } from '@/lib/utils/safeExternalHref';
  * One article's summary, where it airs in the episode, and when it will be
  * re-asked. Episode / segment / script / quiz data has no backend API yet:
  * those regions render hairline frames with `—` (README ローディング spec).
- * The player is fully implemented but has no audio source until the episode
- * API lands, so it renders in its degraded state.
+ *
+ * No audio player here (D-35): per-article audio files are never generated,
+ * and episode audio is delivered by the podcast app, not this dashboard.
  */
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
@@ -132,9 +132,6 @@ export default function ArticleDetailPage() {
                 </a>
               )}
             </div>
-
-            {/* Player — no episode audio API yet, renders degraded */}
-            <ConsolePlayer storageKey={`article-${articleId}`} />
 
             <section className="flex flex-col gap-4">
               <SectionLabel>要約</SectionLabel>

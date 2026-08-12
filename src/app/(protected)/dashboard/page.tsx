@@ -15,11 +15,15 @@ import type { SourceKind } from '@/types/api';
  * Dashboard (概況) — 放送卓(改訂版) §3
  *
  * Is there enough material for tomorrow's episode, and are the friends still
- * listening? Only the panels backed by a real API are rendered: 明朝の候補
- * (latest crawled articles) and 受信状況 (per-friend last access, C-8). The
- * episode / batch / retention panels were removed rather than kept as hairline
- * frames full of `—` — no fabricated values, and no frames that never fill in.
- * The metric tiles keep `—` for the fields whose API is still pending.
+ * listening? Both panels are backed by a real API: 明朝の候補 (latest crawled
+ * articles) and 受信状況 (per-friend last access, C-8).
+ *
+ * The episode / batch / retention panels used to sit here as hairline frames
+ * full of permanent `—`, and were removed — a whole panel that never fills in
+ * costs a screenful of attention for nothing. That call was scoped to panels
+ * only: the metric tiles above still show `—` for their pending fields, kept
+ * by explicit instruction because they are one line each and the row already
+ * carries a real value (記事).
  */
 
 const KIND_LABELS: Record<SourceKind, string> = {
@@ -111,7 +115,13 @@ export default function DashboardPage() {
           <MetricTile label="要約待ち" value="—" accent className="border-l" />
         </div>
 
-        <div className="grid flex-1 grid-cols-1 gap-[26px] sm:max-desk:grid-cols-[1.4fr_1fr] desk:grid-cols-[1.55fr_1fr]">
+        {/* `flex-1` is desk-only (same rule as 記事詳細, D-38). At < 640px the
+            two panels stack into two auto rows; stretching the grid to the
+            leftover viewport height would inflate those rows (align-content
+            defaults to stretch) and strand a gap between the panels. Letting
+            the grid stay content-sized below 900px avoids that, and is visually
+            identical at 640–899px where the panels sit side by side. */}
+        <div className="grid grid-cols-1 gap-[26px] sm:max-desk:grid-cols-[1.4fr_1fr] desk:grid-cols-[1.55fr_1fr] desk:flex-1">
           {/* Left column */}
           <div className="flex min-w-0 flex-col gap-5">
             {/* 明朝の候補 — latest crawled articles */}

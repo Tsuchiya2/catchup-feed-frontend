@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.13.4](https://github.com/Tsuchiya2/catchup-feed-frontend/compare/catchup-feed-frontend-v1.13.3...catchup-feed-frontend-v1.13.4) (2026-08-13)
+
+
+### Bug Fixes
+
+* 概況から API 未提供のプレースホルダ領域を削除 ([53c187a](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/53c187a3066c072ca42381ae46ffc0ad5089d1af))
+* 概況から API 未提供のプレースホルダ領域を削除(D-39) ([e0d1940](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/e0d1940bc747aea968b74d57c586f2544dc6140a))
+* 概況のステータスバンドを desk 幅のみの表示にする ([69bf20a](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/69bf20a9f82d5ccfebdbe5b03508032949e9107a))
+* 概況のスマホ幅でパネル間に空白が空く回帰を修正 ([5be837d](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/5be837d8b4bd7ed4aae2ceba3144852a59d7aa55))
+
+
+### Code Refactoring
+
+* 概況のステータスバンド内側の冗長な表示制御を削除 ([4d38744](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/4d3874484b4ed65305cf325317ff57f6156cebc7))
+
 ## [1.13.3](https://github.com/Tsuchiya2/catchup-feed-frontend/compare/catchup-feed-frontend-v1.13.2...catchup-feed-frontend-v1.13.3) (2026-08-12)
 
 

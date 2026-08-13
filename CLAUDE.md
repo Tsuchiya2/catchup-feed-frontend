@@ -11,6 +11,7 @@ Next.js 16(App Router)+ React 19 + TypeScript 5.9 + Tailwind 4 の PWA 運用ダ
 - 認証は backend 発行の HttpOnly cookie(D-22)。localStorage / JS からの cookie 書き込みで JWT を保持しない。**ルート保護は `src/proxy.ts`(サーバー側)が担い、UI で隠すだけの担保は不可**。`viewer` ロール(D-27)は `/sources` の閲覧のみで、それ以外は proxy で遮断する
 - UI 部品は Radix + Tailwind 4 の既存パターン(`src/components/ui/`)と放送卓トークン(`--color-console-*`、角丸 0・影なし・1px ヘアライン)に合わせる。新規コンポーネントライブラリの導入は親の承認制
 - **backend API が無い領域をプレースホルダ(`—`)で描かない**。D-35(記事の音声プレイヤー)・D-38(記事詳細の右サイドバー / 左レールのホスト状態)・D-39(概況の5領域)で恒久 `—` を撤去した。復活させるなら backend の API 追加が先。design_handoff README の該当節も同時に改訂する
+  - **唯一の既知の例外**: 概況の指標タイル(`< 900px`)のうち `EPISODE` `尺` `要約待ち` の3枚は恒久 `—` のまま残っている。D-39(4) がユーザーの撤去列挙に含まれなかったことを理由に判断を保留し、**次サイクルの再検討対象**として design_handoff README §3 に明記した状態。新しく `—` を足す根拠には使わないこと
 - レイアウトは 3 段レスポンシブ(`>= 900px` レール / 640–899px 上部タブ / `< 640px` 下部タブ)。`flex-1` を本文 grid に直接使うと狭幅で空白が伸びる回帰を 2 度出しているため、`desk:flex-1` の形に揃える。ビューポート依存の回帰は `tests/e2e/dashboard/layout.spec.ts` が見張る
 - Sentry は D-8 決定により削除済み。再導入しない(可観測性は `logger.ts` のコンソールログと backend のアクセスログで足りる)
 - 初代 catchup-feed(EDAF 体制)期の文書は `docs/legacy/` にアーカイブ済み。参照しない

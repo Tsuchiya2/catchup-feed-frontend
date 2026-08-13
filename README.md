@@ -37,7 +37,7 @@
 - **認証は HttpOnly cookie** — JWT は backend が `Set-Cookie`(HttpOnly / Secure / SameSite=Strict)で発行し、フロントは `credentials:'include'` で送る。localStorage にトークンを保存しない(D-22)。ルート保護は `src/proxy.ts`(サーバー側)が担い、UI の出し分けだけに頼らない
 - **ゼロ円運用** — 新規の固定費を増やさない。Sentry など外部の可観測性 SaaS は削除済み(再導入しない)
 - **API 契約はバックエンドが正** — 手書きの API 型を作らず、バックエンドの Swagger から `npm run generate:api` で TypeScript 型を再生成する
-- **画面デザインの正は design_handoff** — 親リポジトリの `design_handoff_catchup_feed_console/README.md`(放送卓デザイン)。API が存在しない領域をプレースホルダで描かない(D-35 / D-38 / D-39)
+- **画面デザインの正は design_handoff** — 親リポジトリの `design_handoff_catchup_feed_console/README.md`(放送卓デザイン)。API が存在しない領域をプレースホルダで描かない(D-35 / D-38 / D-39)。既知の例外は概況の指標タイル `EPISODE` `尺` `要約待ち` の3枚で、D-39(4) が判断を保留し次サイクルの再検討対象として design_handoff §3 に明記している
 
 ---
 

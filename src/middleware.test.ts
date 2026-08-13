@@ -897,4 +897,56 @@ describe('Proxy Function - CSRF Protection Integration Tests', () => {
       expect(response.status).toBe(403);
     });
   });
+
+  describe('Unexpected Errors - Should fail closed on protected routes', () => {
+    /**
+     * ルート保護は proxy の責務なので、想定外の例外で保護ルートが素通しに
+     * なってはいけない。認証判定そのものは内部で例外を吸収するため、ここでは
+     * 認証を通過した後段(CSRF トークン発行)で例外を起こして catch を踏ませる。
+     */
+    it('should redirect to login when an unexpected error occurs on a protected route', async () => {
+      // Arrange
+      const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const request = new NextRequest('http://localhost:3000/dashboard', {
+        method: 'GET',
+      });
+      request.cookies.set('catchup_feed_auth_token', mockValidToken);
+
+      const { decodeJwt } = await import('jose');
+      vi.mocked(decodeJwt).mockReturnValue({
+        exp: Math.floor(Date.now() / 1000) + 3600,
+      });
+      vi.mocked(csrfUtils.setCsrfToken).mockImplementation(() => {
+        throw new Error('unexpected proxy failure');
+      });
+
+      // Act
+      const response = proxy(request);
+
+      // Assert - 認証済みでも、判定が壊れた以上は未認証として扱う
+      expect(response.status).toBe(307);
+      expect(response.headers.get('location')).toContain('/login');
+      expect(response.headers.get('location')).toContain('redirect=%2Fdashboard');
+      expect(consoleError).toHaveBeenCalled();
+    });
+
+    it('should let public routes continue when an unexpected error occurs', () => {
+      // Arrange
+      const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const request = new NextRequest('http://localhost:3000/login', {
+        method: 'GET',
+      });
+      vi.mocked(csrfUtils.setCsrfToken).mockImplementation(() => {
+        throw new Error('unexpected proxy failure');
+      });
+
+      // Act
+      const response = proxy(request);
+
+      // Assert - 公開ルートまで巻き込んで落とさない(元の resilience の意図)
+      expect(response.status).toBe(200);
+      expect(response.headers.get('location')).toBeNull();
+      expect(consoleError).toHaveBeenCalled();
+    });
+  });
 });

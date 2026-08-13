@@ -1533,9 +1533,9 @@ npm run storybook        # Start Storybook (http://localhost:6006)
 
 ### Internal Documentation
 
-- [README.md](../README.md) - Project overview
-- 設計・要件の正: 親リポジトリの `docs/pulse-phase1-design.md` / `docs/decisions.md`
-- [Legacy Documents](./legacy/README.md) - 旧 catchup-feed 期のアーカイブ(参照非推奨)
+- [README.md](../../README.md) - Project overview
+- 設計・要件の正: 親リポジトリの `docs/pulse-phase1〜3-design.md` / `docs/decisions.md`
+- [Legacy Documents](./README.md) - 初代 catchup-feed 期のアーカイブ(参照非推奨)
 
 ---
 

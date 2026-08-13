@@ -11,7 +11,9 @@
  *
  * Next.js 16 Changes:
  * - Renamed from `middleware` to `proxy` per Next.js 16 specification
- * - Added error handling wrapper for better resilience
+ * - Added error handling wrapper for better resilience — it fails closed on
+ *   protected routes (redirect to /login) so an unexpected error can never turn
+ *   into an unauthenticated page view
  * - Maintains all CSRF and JWT validation logic
  */
 
@@ -203,11 +205,24 @@ export function proxy(request: NextRequest) {
 
     return response;
   } catch (error) {
-    // Error handling: Log error and allow request to continue
-    // This prevents proxy errors from breaking the entire application
+    // Fail closed on protected routes.
+    //
+    // ルート保護は proxy の責務(README / CLAUDE.md)であり、例外時に
+    // NextResponse.next() を返すと保護ルートがそのまま素通しになる。認証判定に
+    // 使う isTokenValid / getTokenRole はいずれも内部で例外を吸収しており今の
+    // コードに到達経路は無いが、最終防衛線が fail-open のままだと proxy に処理を
+    // 足したときに危険な側へ倒れる。保護ルートは未認証として /login へ送り、
+    // 公開ルートだけ素通しを許す(アプリ全体が proxy の不具合で止まらない、という
+    // 元の意図はここで保つ)。
     console.error('[Proxy Error]', error);
 
-    // Return a safe fallback response that allows the request to proceed
+    const { pathname } = request.nextUrl;
+    if (isProtectedRoute(pathname)) {
+      const loginUrl = new URL('/login', request.url);
+      loginUrl.searchParams.set('redirect', pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+
     return NextResponse.next();
   }
 }

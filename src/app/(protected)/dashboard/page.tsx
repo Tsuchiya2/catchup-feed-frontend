@@ -16,8 +16,8 @@ import type { SourceKind } from '@/types/api';
  *
  * Is there enough material for tomorrow's episode, and are the friends still
  * listening? D-39(2) dropped the older "did this morning's episode go out"
- * half of that question — the podcast app and the Discord notification answer
- * it. Both remaining panels are backed by a real API: 明朝の候補 (latest
+ * half of that question — the podcast app and the admin email notification
+ * (D-29) answer it. Both remaining panels are backed by a real API: 明朝の候補 (latest
  * crawled articles) and 受信状況 (per-friend last access, C-8).
  *
  * D-39(1) removed five regions that had displayed a permanent `—` ever since

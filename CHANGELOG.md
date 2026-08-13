@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.13.5](https://github.com/Tsuchiya2/catchup-feed-frontend/compare/catchup-feed-frontend-v1.13.4...catchup-feed-frontend-v1.13.5) (2026-08-13)
+
+
+### Bug Fixes
+
+* 概況の docblock が挙げる通知チャネルを実態に合わせる ([2b42e12](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/2b42e12ecea0092422e0ef63c6627fdf8d546a2b))
+
+
+### Documentation
+
+* ドキュメントを現行実装に追随させる ([57672e0](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/57672e013b51bacc5eeb9d54766fc00dc524753e))
+* ドキュメントを現行実装に追随させる ([4039363](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/4039363f1058b7a25a92f063817afa4f85088921))
+* レビュー指摘の反映(隔離時に壊れた相対リンクと、プレースホルダ規則の例外明記) ([482ead4](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/482ead4a631f06c45eb6bcc7cef649873f70dcd1))
+
 ## [1.13.4](https://github.com/Tsuchiya2/catchup-feed-frontend/compare/catchup-feed-frontend-v1.13.3...catchup-feed-frontend-v1.13.4) (2026-08-13)
 
 

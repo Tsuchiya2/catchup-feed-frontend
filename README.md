@@ -22,31 +22,41 @@
 
 本リポジトリはそのフロントエンド、すなわち **Next.js 製の PWA 運用ダッシュボード** です。番組の再生 UI ではなく、**運用管理 UI** に特化しています:
 
-- **ソース管理** — クロール対象の RSS/Atom ソースの追加・有効/無効・カテゴリ/言語設定
+- **ソース管理** — クロール対象ソース(RSS / YouTube / ポッドキャスト / ニュースレター)の追加・有効/無効・カテゴリ/言語設定
 - **友人(購読者)/トークン管理** — ポッドキャスト購読トークンの発行・失効。購読 URL は発行時に一度だけ表示
 - **アクセスログ閲覧** — 誰がいつどのエピソードを取得したか。放置(一定期間アクセスなし)の検知
+- **書籍管理** — 書籍 PDF のアップロード・取り込みステータス確認・削除(取り込み本体は Mac の夜間バッチ)
+- **学習ループ** — 復習クイズの採点・理解トラッカー・book_review 対象書籍の進行管理
+- **閲覧者(viewer)管理** — 友人にソース一覧だけを見せる閲覧専用アカウントの発行・無効化
 
 音声番組の生成・配信そのものはバックエンド([catchup-feed-backend](https://github.com/Tsuchiya2/catchup-feed-backend))が担います。本フロントエンドは、そのバックエンドの管理エンドポイントを叩く画面です。
 
 ### 設計原則
 
-- **単一ユーザー右サイズ** — 単一管理者向け。過度な分散化・監視/分析基盤を持ち込まない。認証は JWT のみ(認証済み=管理者に単純化。role クレームは廃止済み)
+- **単一ユーザー右サイズ** — 管理者は 1 名のみ(資格情報は backend の環境変数 + bcrypt。users テーブルを持たない)。過度な分散化・監視/分析基盤を持ち込まない。友人向けの閲覧専用 `viewer` ロールだけが例外で、権限は「アクティブなソース一覧の閲覧」に限定(D-27)
+- **認証は HttpOnly cookie** — JWT は backend が `Set-Cookie`(HttpOnly / Secure / SameSite=Strict)で発行し、フロントは `credentials:'include'` で送る。localStorage にトークンを保存しない(D-22)。ルート保護は `src/proxy.ts`(サーバー側)が担い、UI の出し分けだけに頼らない
 - **ゼロ円運用** — 新規の固定費を増やさない。Sentry など外部の可観測性 SaaS は削除済み(再導入しない)
 - **API 契約はバックエンドが正** — 手書きの API 型を作らず、バックエンドの Swagger から `npm run generate:api` で TypeScript 型を再生成する
+- **画面デザインの正は design_handoff** — 親リポジトリの `design_handoff_catchup_feed_console/README.md`(放送卓デザイン)。API が存在しない領域をプレースホルダで描かない(D-35 / D-38 / D-39)
 
 ---
 
 ## 主な画面/機能
 
-ナビゲーション上の各画面(認証後):
+ナビゲーション(放送卓デザインの 卓 / 入力 / 送出 の 3 グループ)と各画面。すべて認証後:
 
-| 画面 | パス | 内容 |
-|------|------|------|
-| **Dashboard** | `/dashboard` | 概況 |
-| **Sources** | `/sources` | クロール対象 RSS/Atom ソースの CRUD、有効/無効・カテゴリ/言語設定 |
-| **Friends** | `/subscribers`, `/subscribers/[id]` | 購読者(友人)の管理。無効化は論理削除(履歴を残したまま非アクティブ化) |
-| **Access Logs** | `/access-logs` | 購読者ごとのアクセス概況(放置検知)と、時系列アクセスログ。友人単位で絞り込み可 |
-| **Review** | `/learning` | 学習ループ関連(Phase 2、開発中) |
+| グループ | 画面 | パス | 内容 |
+|---|------|------|------|
+| 卓 | **概況** | `/dashboard` | 明朝の候補(直近クロール記事)と受信状況(友人ごとの最終アクセス・放置検知) |
+| 入力 | **記事** | `/articles`, `/articles/[id]` | 収集済み記事の一覧・検索と、要約の閲覧 |
+| 入力 | **ソース** | `/sources` | クロール対象の CRUD、有効/無効・種別(RSS / YouTube / ポッドキャスト / ニュースレター)・カテゴリ/言語設定 |
+| 入力 | **書籍** | `/books` | 書籍 PDF のアップロード(100MB/冊)・取り込みステータス・削除(D-25) |
+| 送出 | **友人** | `/subscribers`, `/subscribers/[id]` | 購読者の管理と購読トークンの発行・失効。無効化は論理削除 |
+| 送出 | **視聴者** | `/viewers` | 閲覧専用アカウントの作成・有効/無効・削除(D-27) |
+| 送出 | **アクセスログ** | `/access-logs` | 購読者ごとのアクセス概況(放置検知)と時系列ログ。友人単位で絞り込み可 |
+| 送出 | **復習** | `/learning`, `/learning/items`, `/learning/books` | 復習クイズの採点(○△×)、理解トラッカー(ステージ・次回予定日)、book_review 対象書籍の activate / deactivate |
+
+ナビ外: `/`(ランディング)、`/login`、`/terms`、`/privacy`。`viewer` ロールでログインした場合は `/sources`(閲覧のみ)だけが見え、他はサーバー側の `proxy.ts` が遮断します。
 
 ### トークン発行と一度きり表示
 
@@ -72,7 +82,7 @@
 | **アイコン** | [lucide-react](https://lucide.dev/) |
 | **データ取得** | [TanStack Query 5](https://tanstack.com/query) |
 | **フォーム** | [React Hook Form](https://react-hook-form.com/) + [Zod](https://zod.dev/) |
-| **認証** | JWT([jose](https://github.com/panva/jose)) |
+| **認証** | JWT([jose](https://github.com/panva/jose))— backend 発行の HttpOnly cookie を `proxy.ts` が検証(D-22) |
 | **PWA** | [Serwist](https://serwist.pages.dev/) (Service Worker) |
 | **テーマ** | [next-themes](https://github.com/pacocoursey/next-themes)(ダークモード) |
 | **API 型生成** | [openapi-typescript](https://openapi-ts.pages.dev/) + [swagger2openapi](https://github.com/Mermade/oas-kit)(Swagger 2.0 → OpenAPI 3 変換) |
@@ -110,14 +120,14 @@ docker compose up -d
 docker compose logs -f web
 ```
 
-コンテナはポート `3001` で公開されます(ホストの `3000` を Grafana 等と競合させないため、`3001:3000` にマッピング)。
+コンテナはポート `3001` で公開されます(`3001:3000` にマッピング)。
 
 ### 主なスクリプト
 
 | コマンド | 内容 |
 |----------|------|
 | `npm run dev` | 開発サーバー起動 |
-| `npm run build` / `npm run start` | 本番ビルド / 本番起動 |
+| `npm run build` / `npm run start` | 本番ビルド / 本番起動(**ビルドは webpack**。Turbopack では `@serwist/next` の Service Worker 生成が走らず PWA が壊れるため、意図的に維持 — D-23) |
 | `npm run lint` | ESLint(`--max-warnings 0`。警告ゼロが完了条件) |
 | `npm run lint:fix` | ESLint 自動修正 |
 | `npm run format` / `npm run format:check` | Prettier 整形 / チェック |
@@ -160,11 +170,11 @@ npm run generate:api -- http://localhost:8080/swagger/doc.json
 | `NEXT_PUBLIC_API_RETRY_DELAY` | `1000` | リトライ間隔(ms) |
 | `NEXT_PUBLIC_APP_NAME` / `NEXT_PUBLIC_APP_SHORT_NAME` | — | アプリ名(メタデータ / PWA マニフェスト) |
 | `NEXT_PUBLIC_APP_URL` | — | 公開 URL(メタデータ / OGP) |
-| `NEXT_PUBLIC_TOKEN_REFRESH_THRESHOLD` | `300` | トークン更新の閾値(秒) |
-| `NEXT_PUBLIC_TOKEN_GRACE_PERIOD` | `60` | 期限後の更新猶予(秒) |
 | `NEXT_PUBLIC_FEATURE_PWA` | `false` | PWA 機能フラグ |
-| `NEXT_PUBLIC_FEATURE_DARK_MODE` | `true` | ダークモード切り替え |
+| `NEXT_PUBLIC_FEATURE_DARK_MODE` | `true` | ダークモード(OS 設定に追従。手動トグルは持たない) |
 | `NEXT_PUBLIC_LOG_LEVEL` / `NEXT_PUBLIC_LOG_FORMAT` | `debug` / `pretty` | ロギング |
+
+認証まわりの環境変数はありません。JWT は backend が HttpOnly cookie で発行するため、フロントに保存も更新もありません(D-22。cookie の Domain は backend の `AUTH_COOKIE_DOMAIN`)。
 
 ---
 
@@ -189,22 +199,25 @@ src/
 │   ├── (auth)/login/               # ログイン
 │   ├── (legal)/                    # 利用規約・プライバシー
 │   ├── (protected)/                # 認証必須ルート
-│   │   ├── dashboard/
+│   │   ├── dashboard/              # 概況
+│   │   ├── articles/               # 記事一覧・詳細
 │   │   ├── sources/                # ソース管理
+│   │   ├── books/                  # 書籍 PDF 管理(D-25)
 │   │   ├── subscribers/            # 友人管理
 │   │   │   └── [id]/               # 友人詳細(トークン発行・失効)
+│   │   ├── viewers/                # 閲覧専用アカウント管理(D-27)
 │   │   ├── access-logs/            # アクセスログ
-│   │   ├── articles/
-│   │   └── learning/               # 学習ループ(Phase 2)
-│   └── api/                        # ルートハンドラ(health など)
+│   │   └── learning/               # 学習ループ(採点 / items / books)
+│   └── api/                        # ルートハンドラ(health / readiness / 記事検索)
 ├── components/
+│   ├── console/                    # 放送卓シェル(レール・タブ・時計)
 │   ├── ui/                         # Radix ベースの UI 部品
-│   ├── subscribers/                # 友人・トークン系ダイアログ
-│   ├── access-logs/                # アクセスログ表示
-│   ├── sources/                    # ソース系
+│   ├── subscribers/ viewers/ books/ learning/ sources/ access-logs/ articles/
 │   └── ...
 ├── hooks/                          # TanStack Query フック
-├── lib/                            # API クライアント・認証など
+├── lib/                            # API クライアント・セキュリティユーティリティなど
+├── proxy.ts                        # ルート保護(cookie 検証・viewer の閉じ込め)
+├── sw.ts                           # Serwist の Service Worker 定義
 ├── types/
 │   ├── api.d.ts                    # アプリ用エイリアス
 │   └── generated/api.d.ts          # Swagger からの自動生成(編集禁止)
@@ -215,15 +228,18 @@ src/
 
 ## デプロイ
 
-現状は Vercel Edge で配信。今後、バックエンドが動作する Raspberry Pi 5 上のローカル配信(Tailscale / Cloudflare Tunnel 経由)へ移行予定です。`next build` がスタンドアロンで動く構成を維持します。
+現状は Vercel で `pulse.catchup-feed.com` として配信し、API はバックエンド(`radio.catchup-feed.com`、Cloudflare Tunnel 経由)を直接叩きます(`NEXT_PUBLIC_API_URL`)。今後、バックエンドが動作する Raspberry Pi 5 上のローカル配信(Tailscale / Cloudflare Tunnel 経由)へ移行予定です。`next build` がスタンドアロンで動く構成を維持します。
+
+> `NEXT_PUBLIC_API_URL` は**ビルド時に CSP の `connect-src` へ焼き込まれる**ため、Vercel 側で値を変えたら再デプロイ(再ビルド)が必要です。env の変更だけでは反映されません。
 
 ---
 
 ## 関連
 
 - **[catchup-feed-backend](https://github.com/Tsuchiya2/catchup-feed-backend)** — 音声番組の生成・フィード配信・トークン認証を担う Go バックエンド
-- 設計・要件の正は親リポジトリの `docs/pulse-phase1-design.md` / `docs/decisions.md`
-- 旧 catchup-feed 期の文書は [docs/legacy/](./docs/legacy/README.md) にアーカイブ済み(参照非推奨)
+- **[catchup-feed-ai](https://github.com/Tsuchiya2/catchup-feed-ai)** — 文字起こしと書籍 PDF の取り込み(Python、Mac 夜間バッチ)
+- 設計・要件の正は親リポジトリの `docs/pulse-phase1〜3-design.md` / `docs/decisions.md`、画面デザインは `design_handoff_catchup_feed_console/README.md`
+- 初代 catchup-feed 期の文書は [docs/legacy/](./docs/legacy/README.md) にアーカイブ済み(参照非推奨)
 
 ---
 

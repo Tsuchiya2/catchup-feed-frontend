@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.13.6](https://github.com/Tsuchiya2/catchup-feed-frontend/compare/catchup-feed-frontend-v1.13.5...catchup-feed-frontend-v1.13.6) (2026-08-15)
+
+
+### Documentation
+
+* **legacy:** mask local absolute paths in archived docs ([deae1cc](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/deae1cc87e6e77de59b62c57fd6d7d88f538c09e))
+* **legacy:** アーカイブ文書のローカル絶対パスをマスクする ([c477f98](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/c477f987b3097d6409e287f5938c296b1fd1a289))
+
 ## [1.13.5](https://github.com/Tsuchiya2/catchup-feed-frontend/compare/catchup-feed-frontend-v1.13.4...catchup-feed-frontend-v1.13.5) (2026-08-13)
 
 

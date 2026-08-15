@@ -1022,11 +1022,11 @@ Google's metrics for web performance.
 
 ## Related Documentation
 
-- [Product Requirements](/Users/yujitsuchiya/catchup-feed-frontend/docs/product-requirements.md)
-- [Functional Design](/Users/yujitsuchiya/catchup-feed-frontend/docs/functional-design.md)
-- [Architecture](/Users/yujitsuchiya/catchup-feed-frontend/docs/architecture.md)
-- [Repository Structure](/Users/yujitsuchiya/catchup-feed-frontend/docs/repository-structure.md)
-- [Development Guidelines](/Users/yujitsuchiya/catchup-feed-frontend/docs/development-guidelines.md)
+- [Product Requirements](./product-requirements.md)
+- [Functional Design](./functional-design.md)
+- [Architecture](./architecture.md)
+- [Repository Structure](./repository-structure.md)
+- [Development Guidelines](./development-guidelines.md)
 
 ---
 

@@ -1267,4 +1267,4 @@ catchup-feed-frontend/
 
 **Document Maintained By**: Development Team
 **Review Cycle**: Quarterly or on major architectural changes
-**Questions?**: See [repository-structure.md](/Users/yujitsuchiya/catchup-feed-frontend/docs/repository-structure.md) for file organization details.
+**Questions?**: See [repository-structure.md](./repository-structure.md) for file organization details.

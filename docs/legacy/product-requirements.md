@@ -1444,4 +1444,4 @@ interface PaginationMetadata {
 **Document History**:
 - 2026-01-05: Initial version created based on codebase analysis
 - 2026-01-10: Updated for Next.js 16.1.1, React 19.2.3, and @serwist/next PWA migration
-- Generated from actual source code in /Users/yujitsuchiya/catchup-feed-frontend
+- Generated from actual source code in path/to/catchup-feed-frontend

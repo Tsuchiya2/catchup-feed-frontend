@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.13.7](https://github.com/Tsuchiya2/catchup-feed-frontend/compare/catchup-feed-frontend-v1.13.6...catchup-feed-frontend-v1.13.7) (2026-08-16)
+
+
+### Documentation
+
+* **readme:** システム全体像の図を概要に追加する ([7830ef3](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/7830ef3c27ab9f91387da24cecbadfc1ef36fd73))
+* **readme:** 全体像の図と現行 UI のキャプチャを載せ、旧デザインの残骸を差し替える ([925984c](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/925984cd1d85d1936a119fab3fe752a57c58738d))
+* **readme:** 現行 UI のキャプチャを README に載せ、旧デザインの残骸を差し替える ([c3b8cdf](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/c3b8cdfee06af255f4cc2ccd3db9dd5aa5789906))
+
 ## [1.13.6](https://github.com/Tsuchiya2/catchup-feed-frontend/compare/catchup-feed-frontend-v1.13.5...catchup-feed-frontend-v1.13.6) (2026-08-15)
 
 

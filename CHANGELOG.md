@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.13.8](https://github.com/Tsuchiya2/catchup-feed-frontend/compare/catchup-feed-frontend-v1.13.7...catchup-feed-frontend-v1.13.8) (2026-08-17)
+
+
+### Documentation
+
+* **readme:** 47 条の 5 の射程を誤らせない書き方に直す ([cefc21b](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/cefc21bec841e8ca39f7dc62f3ed66684ac22f9c))
+* **readme:** 友人・視聴者の位置づけとコンテンツの取り扱いを明記する ([1f1983a](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/1f1983a70c4d1e76ef94b91dcf40179d8151d93d))
+* **readme:** 画面一覧に運用上の補足を追記する ([5ef1afd](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/5ef1afdfb74f3ffa8388c7c25f7632bdb0f57292))
+
 ## [1.13.7](https://github.com/Tsuchiya2/catchup-feed-frontend/compare/catchup-feed-frontend-v1.13.6...catchup-feed-frontend-v1.13.7) (2026-08-16)
 
 

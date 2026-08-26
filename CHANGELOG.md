@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.13.9](https://github.com/Tsuchiya2/catchup-feed-frontend/compare/catchup-feed-frontend-v1.13.8...catchup-feed-frontend-v1.13.9) (2026-08-26)
+
+
+### Bug Fixes
+
+* enforce webpack production builds ([ecdc9ea](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/ecdc9ea802cc60973f133474a095a33c035e1611))
+
+
+### Miscellaneous
+
+* upgrade Next.js and TypeScript ([1237993](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/1237993b57f18d161fc8460e19085ed7115ba559))
+* upgrade Next.js and TypeScript ([d0aea56](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/d0aea5659188f796233f5f80f62eb1c604e43be8))
+
 ## [1.13.8](https://github.com/Tsuchiya2/catchup-feed-frontend/compare/catchup-feed-frontend-v1.13.7...catchup-feed-frontend-v1.13.8) (2026-08-17)
 
 

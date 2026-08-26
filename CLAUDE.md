@@ -1,12 +1,12 @@
 # catchup-feed-frontend(pulse ダッシュボード)
 
-Next.js 16(App Router)+ React 19 + TypeScript 5.9 + Tailwind 4 の PWA 運用ダッシュボード。Phase 1〜3 の画面は実装済みで、Vercel(`pulse.catchup-feed.com`)から Pi の backend(`radio.catchup-feed.com`)を叩いて運用中。全体像と規約は親ディレクトリの `CLAUDE.md`、Phase 別設計は `docs/pulse-phase1〜3-design.md` と `docs/decisions.md`、**画面デザインは `design_handoff_catchup_feed_console/README.md`(放送卓)** が正。ここにはリポジトリ固有の事項のみ書く。
+Next.js 16(App Router)+ React 19 + TypeScript 6.0 + Tailwind 4 の PWA 運用ダッシュボード。Phase 1〜3 の画面は実装済みで、Vercel(`pulse.catchup-feed.com`)から Pi の backend(`radio.catchup-feed.com`)を叩いて運用中。全体像と規約は親ディレクトリの `CLAUDE.md`、Phase 別設計は `docs/pulse-phase1〜3-design.md` と `docs/decisions.md`、**画面デザインは `design_handoff_catchup_feed_console/README.md`(放送卓)** が正。ここにはリポジトリ固有の事項のみ書く。
 
 ## このリポジトリの約束
 
 - API 型は手書きせず `npm run generate:api` で backend の Swagger から生成する(C-19。生成済み `src/types/generated/api.d.ts` を正として扱い、読みやすいエイリアスだけを `src/types/api.d.ts` に置く)
 - `npm run lint`(max-warnings 0)と `npm run test`(Vitest)が完了条件。画面を触ったら `npm run test:e2e`(Playwright)と `npm run build` も通す。画面追加時は Storybook のストーリーも追う
-- **本番ビルドは webpack**(`next build`)。Turbopack にすると `@serwist/next` の Service Worker 生成が走らず `public/sw.js` が作られない=PWA のオフラインキャッシュが消える(D-23)。dev サーバは Next 16 既定の Turbopack のままでよい
+- **本番ビルドは webpack**(`npm run build`)。Turbopack にすると `@serwist/next` の Service Worker 生成が走らず `public/sw.js` が作られない=PWA のオフラインキャッシュが消える(D-23)。dev サーバは Next 16 既定の Turbopack のままでよい
 - PWA(Serwist)を壊さない。**機微 API を足したら `src/sw.ts` の `SENSITIVE_API_SEGMENTS` にも追加する**(NetworkOnly にしないと私的データがディスクキャッシュに残る)。ビルド後にスマホ幅での表示確認を必ず行う(ユーザーの主要動線はスマホ)
 - 認証は backend 発行の HttpOnly cookie(D-22)。localStorage / JS からの cookie 書き込みで JWT を保持しない。**ルート保護は `src/proxy.ts`(サーバー側)が担い、UI で隠すだけの担保は不可**。`viewer` ロール(D-27)は `/sources` の閲覧のみで、それ以外は proxy で遮断する
 - UI 部品は Radix + Tailwind 4 の既存パターン(`src/components/ui/`)と放送卓トークン(`--color-console-*`、角丸 0・影なし・1px ヘアライン)に合わせる。新規コンポーネントライブラリの導入は親の承認制
@@ -24,3 +24,13 @@ Next.js 16(App Router)+ React 19 + TypeScript 5.9 + Tailwind 4 の PWA 運用ダ
 **トークン発行ダイアログのガードは仕様(D-5)**: 購読 URL は発行時に一度だけ表示、Escape・背景クリックで閉じられない、閉じたら再取得不可(失効+再発行のみ)、失効は不可逆であることを UI で明示。閉じるときに React Query の mutation キャッシュを `reset()` して平文トークンを残さない。
 
 **罪悪感 UI の禁止(Phase 3 §8.2)**: 期日超過の警告色・件数バッジ・ストリークを `/learning` に出さない。「今日は採点するものがありません」を正常系として気持ちよく表示する。
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

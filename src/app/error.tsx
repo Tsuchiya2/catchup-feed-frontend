@@ -47,7 +47,10 @@ export default function Error({
           </button>
           <button
             type="button"
-            onClick={() => (window.location.href = '/')}
+            onClick={() => {
+              // A full reload recovers from state that may have caused this global error.
+              window.location.href = new URL('/', window.location.origin).href;
+            }}
             className="flex min-h-[44px] items-center justify-center border border-console-line-3 px-5 text-[13px] text-console-ink-sub transition-colors duration-[120ms] ease-out hover:bg-console-hover focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-console-cyan"
           >
             トップへ戻る

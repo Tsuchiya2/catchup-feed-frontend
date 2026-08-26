@@ -329,6 +329,8 @@ class ApiClient {
 
         // Redirect to login page on client-side
         if (typeof window !== 'undefined') {
+          // A full navigation lets the server-side proxy re-evaluate the auth cookie.
+          // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- Intentional hard navigation after authentication failure.
           window.location.href = '/login';
         }
 

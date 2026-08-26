@@ -348,26 +348,19 @@ describe('Performance benchmarks', () => {
     expect(result.length).toBeGreaterThan(0);
   });
 
-  it('should maintain O(n) complexity - linear scaling', () => {
-    // Test 100 sources
-    const sources100 = Array.from({ length: 100 }, (_, i) =>
-      createMockSource({ id: i, active: i % 2 === 0 })
-    );
-    const start100 = performance.now();
-    filterSources(sources100);
-    const duration100 = performance.now() - start100;
-
-    // Test 1000 sources (10x)
+  it('should evaluate each source once when filtering a large dataset', () => {
     const sources1000 = Array.from({ length: 1000 }, (_, i) =>
       createMockSource({ id: i, active: i % 2 === 0 })
     );
-    const start1000 = performance.now();
-    filterSources(sources1000);
-    const duration1000 = performance.now() - start1000;
+    let predicateCalls = 0;
 
-    // With O(n) complexity, 10x input should be roughly 10x time
-    // Allow generous 50x multiplier for test stability
-    expect(duration1000).toBeLessThan(duration100 * 50);
+    const result = filterSources(sources1000, (source) => {
+      predicateCalls += 1;
+      return source.active === true;
+    });
+
+    expect(predicateCalls).toBe(sources1000.length);
+    expect(result).toHaveLength(500);
   });
 });
 

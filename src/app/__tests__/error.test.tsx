@@ -22,9 +22,9 @@ describe('Error Component', () => {
     mockReset = vi.fn();
     consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-    // Mock window.location
+    // Mock the hard navigation used to recover from a global error.
     Object.defineProperty(window, 'location', {
-      value: { href: '' },
+      value: { href: '', origin: 'http://localhost' },
       writable: true,
     });
   });
@@ -108,7 +108,7 @@ describe('Error Component', () => {
       const goHomeButton = screen.getByRole('button', { name: 'トップへ戻る' });
       await user.click(goHomeButton);
 
-      expect(window.location.href).toBe('/');
+      expect(window.location.href).toBe('http://localhost/');
     });
   });
 

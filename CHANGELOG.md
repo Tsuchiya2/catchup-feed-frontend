@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.13.10](https://github.com/Tsuchiya2/catchup-feed-frontend/compare/catchup-feed-frontend-v1.13.9...catchup-feed-frontend-v1.13.10) (2026-10-22)
+
+
+### Bug Fixes
+
+* **deps:** upgrade Next.js to 16.4.2 and apply npm audit fixes ([46477fa](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/46477fa498fbec79bb6ea327aaa9b0b39330f74a))
+* **deps:** upgrade Next.js to 16.4.2 and apply npm audit fixes ([1afeb55](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/1afeb5515ca9ad5a36c23eb58bcf77fd75f39086))
+
 ## [1.13.9](https://github.com/Tsuchiya2/catchup-feed-frontend/compare/catchup-feed-frontend-v1.13.8...catchup-feed-frontend-v1.13.9) (2026-08-26)
 
 

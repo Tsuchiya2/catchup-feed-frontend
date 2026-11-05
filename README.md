@@ -90,7 +90,7 @@
 |----------|------|
 | **フレームワーク** | [Next.js 16](https://nextjs.org/) (App Router) / [React 19](https://react.dev/) |
 | **言語** | [TypeScript 5](https://www.typescriptlang.org/) (Strict) |
-| **ランタイム** | Node.js 24 |
+| **ランタイム** | Node.js 26 |
 | **スタイリング** | [Tailwind CSS 4](https://tailwindcss.com/) |
 | **UI コンポーネント** | [Radix UI](https://www.radix-ui.com/) primitives + shadcn/ui スタイル(cva / clsx / tailwind-merge) |
 | **アイコン** | [lucide-react](https://lucide.dev/) |
@@ -110,7 +110,7 @@
 
 ### 前提
 
-- Node.js 24 系
+- Node.js 26 系
 - バックエンド([catchup-feed-backend](https://github.com/Tsuchiya2/catchup-feed-backend))が起動していること(API 型生成・実データ表示に必要)
 
 ### ローカル(Node で直接起動)

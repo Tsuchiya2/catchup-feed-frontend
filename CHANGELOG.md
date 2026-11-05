@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.13.10](https://github.com/Tsuchiya2/catchup-feed-frontend/compare/catchup-feed-frontend-v1.13.9...catchup-feed-frontend-v1.13.10) (2026-11-05)
+
+
+### Bug Fixes
+
+* **deps:** upgrade Next.js to 16.4.2 and apply npm audit fixes ([46477fa](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/46477fa498fbec79bb6ea327aaa9b0b39330f74a))
+* **deps:** upgrade Next.js to 16.4.2 and apply npm audit fixes ([1afeb55](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/1afeb5515ca9ad5a36c23eb58bcf77fd75f39086))
+
+
+### Miscellaneous
+
+* **deps:** bump Node.js runtime to 26 LTS ([1f3d1fa](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/1f3d1fab19765f15a3810b8792a87d589acf8d26))
+* **deps:** bump Node.js runtime to 26 LTS ([e5cff18](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/e5cff1813c55ec0fae896561345cccb73861fc02))
+* **deps:** pin Node 26 via engines and bump @types/node to 26 ([02d0be1](https://github.com/Tsuchiya2/catchup-feed-frontend/commit/02d0be12f11b8d8775e13b2ebf0ff43d5a93e16f))
+
 ## [1.13.9](https://github.com/Tsuchiya2/catchup-feed-frontend/compare/catchup-feed-frontend-v1.13.8...catchup-feed-frontend-v1.13.9) (2026-08-26)
 
 
